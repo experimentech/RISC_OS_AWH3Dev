@@ -203,6 +203,7 @@ bsd/RiscOS/Sources/Utilities/SDCreate                       HEAD
 #
 # Sources/Video
 ##bsd/RiscOS/Sources/Video/HWSupport/OMAPVideo                HEAD
+castle/RiscOS/Sources/Video/HWSupport/NewVideo              HEAD
 bsd/RiscOS/Sources/Video/Render/BlendTable                  HEAD
 castle/RiscOS/Sources/Video/Render/Colours                  HEAD
 castle/RiscOS/Sources/Video/Render/Draw                     HEAD
