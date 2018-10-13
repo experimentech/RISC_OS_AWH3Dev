@@ -180,7 +180,7 @@ addram
 ;        =    "RAM Added\r\n", 0
 ;        POP  {a1, lr}
 ; ]
- ;Something after this point is throwing an undefined instruction abort
+ ;Something after this point is throwing an undefined instructionï¿½abort
  ;copro maybe?
 
         ;MOV a1, #'3'
@@ -257,49 +257,15 @@ HALdescriptor   DATA
         ;IMPORT   SDMA_Init
         ;IMPORT   VideoDevice_Init
         ;IMPORT   Audio_Init
-        ;IMPORT   PandoraAudio_Init
-        ;IMPORT   GPMC_Init
+
         ;IMPORT   NIC_Init
-        ;IMPORT   NIC_GPMC_Config_IGEP
-        ;IMPORT   NIC_GPMC_Config_DevKit
-        ;IMPORT   NIC_SMSC
-        ;IMPORT   NIC_DM9000
+
         ;IMPORT   GPIO_Init
         ;IMPORT   GPIOx_SetAsOutput
         ;IMPORT   GPIO_InitDevice
         ;IMPORT   SDIO_InitDevices
-        ;IMPORT   NVMemory_Init
-        ;IMPORT   NVMemory_InitDevice
-        ;IMPORT   TPS_Init
-        ;IMPORT   PandoraKB_Init
-        ;IMPORT   Enable_main_battery_charging
-        ;IMPORT   BMU_InitDevice
-        ;IMPORT   BMUParams_TPS65950_TouchBook
-        ;IMPORT   BMUParams_BQ27200_TouchBook
-        ;IMPORT   BMUParams_BQ27500_Pandora
-        ;IMPORT   Video_SetPandoraGamma
         ;IMPORT   BoardConfigNames
 
-        ;EXPORT   Board_Init_BeagleBoard
-        ;EXPORT   Board_Init_DevKit8000
-        ;EXPORT   Board_Init_IGEPv2
-        ;EXPORT   Board_Init_Pandora
-        ;EXPORT   Board_Init_TouchBook
-        ;EXPORT   Board_Init_OMAP35xEVM
-
-        ;EXPORT   Board_InitDevices_BeagleBoard
-        ;EXPORT   Board_InitDevices_DevKit8000
-        ;EXPORT   Board_InitDevices_IGEPv2
-        ;EXPORT   Board_InitDevices_Pandora
-        ;EXPORT   Board_InitDevices_TouchBook
-        ;EXPORT   Board_InitDevices_OMAP35xEVM
-
-        ;EXPORT   Board_PowerOff_BeagleBoard
-        ;EXPORT   Board_PowerOff_DevKit8000
-        ;EXPORT   Board_PowerOff_IGEPv2
-        ;EXPORT   Board_PowerOff_Pandora
-        ;EXPORT   Board_PowerOff_TouchBook
-        ;EXPORT   Board_PowerOff_OMAP35xEVM
 
         IMPORT   HAL_IRQEnable
         IMPORT   HAL_IRQDisable
