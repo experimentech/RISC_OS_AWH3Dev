@@ -619,6 +619,7 @@ HAL_Init
     STR a1, HALUARTIRQ
 
 ;Mapping the SRAM as IO. I have no idea what else to do with it.
+;Could be commented out.
     MOV a1, #0
     MOV a2, #SRAM_A1
     MOV a3, #SRAM_A1_Size
