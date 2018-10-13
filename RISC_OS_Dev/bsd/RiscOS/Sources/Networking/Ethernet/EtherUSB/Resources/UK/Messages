@@ -1,0 +1,146 @@
+#{DictTokens}
+DescAx1:ASIX AX88172
+DescAx7:ASIX AX88772
+DescCDC:USB Communications Class Ethernet [Not functional yet]
+DescMos:MosChip MCS7830
+DescPeg:Pegasus USB Ethernet Adapter
+DescSMC9:SMSC 95xx
+DescSMC7:SMSC 75xx
+DescSMC78:SMSC 78xx
+HV:Vendor
+HP:Product
+HB:Backend
+HO:Options
+Ign:Ignore
+None:none
+Bad:bad
+Down:down
+Up:up
+Sp10:10Mb
+Sp100:100Mb
+Sp1000:1000Mb
+Uni:Unicast
+BCast:Broadcast
+Loop:Loopback
+ANeg:Auto negotiate
+MutM:Mutable MAC
+TxRxL:Tx-Rx loopback
+EJC:*EJConfig
+Dit3:10baseT
+Dit12:100baseTX
+Dit14:100baseT4
+Dit21:1000baseT
+Dit?/Dit??:Unknown
+DupH:half duplex
+DupF:full duplex
+PolI:Incorrect
+PolC:Correct
+PolU:Uncertain
+Mod000:Specific
+Mod010:Normal
+Mod0?1/Multi:Multicast
+Mod1??/Prom:Promiscuous
+Loc:USB bus %u, device %u, Devices:$.%s
+AuthInf:%s driver for USB network adapters, version %s, by %s
+DCI4Inf:DCI version %u.%02u, prefix '%s', maximum %u units
+BackSup:Supported backends
+BackInf:Backend information
+CIEEE:IEEE 802.3 clients
+CMon:Monitor clients
+CSink:Sink clients
+CStd:Standard clients
+Type:Type %04X (AddrLvl %02X, ErrLvl %02X) handler=(%p/%p)
+IfLen:------Longest-------
+IfEUI:Interface EUI48
+IfNum:Interface unit
+IfDrv:Interface driver
+IfLoc:Interface location
+IfBak:Interface backend
+IfMed:Interface media
+IfPol:Interface polarity
+CtMod:Controller mode
+Stat0:Packets sent
+Stat1:Packets received
+Stat2:Bytes sent
+Stat3:Bytes received
+Stat4:Send errors
+Stat5:Receive errors
+Stat6:Undelivered packets
+Stat7:Send queue overflows
+VVend:Vendor & product
+VUSBL:USB location
+VDupe:Duplex capability
+VSped:Speed capability
+VMode:Mode capability
+VOthr:Other capability
+# Device-specific info tokens
+S78Len:------Longest--------------
+S78I00:RX FCS Errors
+S78I01:RX Alignment Errors
+S78I02:RX Fragment Errors
+S78I03:RX Jabber Errors
+S78I04:RX Undersize Frame Errors
+S78I05:RX Oversize Frame Errors
+S78I06:RX Dropped Frames
+S78I07:RX Unicast Byte Count
+S78I08:RX Broadcast Byte Count
+S78I09:RX Multicast Byte Count
+S78I10:RX Unicast Frames
+S78I11:RX Broadcast Frames
+S78I12:RX Multicast Frames
+S78I13:RX Pause Frames
+S78I14:RX 64 Byte Frames
+S78I15:RX 65-127 Byte Frames
+S78I16:RX 126-255 Byte Frames
+S78I17:RX 256-511 Byte Frames
+S78I18:RX 512-1023 Byte Frames
+S78I19:RX 1024-1518 Byte Frames
+S78I20:RX Greater 1518 Byte Frames
+S78I21:EEE RX LPI Transitions
+S78I22:EEE RX LPI Time
+S78I23:TX FCS Errors
+S78I24:TX Excess Deferral Errors
+S78I25:TX Carrier Errors
+S78I26:TX Bad Byte Count
+S78I27:TX Single Collisions
+S78I28:TX Multiple Collisions
+S78I29:TX Excessive Collision
+S78I30:TX Late Collisions
+S78I31:TX Unicast Byte Count
+S78I32:TX Broadcast Byte Count
+S78I33:TX Multicast Byte Count
+S78I34:TX Unicast Frames
+S78I35:TX Broadcast Frames
+S78I36:TX Multicast Frames
+S78I37:TX Pause Frames
+S78I38:TX 64 Byte Frames
+S78I39:TX 65-127 Byte Frames
+S78I40:TX 126-255 Byte Frames
+S78I41:TX 256-511 Byte Frames
+S78I42:TX 512-1023 Byte Frames
+S78I43:TX 1024-1518 Byte Frames
+S78I44:TX Greater 1518 Byte Frames
+S78I45:EEE TX LPI Transitions
+S78I46:EEE TX LPI Time
+# Errors
+E00:Module cannot be multiple instantiated
+E01:Unable to allocate memory
+E02:Not supported
+E03:Device broken or misbehaving
+E04:Too many units
+E05:Configuration failed
+E06:Invalid configuration
+E07:No PHY or bad PHY address
+E08:Unit in use
+E09:Require USBDriver 0.49 or later
+E0a:Operation timeout
+E0b:Data out of EEPROM address range
+E0c:MII in use
+E20e06:Bad unit
+E20e19:Unsupported operation
+E20e87:Frame type already claimed
+E20e16:Frame type claim failed
+E20e01:Attempt to release another's frame claim
+E20e86:Transmission blocked
+E20e28:Packet too big
+Edc:Syntax

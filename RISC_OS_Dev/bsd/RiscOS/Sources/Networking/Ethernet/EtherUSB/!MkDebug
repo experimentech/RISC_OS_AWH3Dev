@@ -1,0 +1,2 @@
+Dir <Obey$Dir>
+amu_machine debug CDFLAGS=-DDEBUG=1 CMHGDEFINES=-DDEBUG=1 THROWBACK=-throwback

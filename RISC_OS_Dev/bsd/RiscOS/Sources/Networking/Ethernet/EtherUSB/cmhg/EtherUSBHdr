@@ -1,0 +1,91 @@
+; 
+; Copyright (c) 2006, James Peacock
+; All rights reserved.
+; 
+; Redistribution and use in source and binary forms, with or without
+; modification, are permitted provided that the following conditions are met: 
+;     * Redistributions of source code must retain the above copyright
+;       notice, this list of conditions and the following disclaimer.
+;     * Redistributions in binary form must reproduce the above copyright
+;       notice, this list of conditions and the following disclaimer in the
+;       documentation and/or other materials provided with the distribution.
+;     * Neither the name of RISC OS Open Ltd nor the names of its contributors
+;       may be used to endorse or promote products derived from this software
+;       without specific prior written permission.
+; 
+; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+; IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+; ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+; LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+; CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+; SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+; INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+; CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+; POSSIBILITY OF SUCH DAMAGE.
+; 
+; CMHG module definition for EtherUSB.
+
+#include "Global/Services.h"
+#include "VersionNum"
+
+#ifdef DEBUG
+help-string:  EtherUSB Module_MajorVersion_CMHG James Peacock [Debug]
+#else
+help-string:  EtherUSB Module_MajorVersion_CMHG James Peacock
+#endif
+title-string: EtherUSB
+date-string:  Module_Date_CMHG
+
+international-help-file:"Resources:$.Resources."Module_ComponentName".Messages"
+
+initialisation-code: module_init
+finalisation-code: module_final
+
+service-call-handler: module_service    Service_USB,
+                                        Service_DeviceDead,
+                                        Service_EnumerateNetworkDrivers,
+                                        Service_DCIProtocolStatus,
+                                        Service_DeviceFSStarting,
+                                        Service_MbufManagerStatus,
+                                        Service_Reset,
+                                        Service_ResourceFSStarting
+
+swi-chunk-base-number:                  0x55200
+swi-handler-code:                       module_swi
+swi-decoding-table:                     EtherUSB,
+                                        DCIVersion,
+                                        Inquire,
+                                        GetNetworkMTU,
+                                        SetNetworkMTU,
+                                        Transmit,
+                                        Filter,
+                                        Stats,
+                                        MulticastRequest
+
+
+command-keyword-table: module_command
+  EJInfo(min-args:0, max-args:2,
+         international:,
+         help-text:      "HEJI",
+         invalid-syntax: "SEJI"
+        ),
+  EJTest(min-args:0, max-args:2,
+         international:,
+         help-text:      "HEJT",
+         invalid-syntax: "SEJT"
+        ),
+  EJProducts(min-args:0, max-args:0,
+         international:,
+         help-text:      "HEJP",
+         invalid-syntax: "SEJP"
+        ),
+  EJConfig(min-args:0, max-args:20,
+         international:,
+         help-text:      "HEJC",
+         invalid-syntax: "SEJC"
+        )
+        
+generic-veneers: callback_hook
+vector-handlers: usb_upcall_hook usb_fscontrol_hook usb_find_hook

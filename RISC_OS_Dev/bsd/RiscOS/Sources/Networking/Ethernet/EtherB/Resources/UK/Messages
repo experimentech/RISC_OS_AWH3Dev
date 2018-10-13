@@ -1,0 +1,73 @@
+#{DictTokens}
+# Unix errors
+E01:Operation not permitted
+E06:Invalid unit number
+E12:Out of memory
+E22:Invalid argument
+E25:Inappropriate operation
+E40:Oversized message
+E50:Link is down
+E55:Out of buffers
+E135:Higher priority filter already claimed
+# Private errors
+E200:No podules supported
+E201:Slot does not contain EtherB
+E202:Machine has no hardware address
+E203:Multiple instantiation forbidden
+E204:Failed to detect SEEQ controller
+E205:Interface not configured as active
+# Messages
+M00:Length--------------
+M01:Interface driver
+M02:Interface unit
+M03:Interface location
+M04:Interface EUI48
+M05:Interface controller
+M06:Running time
+M07:Attribution
+#{Default}
+M08a:Copyright (c) 2000-2001 Ben Harris
+M08b:Copyright (c) 1995-1998 Mark Brinicombe
+M08c:All rights reserved.
+M08d:THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR IMPLIED
+M08e:WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+M08f:MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+M08g:IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+M08h:INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+M08i:(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+M08j:SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+M08k:HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+M08l:LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+M08m:OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+M08n:SUCH DAMAGE.
+#{DictTokens}
+M09:%dd, %dh %dm %ds
+M10:up
+M11:down
+M12:Network slot
+M13:Expansion slot %d
+M14:This product includes software developed by
+M15:Mark Brinicombe for the NetBSD Project
+M16:passed
+M17:failed
+M18:EtherB interface statistics
+M19:
+M20:Packets sent
+M21:Packets received
+M22:Bytes sent
+M23:Bytes received
+M24:Send errors
+M25:Receive errors
+M26:Undelivered packets
+M27:IEEE 802.3 clients
+M28:Monitor clients
+M29:Sink clients
+M30:Standard clients
+M31:Type %04X (AddrLvl %02X, ErrLvl %02X) handler=(%p/%p)
+M32:selftest
+M33:Test location........
+M34:Test interrupts......
+M35:Test buffer memory...
+M36:Test loopback........
+M37:Test livewire........
+M38:Test CRC engine......

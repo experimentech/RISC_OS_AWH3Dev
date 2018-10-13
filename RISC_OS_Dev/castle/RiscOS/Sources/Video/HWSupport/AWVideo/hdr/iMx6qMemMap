@@ -1,0 +1,7 @@
+
+        [       :LNOT: :DEF: __HAL_SOC_MEMORY_MAP__
+        GBLL    __HAL_SOC_MEMORY_MAP__
+
+        ] ;__HAL_SOC_MEMORY_MAP__
+
+    END

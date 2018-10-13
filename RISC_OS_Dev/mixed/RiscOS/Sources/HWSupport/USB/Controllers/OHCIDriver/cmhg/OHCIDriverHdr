@@ -1,0 +1,66 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+; 
+#include "Global/RISCOS.h"
+#include "Global/Services.h"
+#include "VersionNum"
+
+initialisation-code:    module_init
+
+finalisation-code:      module_final
+
+service-call-handler:   module_services Service_ResourceFSStarting,
+                                        Service_USB,
+                                        Service_PreReset,
+                                        Service_PCI
+
+title-string:           OHCIDriver
+
+help-string:            OHCIDriver Module_MajorVersion_CMHG
+
+date-string:            Module_Date_CMHG
+
+international-help-file: "Resources:$.Resources.OHCIDriver.Messages"
+
+#ifdef OHCI_DEBUG
+command-keyword-table:  module_commands
+
+OHCIRegs(   min-args:0, max-args:0,
+            help-text: "*OHCIRegs reads the registers from the OHCI controller\n",
+            add-syntax:, invalid-syntax: "Syntax: *OHCIRegs"),
+
+OHCIEDS(),
+
+OHCIWrite(  min-args:2, max-args:2,
+            help-text: "*OHCIWrite writes to a register in the OHCI controller.\n",
+            add-syntax:, invalid-syntax: "Syntax: *OHCIWrite <offset> <value>"),
+
+OHCIDebug(  min-args:1, max-args:2,
+            help-text: "*OHCIDebug sets the debug level for debuglib output, optionally also setting the debug level for output controlled by the usbdebug variable within the ohcidriver.\n",
+            add-syntax:, invalid-syntax: "Syntax: OHCIDebug <ohci> [<usb>]"),
+
+TargetFM(   min-args:1, max-args:1,
+            help-text: "*TargetFM sets the frame interval that will be targeted for phase synchronisation.\n",
+            add-syntax:, invalid-syntax: "Syntax: TargetFM <n>");
+
+event-handler:          vsync_entry/vsync Event_VSync
+#endif
+
+vector-handlers:        usb_irq_entry/usb_irq_handler,
+                        usb_overcurrent_entry/usb_overcurrent_handler,
+                        softintr_entry/softintr
+generic-veneers:        callout_entry/callout_handler

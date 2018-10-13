@@ -1,0 +1,99 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+;Timers.hdr
+
+;hdr2h safe
+
+;fun facts
+;   TIMER              *    0x01C20C00
+
+;Registers
+TMR_IRQ_EN_REG         *    &00
+TMR_IRQ_STA_REG        *    &04
+TMR0_CTRL_REG          *    &10
+TMR0_INTV_VALUE_REG    *    &14
+TMR0_CUR_VALUE_REG     *    &18
+TMR1_CTRL_REG          *    &20
+TMR1_INTV_VALUE_REG    *    &24
+TMR1_CUR_VALUE_REG     *    &28
+
+AVS_CNT_CTL_REG        *    &80
+AVS_CNT_0_REG          *    &84
+AVS_CNT_1_REG          *    &88
+AVS_CNT_DIV_REG        *    &8C
+
+WDOG0_IRQ_EN_REG       *    &A0
+WDOG0_IRQ_STA_REG      *    &A4
+WDOG0_CTRL_REG         *    &B0
+WDOG0_CFG_REG          *    &B4
+WDOG0_MODE_REG         *    &B8
+
+;REGISTER MASKS ETC
+
+;TMR_IRQ_EN_REG             R/W
+TMR1_IRQ_EN            *    2_10 ;TIMER 1 INTERRUPT ENABLE
+TMR0_IRQ_EN            *    2_01 ;TIMER 0 INTERRUPT ENABLE
+
+;TMR_IRQ_STA_REG            R/W
+TMR_1_IRQ_PEND         *    2_01
+TMR_0_IRQ_PEND         *    2_10
+
+;TMR0_CTRL_REG
+
+TMR0_MODE              *    2_10000000 ;0= continuous. 1=auto stop
+TMR0_CLK_PRES          *    2_01110000 ;timer prescale
+                                       ; 000 /  1
+                                       ; 001 /  2
+                                       ; 010 /  4
+                                       ; 011 /  8
+                                       ; 100 / 16
+                                       ; 101 / 32
+                                       ; 110 / 64
+                                       ; 111 /128
+
+TMR0_CLK_SRC          *    2_00001100 ; 00 Int. OSC / N
+                                       ; 01 OSC24M
+                                       ; 10 -
+                                       ; 11 -
+                                       ; *Int Osc / N. ~32KHz
+
+TMR0_RELOAD           *    2_00000010
+TMR0_EN               *    2_00000001
+
+;TMR0_INTV_VALUE_REG
+TMR0_INTV_VALUE       *    &FFFFFFFF ;32 bit value.
+
+;now it;s all Timer1 stuff
+;TODO
+
+;Offset from CPUCFG = &01F01C00
+;64 bit counter stuff.
+;CNT64_CTRL_REG        *     &280
+;-
+CNT64_CLK_SRC_SEL     *     2_100 ;only valid value is 0.
+CNT64_RL_EN           *     2_010
+CNT64_CLR_EN          *     2_001
+
+    ;CNT64_LOW_REG
+CNT64_LO              *     &FFFFFFFF ;32 bit. pointless def
+
+    ;CNT64_HIGH_REG
+CNT64_HI              *     &FFFFFFFF ;Docs are garbled. This seems right
+
+    END
+    

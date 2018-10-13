@@ -1,0 +1,14 @@
+
+AREA map of linked.Paint:
+Base     Size     Type     Name
+0        628      CODE     !!!Module$$Header from object file Paint
+628      16914    CODE     C$$code from object file Paint
+16f3c    1a0      CODE     Stub$$Code from object file Paint
+170dc    3c       CODE     Stub$$Init from object file Paint
+17118    4        CODE     Stub$$InitEnd from object file Paint
+1711c    c0       DATA     C$$constdata from object file Paint
+171dc    28       DATA     RTSK$$Data from object file Paint
+17204    734      DATA     C$$data from object file Paint
+17938    4        DATA     ModuleWrapData from object file Paint
+1793c    1004     ZERO     C$$zidata from object file Paint
+18940    17f4     ZERO     Stub$$Data from object file Paint

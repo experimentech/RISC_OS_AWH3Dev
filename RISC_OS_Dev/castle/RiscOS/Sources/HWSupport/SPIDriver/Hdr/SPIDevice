@@ -1,0 +1,48 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: Included_Hdr_SPIDevice
+OldOpt  SETA    {OPT}
+        OPT     OptNoList+OptNoP1List
+        
+        GBLL    Included_Hdr_SPIDevice
+Included_Hdr_SPIDevice SETL {TRUE}
+
+
+; Define a HAL device to let the HAL pass addresses to modules
+        [      :LNOT: :DEF: Included_Hdr_HALDevice
+                GET     HALDevice
+        ]
+                                ^       0
+HALDevice_SPI                   #       0
+                                ^       HALDeviceSize
+; Additional device fields
+HALDevice_Capabilities          #       4       ; query interface capabilities
+HALDevice_Configure             #       4       ; configure interface
+HALDevice_Transfer              #       4       ; transfer
+HALDevice_PinMap                #       4       ; I/O decode optional pinmapping
+HALDevice_3                     #       4       ; placeholder
+HALDevice_4                     #       4       ; placeholder
+HALDevice_5                     #       4       ; placeholder
+HALDevice_SPI_Size              *       :INDEX: @
+
+        OPT     OldOpt
+
+        ] ; __HAL_SPIDevice_HDR__
+
+        END

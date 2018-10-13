@@ -1,0 +1,1122 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+;/*
+; * Copyright (c) 2011-2012, Freescale Semiconductor, Inc.
+; * All rights reserved.
+; *
+; * Redistribution and use in source and binary forms, with or without modification,
+; * are permitted provided that the following conditions are met:
+; *
+; * o Redistributions of source code must retain the above copyright notice, this list
+; *   of conditions and the following disclaimer.
+; *
+; * o Redistributions in binary form must reproduce the above copyright notice, this
+; *   list of conditions and the following disclaimer in the documentation and/or
+; *   other materials provided with the distribution.
+; *
+; * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+; *   contributors may be used to endorse or promote products derived from this
+; *   software without specific prior written permission.
+; *
+; * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+; * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+; * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+; * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+; * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+; * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+; * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+; * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+; * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+; * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+; */
+
+        [       :LNOT: :DEF: __HAL_CPMEM_REGISTERS__
+        GBLL    __HAL_CPMEM_REGISTERS__
+
+
+CPMEM_WORD0_DATA0_INT_ADDR *  IPU_MEMORY_OFFSET+0x0000000
+CPMEM_WORD0_DATA1_INT_ADDR *   IPU_MEMORY_OFFSET+0x0000004
+CPMEM_WORD0_DATA2_INT_ADDR *    IPU_MEMORY_OFFSET+0x0000008
+CPMEM_WORD0_DATA3_INT_ADDR *    IPU_MEMORY_OFFSET+0x000000C
+CPMEM_WORD0_DATA4_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000010
+CPMEM_WORD0_DATA0_N_INT_ADDR *  IPU_MEMORY_OFFSET+0x0000000
+CPMEM_WORD0_DATA1_N_INT_ADDR *    IPU_MEMORY_OFFSET+0x0000004
+CPMEM_WORD0_DATA2_N_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000008
+CPMEM_WORD0_DATA3_N_INT_ADDR *     IPU_MEMORY_OFFSET+0x000000C
+CPMEM_WORD0_DATA4_N_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000010
+CPMEM_WORD1_DATA0_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000020
+CPMEM_WORD1_DATA1_INT_ADDR *      IPU_MEMORY_OFFSET+0x0000024
+CPMEM_WORD1_DATA2_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000028
+CPMEM_WORD1_DATA3_INT_ADDR *    IPU_MEMORY_OFFSET+0x000002C
+CPMEM_WORD1_DATA4_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000030
+CPMEM_WORD1_DATA0_N_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000020
+CPMEM_WORD1_DATA1_N_INT_ADDR *      IPU_MEMORY_OFFSET+0x0000024
+CPMEM_WORD1_DATA2_N_INT_ADDR *     IPU_MEMORY_OFFSET+0x0000028
+CPMEM_WORD1_DATA3_N_INT_ADDR *     IPU_MEMORY_OFFSET+0x000002C
+CPMEM_WORD1_DATA4_N_INT_ADDR *      IPU_MEMORY_OFFSET+0x0000030
+;IPU_IC_TPMEM_ENC_CSC1_WORD0_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK1_CSC1_W0 << 3)
+;IPU_IC_TPMEM_ENC_CSC1_WORD1_ADDR *     IPU_MEMORY_OFFSET+0x0060000 + (TASK1_CSC1_W0 << 3) + 4
+;IPU_IC_TPMEM_ENC_CSC1_WORD2_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK1_CSC1_W1 << 3)
+;IIPU_IC_TPMEM_ENC_CSC1_WORD3_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK1_CSC1_W1 << 3) + 4
+;IPU_IC_TPMEM_ENC_CSC1_WORD4_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK1_CSC1_W2 << 3)
+;IPU_IC_TPMEM_ENC_CSC1_WORD5_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK1_CSC1_W2 << 3) + 4
+;IPU_IC_TPMEM_VIEW_CSC1_WORD0_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC1_W0 << 3)
+;IPU_IC_TPMEM_VIEW_CSC1_WORD1_ADDR *     IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC1_W0 << 3) + 4
+;PU_IC_TPMEM_VIEW_CSC1_WORD2_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC1_W1 << 3)
+;IPU_IC_TPMEM_VIEW_CSC1_WORD3_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC1_W1 << 3) + 4
+;IPU_IC_TPMEM_VIEW_CSC1_WORD4_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC1_W2 << 3)
+;IPU_IC_TPMEM_VIEW_CSC1_WORD5_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC1_W2 << 3) + 4
+;IPU_IC_TPMEM_VIEW_CSC2_WORD0_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC2_W0 << 3)
+;IPU_IC_TPMEM_VIEW_CSC2_WORD1_ADDR *     IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC2_W0 << 3) + 4
+;IPU_IC_TPMEM_VIEW_CSC2_WORD2_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC2_W1 << 3)
+;IPU_IC_TPMEM_VIEW_CSC2_WORD3_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC2_W1 << 3) + 4
+;IPU_IC_TPMEM_VIEW_CSC2_WORD4_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC2_W2 << 3)
+;IPU_IC_TPMEM_VIEW_CSC2_WORD5_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK2_CSC2_W2 << 3) + 4
+;IPU_IC_TPMEM_POST_CSC1_WORD0_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC1_W0 << 3)
+;IPU_IC_TPMEM_POST_CSC1_WORD1_ADDR *     IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC1_W0 << 3) + 4
+;IPU_IC_TPMEM_POST_CSC1_WORD2_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC1_W1 << 3)
+;IPU_IC_TPMEM_POST_CSC1_WORD3_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC1_W1 << 3) + 4
+;IPU_IC_TPMEM_POST_CSC1_WORD4_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC1_W2 << 3)
+;IPU_IC_TPMEM_POST_CSC1_WORD5_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC1_W2 << 3) + 4
+;IPU_IC_TPMEM_POST_CSC2_WORD0_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC2_W0 << 3)
+;IPU_IC_TPMEM_POST_CSC2_WORD1_ADDR *     IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC2_W0 << 3) + 4
+;IPU_IC_TPMEM_POST_CSC2_WORD2_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC2_W1 << 3)
+;IPU_IC_TPMEM_POST_CSC2_WORD3_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC2_W1 << 3) + 4
+;IPU_IC_TPMEM_POST_CSC2_WORD4_ADDR *   IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC2_W2 << 3)
+;IPU_IC_TPMEM_POST_CSC2_WORD5_ADDR *    IPU_MEMORY_OFFSET+0x0060000 + (TASK3_CSC2_W2 << 3) + 4
+SRM_DP_COM_CONF_SYNC_ADDR *                              IPU_MEMORY_OFFSET+0x0040000
+SRM_DP_GRAPH_WIND_CTRL_SYNC_ADDR *                       IPU_MEMORY_OFFSET+0x0040004
+SRM_DP_FG_POS_SYNC_ADDR *                                IPU_MEMORY_OFFSET+0x0040008
+SRM_DP_CUR_POS_SYNC_ADDR *                               IPU_MEMORY_OFFSET+0x004000C
+SRM_DP_CUR_MAP_SYNC_ADDR *                               IPU_MEMORY_OFFSET+0x0040010
+SRM_DP_GAMMA_C_SYNC_0_ADDR *                             IPU_MEMORY_OFFSET+0x0040014
+SRM_DP_GAMMA_C_SYNC_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040018
+SRM_DP_GAMMA_C_SYNC_2_ADDR *                             IPU_MEMORY_OFFSET+0x004001C
+SRM_DP_GAMMA_C_SYNC_3_ADDR *                             IPU_MEMORY_OFFSET+0x0040020
+SRM_DP_GAMMA_C_SYNC_4_ADDR *                             IPU_MEMORY_OFFSET+0x0040024
+SRM_DP_GAMMA_C_SYNC_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040028
+SRM_DP_GAMMA_C_SYNC_6_ADDR *                             IPU_MEMORY_OFFSET+0x004002C
+SRM_DP_GAMMA_C_SYNC_7_ADDR *                             IPU_MEMORY_OFFSET+0x0040030
+SRM_DP_GAMMA_S_SYNC_0_ADDR *                             IPU_MEMORY_OFFSET+0x0040034
+SRM_DP_GAMMA_S_SYNC_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040038
+SRM_DP_GAMMA_S_SYNC_2_ADDR *                             IPU_MEMORY_OFFSET+0x004003C
+SRM_DP_GAMMA_S_SYNC_3_ADDR *                             IPU_MEMORY_OFFSET+0x0040040
+SRM_DP_CSCA_SYNC_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040044
+SRM_DP_CSCA_SYNC_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040048
+SRM_DP_CSCA_SYNC_2_ADDR *                                IPU_MEMORY_OFFSET+0x004004C
+SRM_DP_CSCA_SYNC_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040050
+SRM_DP_CSC_SYNC_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040054
+SRM_DP_CSC_SYNC_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040058
+SRM_DP_CUR_POS_ALT_ADDR *                                IPU_MEMORY_OFFSET+0x004005C
+SRM_DP_COM_CONF_ASYNC0_ADDR *                            IPU_MEMORY_OFFSET+0x0040060
+SRM_DP_GRAPH_WIND_CTRL_ASYNC0_ADDR *                     IPU_MEMORY_OFFSET+0x0040064
+SRM_DP_FG_POS_ASYNC0_ADDR *                              IPU_MEMORY_OFFSET+0x0040068
+SRM_DP_CUR_POS_ASYNC0_ADDR *                             IPU_MEMORY_OFFSET+0x004006C
+SRM_DP_CUR_MAP_ASYNC0_ADDR *                             IPU_MEMORY_OFFSET+0x0040070
+SRM_DP_GAMMA_C_ASYNC0_0_ADDR *                           IPU_MEMORY_OFFSET+0x0040074
+SRM_DP_GAMMA_C_ASYNC0_1_ADDR *                           IPU_MEMORY_OFFSET+0x0040078
+SRM_DP_GAMMA_C_ASYNC0_2_ADDR *                           IPU_MEMORY_OFFSET+0x004007C
+SRM_DP_GAMMA_C_ASYNC0_3_ADDR *                           IPU_MEMORY_OFFSET+0x0040080
+SRM_DP_GAMMA_C_ASYNC0_4_ADDR *                           IPU_MEMORY_OFFSET+0x0040084
+SRM_DP_GAMMA_C_ASYNC0_5_ADDR *                           IPU_MEMORY_OFFSET+0x0040088
+SRM_DP_GAMMA_C_ASYNC0_6_ADDR *                           IPU_MEMORY_OFFSET+0x004008C
+SRM_DP_GAMMA_C_ASYNC0_7_ADDR *                           IPU_MEMORY_OFFSET+0x0040090
+SRM_DP_GAMMA_S_ASYNC0_0_ADDR *                           IPU_MEMORY_OFFSET+0x0040094
+SRM_DP_GAMMA_S_ASYNC0_1_ADDR *                           IPU_MEMORY_OFFSET+0x0040098
+SRM_DP_GAMMA_S_ASYNC0_2_ADDR *                           IPU_MEMORY_OFFSET+0x004009C
+SRM_DP_GAMMA_S_ASYNC0_3_ADDR *                           IPU_MEMORY_OFFSET+0x00400A0
+SRM_DP_CSCA_ASYNC0_0_ADDR *                              IPU_MEMORY_OFFSET+0x00400A4
+SRM_DP_CSCA_ASYNC0_1_ADDR *                              IPU_MEMORY_OFFSET+0x00400A8
+SRM_DP_CSCA_ASYNC0_2_ADDR *                              IPU_MEMORY_OFFSET+0x00400AC
+SRM_DP_CSCA_ASYNC0_3_ADDR *                              IPU_MEMORY_OFFSET+0x00400B0
+SRM_DP_CSC_ASYNC0_0_ADDR *                               IPU_MEMORY_OFFSET+0x00400B4
+SRM_DP_CSC_ASYNC0_1_ADDR *                               IPU_MEMORY_OFFSET+0x00400B8
+SRM_DP_COM_CONF_ASYNC1_ADDR *                            IPU_MEMORY_OFFSET+0x00400BC
+SRM_DP_GRAPH_WIND_CTRL_ASYNC1_ADDR *                     IPU_MEMORY_OFFSET+0x00400C0
+SRM_DP_FG_POS_ASYNC1_ADDR *                              IPU_MEMORY_OFFSET+0x00400C4
+SRM_DP_CUR_POS_ASYNC1_ADDR *                             IPU_MEMORY_OFFSET+0x00400C8
+SRM_DP_CUR_MAP_ASYNC1_ADDR *                             IPU_MEMORY_OFFSET+0x00400CC
+SRM_DP_GAMMA_C_ASYNC1_0_ADDR *                           IPU_MEMORY_OFFSET+0x00400D0
+SRM_DP_GAMMA_C_ASYNC1_1_ADDR *                           IPU_MEMORY_OFFSET+0x00400D4
+SRM_DP_GAMMA_C_ASYNC1_2_ADDR *                           IPU_MEMORY_OFFSET+0x00400D8
+SRM_DP_GAMMA_C_ASYNC1_3_ADDR *                           IPU_MEMORY_OFFSET+0x00400DC
+SRM_DP_GAMMA_C_ASYNC1_4_ADDR *                           IPU_MEMORY_OFFSET+0x00400E0
+SRM_DP_GAMMA_C_ASYNC1_5_ADDR *                           IPU_MEMORY_OFFSET+0x00400E4
+SRM_DP_GAMMA_C_ASYNC1_6_ADDR *                           IPU_MEMORY_OFFSET+0x00400E8
+SRM_DP_GAMMA_C_ASYNC1_7_ADDR *                           IPU_MEMORY_OFFSET+0x00400EC
+SRM_DP_GAMMA_S_ASYNC1_0_ADDR *                           IPU_MEMORY_OFFSET+0x00400F0
+SRM_DP_GAMMA_S_ASYNC1_1_ADDR *                           IPU_MEMORY_OFFSET+0x00400F4
+SRM_DP_GAMMA_S_ASYNC1_2_ADDR *                           IPU_MEMORY_OFFSET+0x00400F8
+SRM_DP_GAMMA_S_ASYNC1_3_ADDR *                           IPU_MEMORY_OFFSET+0x00400FC
+SRM_DP_CSCA_ASYNC1_0_ADDR *                              IPU_MEMORY_OFFSET+0x0040100
+SRM_DP_CSCA_ASYNC1_1_ADDR *                              IPU_MEMORY_OFFSET+0x0040104
+SRM_DP_CSCA_ASYNC1_2_ADDR *                              IPU_MEMORY_OFFSET+0x0040108
+SRM_DP_CSCA_ASYNC1_3_ADDR *                              IPU_MEMORY_OFFSET+0x004010C
+SRM_DP_CSC_ASYNC1_0_ADDR *                               IPU_MEMORY_OFFSET+0x0040110
+SRM_DP_CSC_ASYNC1_1_ADDR *                               IPU_MEMORY_OFFSET+0x0040114
+SRM_CSI0_CPD_CTRL_ADDR *                                 IPU_MEMORY_OFFSET+0x0040314
+SRM_CSI0_CPD_RC_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040318
+SRM_CSI0_CPD_RC_1_ADDR *                                 IPU_MEMORY_OFFSET+0x004031C
+SRM_CSI0_CPD_RC_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040320
+SRM_CSI0_CPD_RC_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040324
+SRM_CSI0_CPD_RC_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040328
+SRM_CSI0_CPD_RC_5_ADDR *                                 IPU_MEMORY_OFFSET+0x004032C
+SRM_CSI0_CPD_RC_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040330
+SRM_CSI0_CPD_RC_7_ADDR *                                 IPU_MEMORY_OFFSET+0x0040334
+SRM_CSI0_CPD_RS_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040338
+SRM_CSI0_CPD_RS_1_ADDR *                                 IPU_MEMORY_OFFSET+0x004033C
+SRM_CSI0_CPD_RS_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040340
+SRM_CSI0_CPD_RS_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040344
+SRM_CSI0_CPD_GRC_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040348
+SRM_CSI0_CPD_GRC_1_ADDR *                                IPU_MEMORY_OFFSET+0x004034C
+SRM_CSI0_CPD_GRC_2_ADDR *                                IPU_MEMORY_OFFSET+0x0040350
+SRM_CSI0_CPD_GRC_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040354
+SRM_CSI0_CPD_GRC_4_ADDR *                                IPU_MEMORY_OFFSET+0x0040358
+SRM_CSI0_CPD_GRC_5_ADDR *                                IPU_MEMORY_OFFSET+0x004035C
+SRM_CSI0_CPD_GRC_6_ADDR *                                IPU_MEMORY_OFFSET+0x0040360
+SRM_CSI0_CPD_GRC_7_ADDR *                                IPU_MEMORY_OFFSET+0x0040364
+SRM_CSI0_CPD_GRS_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040368
+SRM_CSI0_CPD_GRS_1_ADDR *                                IPU_MEMORY_OFFSET+0x004036C
+SRM_CSI0_CPD_GRS_2_ADDR *                                IPU_MEMORY_OFFSET+0x0040370
+SRM_CSI0_CPD_GRS_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040374
+SRM_CSI0_CPD_GBC_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040378
+SRM_CSI0_CPD_GBC_1_ADDR *                                IPU_MEMORY_OFFSET+0x004037C
+SRM_CSI0_CPD_GBC_2_ADDR *                                IPU_MEMORY_OFFSET+0x0040380
+SRM_CSI0_CPD_GBC_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040384
+SRM_CSI0_CPD_GBC_4_ADDR *                                IPU_MEMORY_OFFSET+0x0040388
+SRM_CSI0_CPD_GBC_5_ADDR *                                IPU_MEMORY_OFFSET+0x004038C
+SRM_CSI0_CPD_GBC_6_ADDR *                                IPU_MEMORY_OFFSET+0x0040390
+SRM_CSI0_CPD_GBC_7_ADDR *                                IPU_MEMORY_OFFSET+0x0040394
+SRM_CSI0_CPD_GBS_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040398
+SRM_CSI0_CPD_GBS_1_ADDR *                                IPU_MEMORY_OFFSET+0x004039C
+SRM_CSI0_CPD_GBS_2_ADDR *                                IPU_MEMORY_OFFSET+0x00403A0
+SRM_CSI0_CPD_GBS_3_ADDR *                                IPU_MEMORY_OFFSET+0x00403A4
+SRM_CSI0_CPD_BC_0_ADDR *                                 IPU_MEMORY_OFFSET+0x00403A8
+SRM_CSI0_CPD_BC_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00403AC
+SRM_CSI0_CPD_BC_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00403B0
+SRM_CSI0_CPD_BC_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00403B4
+SRM_CSI0_CPD_BC_4_ADDR *                                 IPU_MEMORY_OFFSET+0x00403B8
+SRM_CSI0_CPD_BC_5_ADDR *                                 IPU_MEMORY_OFFSET+0x00403BC
+SRM_CSI0_CPD_BC_6_ADDR *                                 IPU_MEMORY_OFFSET+0x00403C0
+SRM_CSI0_CPD_BC_7_ADDR *                                 IPU_MEMORY_OFFSET+0x00403C4
+SRM_CSI0_CPD_BS_0_ADDR *                                 IPU_MEMORY_OFFSET+0x00403C8
+SRM_CSI0_CPD_BS_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00403CC
+SRM_CSI0_CPD_BS_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00403D0
+SRM_CSI0_CPD_BS_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00403D4
+SRM_CSI0_CPD_OFFSET1_ADDR *                              IPU_MEMORY_OFFSET+0x00403D8
+SRM_CSI0_CPD_OFFSET2_ADDR *                              IPU_MEMORY_OFFSET+0x00403DC
+SRM_CSI1_CPD_CTRL_ADDR *                                 IPU_MEMORY_OFFSET+0x00403E0
+SRM_CSI1_CPD_RC_0_ADDR *                                 IPU_MEMORY_OFFSET+0x00403E4
+SRM_CSI1_CPD_RC_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00403E8
+SRM_CSI1_CPD_RC_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00403EC
+SRM_CSI1_CPD_RC_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00403F0
+SRM_CSI1_CPD_RC_4_ADDR *                                 IPU_MEMORY_OFFSET+0x00403F4
+SRM_CSI1_CPD_RC_5_ADDR *                                 IPU_MEMORY_OFFSET+0x00403F8
+SRM_CSI1_CPD_RC_6_ADDR *                                 IPU_MEMORY_OFFSET+0x00403FC
+SRM_CSI1_CPD_RC_7_ADDR *                                 IPU_MEMORY_OFFSET+0x0040400
+SRM_CSI1_CPD_RS_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040404
+SRM_CSI1_CPD_RS_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040408
+SRM_CSI1_CPD_RS_2_ADDR *                                 IPU_MEMORY_OFFSET+0x004040C
+SRM_CSI1_CPD_RS_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040410
+SRM_CSI1_CPD_GRC_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040414
+SRM_CSI1_CPD_GRC_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040418
+SRM_CSI1_CPD_GRC_2_ADDR *                                IPU_MEMORY_OFFSET+0x004041C
+SRM_CSI1_CPD_GRC_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040420
+SRM_CSI1_CPD_GRC_4_ADDR *                                IPU_MEMORY_OFFSET+0x0040424
+SRM_CSI1_CPD_GRC_5_ADDR *                                IPU_MEMORY_OFFSET+0x0040428
+SRM_CSI1_CPD_GRC_6_ADDR *                                IPU_MEMORY_OFFSET+0x004042C
+SRM_CSI1_CPD_GRC_7_ADDR *                                IPU_MEMORY_OFFSET+0x0040430
+SRM_CSI1_CPD_GRS_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040434
+SRM_CSI1_CPD_GRS_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040438
+SRM_CSI1_CPD_GRS_2_ADDR *                                IPU_MEMORY_OFFSET+0x004043C
+SRM_CSI1_CPD_GRS_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040440
+SRM_CSI1_CPD_GBC_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040444
+SRM_CSI1_CPD_GBC_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040448
+SRM_CSI1_CPD_GBC_2_ADDR *                                IPU_MEMORY_OFFSET+0x004044C
+SRM_CSI1_CPD_GBC_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040450
+SRM_CSI1_CPD_GBC_4_ADDR *                                IPU_MEMORY_OFFSET+0x0040454
+SRM_CSI1_CPD_GBC_5_ADDR *                                IPU_MEMORY_OFFSET+0x0040458
+SRM_CSI1_CPD_GBC_6_ADDR *                                IPU_MEMORY_OFFSET+0x004045C
+SRM_CSI1_CPD_GBC_7_ADDR *                                IPU_MEMORY_OFFSET+0x0040460
+SRM_CSI1_CPD_GBS_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040464
+SRM_CSI1_CPD_GBS_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040468
+SRM_CSI1_CPD_GBS_2_ADDR *                                IPU_MEMORY_OFFSET+0x004046C
+SRM_CSI1_CPD_GBS_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040470
+SRM_CSI1_CPD_BC_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040474
+SRM_CSI1_CPD_BC_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040478
+SRM_CSI1_CPD_BC_2_ADDR *                                 IPU_MEMORY_OFFSET+0x004047C
+SRM_CSI1_CPD_BC_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040480
+SRM_CSI1_CPD_BC_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040484
+SRM_CSI1_CPD_BC_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040488
+SRM_CSI1_CPD_BC_6_ADDR *                                 IPU_MEMORY_OFFSET+0x004048C
+SRM_CSI1_CPD_BC_7_ADDR *                                 IPU_MEMORY_OFFSET+0x0040490
+SRM_CSI1_CPD_BS_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040494
+SRM_CSI1_CPD_BS_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040498
+SRM_CSI1_CPD_BS_2_ADDR *                                 IPU_MEMORY_OFFSET+0x004049C
+SRM_CSI1_CPD_BS_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00404A0
+SRM_CSI1_CPD_OFFSET1_ADDR *                              IPU_MEMORY_OFFSET+0x00404A4
+SRM_CSI1_CPD_OFFSET2_ADDR *                              IPU_MEMORY_OFFSET+0x00404A8
+SRM_DI0_GENERAL_ADDR *                                   IPU_MEMORY_OFFSET+0x00404E4
+SRM_DI0_BS_CLKGEN0_ADDR *                                IPU_MEMORY_OFFSET+0x00404E8
+SRM_DI0_BS_CLKGEN1_ADDR *                                IPU_MEMORY_OFFSET+0x00404EC
+SRM_DI0_SW_GEN0_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00404F0
+SRM_DI0_SW_GEN0_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00404F4
+SRM_DI0_SW_GEN0_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00404F8
+SRM_DI0_SW_GEN0_4_ADDR *                                 IPU_MEMORY_OFFSET+0x00404FC
+SRM_DI0_SW_GEN0_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040500
+SRM_DI0_SW_GEN0_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040504
+SRM_DI0_SW_GEN0_7_ADDR *                                 IPU_MEMORY_OFFSET+0x0040508
+SRM_DI0_SW_GEN0_8_ADDR *                                 IPU_MEMORY_OFFSET+0x004050C
+SRM_DI0_SW_GEN0_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040510
+SRM_DI0_SW_GEN1_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040514
+SRM_DI0_SW_GEN1_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040518
+SRM_DI0_SW_GEN1_3_ADDR *                                 IPU_MEMORY_OFFSET+0x004051C
+SRM_DI0_SW_GEN1_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040520
+SRM_DI0_SW_GEN1_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040524
+SRM_DI0_SW_GEN1_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040528
+SRM_DI0_SW_GEN1_7_ADDR *                                 IPU_MEMORY_OFFSET+0x004052C
+SRM_DI0_SW_GEN1_8_ADDR *                                 IPU_MEMORY_OFFSET+0x0040530
+SRM_DI0_SW_GEN1_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040534
+SRM_DI0_SYNC_AS_GEN_ADDR *                               IPU_MEMORY_OFFSET+0x0040538
+SRM_DI0_DW_GEN_0_ADDR *                                  IPU_MEMORY_OFFSET+0x004053C
+SRM_DI0_DW_GEN_1_ADDR *                                  IPU_MEMORY_OFFSET+0x0040540
+SRM_DI0_DW_GEN_2_ADDR *                                  IPU_MEMORY_OFFSET+0x0040544
+SRM_DI0_DW_GEN_3_ADDR *                                  IPU_MEMORY_OFFSET+0x0040548
+SRM_DI0_DW_GEN_4_ADDR *                                  IPU_MEMORY_OFFSET+0x004054C
+SRM_DI0_DW_GEN_5_ADDR *                                  IPU_MEMORY_OFFSET+0x0040550
+SRM_DI0_DW_GEN_6_ADDR *                                  IPU_MEMORY_OFFSET+0x0040554
+SRM_DI0_DW_GEN_7_ADDR *                                  IPU_MEMORY_OFFSET+0x0040558
+SRM_DI0_DW_GEN_8_ADDR *                                  IPU_MEMORY_OFFSET+0x004055C
+SRM_DI0_DW_GEN_9_ADDR *                                  IPU_MEMORY_OFFSET+0x0040560
+SRM_DI0_DW_GEN_10_ADDR *                                 IPU_MEMORY_OFFSET+0x0040564
+SRM_DI0_DW_GEN_11_ADDR *                                 IPU_MEMORY_OFFSET+0x0040568
+SRM_DI0_DW_SET0_0_ADDR *                                 IPU_MEMORY_OFFSET+0x004056C
+SRM_DI0_DW_SET0_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040570
+SRM_DI0_DW_SET0_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040574
+SRM_DI0_DW_SET0_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040578
+SRM_DI0_DW_SET0_4_ADDR *                                 IPU_MEMORY_OFFSET+0x004057C
+SRM_DI0_DW_SET0_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040580
+SRM_DI0_DW_SET0_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040584
+SRM_DI0_DW_SET0_7_ADDR *                                 IPU_MEMORY_OFFSET+0x0040588
+SRM_DI0_DW_SET0_8_ADDR *                                 IPU_MEMORY_OFFSET+0x004058C
+SRM_DI0_DW_SET0_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040590
+SRM_DI0_DW_SET0_10_ADDR *                                IPU_MEMORY_OFFSET+0x0040594
+SRM_DI0_DW_SET0_11_ADDR *                                IPU_MEMORY_OFFSET+0x0040598
+SRM_DI0_DW_SET1_0_ADDR *                                 IPU_MEMORY_OFFSET+0x004059C
+SRM_DI0_DW_SET1_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00405A0
+SRM_DI0_DW_SET1_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00405A4
+SRM_DI0_DW_SET1_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00405A8
+SRM_DI0_DW_SET1_4_ADDR *                                 IPU_MEMORY_OFFSET+0x00405AC
+SRM_DI0_DW_SET1_5_ADDR *                                 IPU_MEMORY_OFFSET+0x00405B0
+SRM_DI0_DW_SET1_6_ADDR *                                 IPU_MEMORY_OFFSET+0x00405B4
+SRM_DI0_DW_SET1_7_ADDR *                                 IPU_MEMORY_OFFSET+0x00405B8
+SRM_DI0_DW_SET1_8_ADDR *                                 IPU_MEMORY_OFFSET+0x00405BC
+SRM_DI0_DW_SET1_9_ADDR *                                 IPU_MEMORY_OFFSET+0x00405C0
+SRM_DI0_DW_SET1_10_ADDR *                                IPU_MEMORY_OFFSET+0x00405C4
+SRM_DI0_DW_SET1_11_ADDR *                                IPU_MEMORY_OFFSET+0x00405C8
+SRM_DI0_DW_SET2_0_ADDR *                                 IPU_MEMORY_OFFSET+0x00405CC
+SRM_DI0_DW_SET2_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00405D0
+SRM_DI0_DW_SET2_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00405D4
+SRM_DI0_DW_SET2_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00405D8
+SRM_DI0_DW_SET2_4_ADDR *                                 IPU_MEMORY_OFFSET+0x00405DC
+SRM_DI0_DW_SET2_5_ADDR *                                 IPU_MEMORY_OFFSET+0x00405E0
+SRM_DI0_DW_SET2_6_ADDR *                                 IPU_MEMORY_OFFSET+0x00405E4
+SRM_DI0_DW_SET2_7_ADDR *                                 IPU_MEMORY_OFFSET+0x00405E8
+SRM_DI0_DW_SET2_8_ADDR *                                 IPU_MEMORY_OFFSET+0x00405EC
+SRM_DI0_DW_SET2_9_ADDR *                                 IPU_MEMORY_OFFSET+0x00405F0
+SRM_DI0_DW_SET2_10_ADDR *                                IPU_MEMORY_OFFSET+0x00405F4
+SRM_DI0_DW_SET2_11_ADDR *                                IPU_MEMORY_OFFSET+0x00405F8
+SRM_DI0_DW_SET3_0_ADDR *                                 IPU_MEMORY_OFFSET+0x00405FC
+SRM_DI0_DW_SET3_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040600
+SRM_DI0_DW_SET3_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040604
+SRM_DI0_DW_SET3_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040608
+SRM_DI0_DW_SET3_4_ADDR *                                 IPU_MEMORY_OFFSET+0x004060C
+SRM_DI0_DW_SET3_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040610
+SRM_DI0_DW_SET3_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040614
+SRM_DI0_DW_SET3_7_ADDR *                                 IPU_MEMORY_OFFSET+0x0040618
+SRM_DI0_DW_SET3_8_ADDR *                                 IPU_MEMORY_OFFSET+0x004061C
+SRM_DI0_DW_SET3_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040620
+SRM_DI0_DW_SET3_10_ADDR *                                IPU_MEMORY_OFFSET+0x0040624
+SRM_DI0_DW_SET3_11_ADDR *                                IPU_MEMORY_OFFSET+0x0040628
+SRM_DI0_STP_REP_1_ADDR *                                 IPU_MEMORY_OFFSET+0x004062C
+SRM_DI0_STP_REP_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040630
+SRM_DI0_STP_REP_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040634
+SRM_DI0_STP_REP_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040638
+SRM_DI0_STP_REP_9_ADDR *                                 IPU_MEMORY_OFFSET+0x004063C
+SRM_DI0_SER_CONF_ADDR *                                  IPU_MEMORY_OFFSET+0x0040640
+SRM_DI0_SSC_ADDR *                                       IPU_MEMORY_OFFSET+0x0040644
+SRM_DI0_POL_ADDR *                                       IPU_MEMORY_OFFSET+0x0040648
+SRM_DI0_AW0_ADDR *                                       IPU_MEMORY_OFFSET+0x004064C
+SRM_DI0_AW1_ADDR *                                       IPU_MEMORY_OFFSET+0x0040650
+SRM_DI0_SCR_CONF_ADDR *                                  IPU_MEMORY_OFFSET+0x0040654
+SRM_DI1_GENERAL_ADDR *                                   IPU_MEMORY_OFFSET+0x0040658
+SRM_DI1_BS_CLKGEN0_ADDR *                                IPU_MEMORY_OFFSET+0x004065C
+SRM_DI1_BS_CLKGEN1_ADDR *                                IPU_MEMORY_OFFSET+0x0040660
+SRM_DI1_SW_GEN0_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040664
+SRM_DI1_SW_GEN0_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040668
+SRM_DI1_SW_GEN0_3_ADDR *                                 IPU_MEMORY_OFFSET+0x004066C
+SRM_DI1_SW_GEN0_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040670
+SRM_DI1_SW_GEN0_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040674
+SRM_DI1_SW_GEN0_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040678
+SRM_DI1_SW_GEN0_7_ADDR *                                 IPU_MEMORY_OFFSET+0x004067C
+SRM_DI1_SW_GEN0_8_ADDR *                                 IPU_MEMORY_OFFSET+0x0040680
+SRM_DI1_SW_GEN0_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040684
+SRM_DI1_SW_GEN1_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040688
+SRM_DI1_SW_GEN1_2_ADDR *                                 IPU_MEMORY_OFFSET+0x004068C
+SRM_DI1_SW_GEN1_3_ADDR *                                 IPU_MEMORY_OFFSET+0x0040690
+SRM_DI1_SW_GEN1_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040694
+SRM_DI1_SW_GEN1_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040698
+SRM_DI1_SW_GEN1_6_ADDR *                                 IPU_MEMORY_OFFSET+0x004069C
+SRM_DI1_SW_GEN1_7_ADDR *                                 IPU_MEMORY_OFFSET+0x00406A0
+SRM_DI1_SW_GEN1_8_ADDR *                                 IPU_MEMORY_OFFSET+0x00406A4
+SRM_DI1_SW_GEN1_9_ADDR *                                 IPU_MEMORY_OFFSET+0x00406A8
+SRM_DI1_SYNC_AS_GEN_ADDR *                               IPU_MEMORY_OFFSET+0x00406AC
+SRM_DI1_DW_GEN_0_ADDR *                                  IPU_MEMORY_OFFSET+0x00406B0
+SRM_DI1_DW_GEN_1_ADDR *                                  IPU_MEMORY_OFFSET+0x00406B4
+SRM_DI1_DW_GEN_2_ADDR *                                  IPU_MEMORY_OFFSET+0x00406B8
+SRM_DI1_DW_GEN_3_ADDR *                                  IPU_MEMORY_OFFSET+0x00406BC
+SRM_DI1_DW_GEN_4_ADDR *                                  IPU_MEMORY_OFFSET+0x00406C0
+SRM_DI1_DW_GEN_5_ADDR *                                  IPU_MEMORY_OFFSET+0x00406C4
+SRM_DI1_DW_GEN_6_ADDR *                                  IPU_MEMORY_OFFSET+0x00406C8
+SRM_DI1_DW_GEN_7_ADDR *                                  IPU_MEMORY_OFFSET+0x00406CC
+SRM_DI1_DW_GEN_8_ADDR *                                  IPU_MEMORY_OFFSET+0x00406D0
+SRM_DI1_DW_GEN_9_ADDR *                                  IPU_MEMORY_OFFSET+0x00406D4
+SRM_DI1_DW_GEN_10_ADDR *                                 IPU_MEMORY_OFFSET+0x00406D8
+SRM_DI1_DW_GEN_11_ADDR *                                 IPU_MEMORY_OFFSET+0x00406DC
+SRM_DI1_DW_SET0_0_ADDR *                                 IPU_MEMORY_OFFSET+0x00406E0
+SRM_DI1_DW_SET0_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00406E4
+SRM_DI1_DW_SET0_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00406E8
+SRM_DI1_DW_SET0_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00406EC
+SRM_DI1_DW_SET0_4_ADDR *                                 IPU_MEMORY_OFFSET+0x00406F0
+SRM_DI1_DW_SET0_5_ADDR *                                 IPU_MEMORY_OFFSET+0x00406F4
+SRM_DI1_DW_SET0_6_ADDR *                                 IPU_MEMORY_OFFSET+0x00406F8
+SRM_DI1_DW_SET0_7_ADDR *                                 IPU_MEMORY_OFFSET+0x00406FC
+SRM_DI1_DW_SET0_8_ADDR *                                 IPU_MEMORY_OFFSET+0x0040700
+SRM_DI1_DW_SET0_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040704
+SRM_DI1_DW_SET0_10_ADDR *                                IPU_MEMORY_OFFSET+0x0040708
+SRM_DI1_DW_SET0_11_ADDR *                                IPU_MEMORY_OFFSET+0x004070C
+SRM_DI1_DW_SET1_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040710
+SRM_DI1_DW_SET1_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040714
+SRM_DI1_DW_SET1_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040718
+SRM_DI1_DW_SET1_3_ADDR *                                 IPU_MEMORY_OFFSET+0x004071C
+SRM_DI1_DW_SET1_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040720
+SRM_DI1_DW_SET1_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040724
+SRM_DI1_DW_SET1_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040728
+SRM_DI1_DW_SET1_7_ADDR *                                 IPU_MEMORY_OFFSET+0x004072C
+SRM_DI1_DW_SET1_8_ADDR *                                 IPU_MEMORY_OFFSET+0x0040730
+SRM_DI1_DW_SET1_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040734
+SRM_DI1_DW_SET1_10_ADDR *                                IPU_MEMORY_OFFSET+0x0040738
+SRM_DI1_DW_SET1_11_ADDR *                                IPU_MEMORY_OFFSET+0x004073C
+SRM_DI1_DW_SET2_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040740
+SRM_DI1_DW_SET2_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040744
+SRM_DI1_DW_SET2_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040748
+SRM_DI1_DW_SET2_3_ADDR *                                 IPU_MEMORY_OFFSET+0x004074C
+SRM_DI1_DW_SET2_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040750
+SRM_DI1_DW_SET2_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040754
+SRM_DI1_DW_SET2_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040758
+SRM_DI1_DW_SET2_7_ADDR *                                 IPU_MEMORY_OFFSET+0x004075C
+SRM_DI1_DW_SET2_8_ADDR *                                 IPU_MEMORY_OFFSET+0x0040760
+SRM_DI1_DW_SET2_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040764
+SRM_DI1_DW_SET2_10_ADDR *                                IPU_MEMORY_OFFSET+0x0040768
+SRM_DI1_DW_SET2_11_ADDR *                                IPU_MEMORY_OFFSET+0x004076C
+SRM_DI1_DW_SET3_0_ADDR *                                 IPU_MEMORY_OFFSET+0x0040770
+SRM_DI1_DW_SET3_1_ADDR *                                 IPU_MEMORY_OFFSET+0x0040774
+SRM_DI1_DW_SET3_2_ADDR *                                 IPU_MEMORY_OFFSET+0x0040778
+SRM_DI1_DW_SET3_3_ADDR *                                 IPU_MEMORY_OFFSET+0x004077C
+SRM_DI1_DW_SET3_4_ADDR *                                 IPU_MEMORY_OFFSET+0x0040780
+SRM_DI1_DW_SET3_5_ADDR *                                 IPU_MEMORY_OFFSET+0x0040784
+SRM_DI1_DW_SET3_6_ADDR *                                 IPU_MEMORY_OFFSET+0x0040788
+SRM_DI1_DW_SET3_7_ADDR *                                 IPU_MEMORY_OFFSET+0x004078C
+SRM_DI1_DW_SET3_8_ADDR *                                 IPU_MEMORY_OFFSET+0x0040790
+SRM_DI1_DW_SET3_9_ADDR *                                 IPU_MEMORY_OFFSET+0x0040794
+SRM_DI1_DW_SET3_10_ADDR *                                IPU_MEMORY_OFFSET+0x0040798
+SRM_DI1_DW_SET3_11_ADDR *                                IPU_MEMORY_OFFSET+0x004079C
+SRM_DI1_STP_REP_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00407A0
+SRM_DI1_STP_REP_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00407A4
+SRM_DI1_STP_REP_3_ADDR *                                 IPU_MEMORY_OFFSET+0x00407A8
+SRM_DI1_STP_REP_4_ADDR *                                 IPU_MEMORY_OFFSET+0x00407AC
+SRM_DI1_STP_REP_9_ADDR *                                 IPU_MEMORY_OFFSET+0x00407B0
+SRM_DI1_SER_CONF_ADDR *                                  IPU_MEMORY_OFFSET+0x00407B4
+SRM_DI1_SSC_ADDR *                                       IPU_MEMORY_OFFSET+0x00407B8
+SRM_DI1_POL_ADDR *                                       IPU_MEMORY_OFFSET+0x00407BC
+SRM_DI1_AW0_ADDR *                                       IPU_MEMORY_OFFSET+0x00407C0
+SRM_DI1_AW1_ADDR *                                       IPU_MEMORY_OFFSET+0x00407C4
+SRM_DI1_SCR_CONF_ADDR *                                  IPU_MEMORY_OFFSET+0x00407C8
+SRM_DC_WR_CH_CONF_2_ADDR *                               IPU_MEMORY_OFFSET+0x00404AC
+SRM_DC_RL0_CH_2_ADDR *                                   IPU_MEMORY_OFFSET+0x00404B4
+SRM_DC_RL1_CH_2_ADDR *                                   IPU_MEMORY_OFFSET+0x00404B8
+SRM_DC_RL2_CH_2_ADDR *                                   IPU_MEMORY_OFFSET+0x00404BC
+SRM_DC_RL3_CH_2_ADDR *                                   IPU_MEMORY_OFFSET+0x00404C0
+SRM_DC_RL4_CH_2_ADDR *                                   IPU_MEMORY_OFFSET+0x00404C4
+SRM_DC_WR_CH_CONF_6_ADDR *                               IPU_MEMORY_OFFSET+0x00404C8
+SRM_DC_RL0_CH_6_ADDR *                                   IPU_MEMORY_OFFSET+0x00404D0
+SRM_DC_RL1_CH_6_ADDR *                                   IPU_MEMORY_OFFSET+0x00404D4
+SRM_DC_RL2_CH_6_ADDR *                                   IPU_MEMORY_OFFSET+0x00404D8
+SRM_DC_RL3_CH_6_ADDR *                                   IPU_MEMORY_OFFSET+0x00404DC
+SRM_DC_RL4_CH_6_ADDR *                                   IPU_MEMORY_OFFSET+0x00404E0
+IPU_MEM_DC_MICROCODE_BASE_ADDR *                IPU_MEMORY_OFFSET+0x0080000
+IPU_LUT_BASE_ADDR       *                       IPU_MEMORY_OFFSET+0x0020000
+LPM_MEM_IPU_CONF_ADDR   *                                IPU_MEMORY_OFFSET+0x0040834
+LPM_MEM_SISG_CTRL0_ADDR *                                IPU_MEMORY_OFFSET+0x0040838
+LPM_MEM_SISG_CTRL1_ADDR *                                IPU_MEMORY_OFFSET+0x004083C
+LPM_MEM_SISG_SET_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040840
+LPM_MEM_SISG_SET_2_ADDR *                                IPU_MEMORY_OFFSET+0x0040844
+LPM_MEM_SISG_SET_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040848
+LPM_MEM_SISG_SET_4_ADDR *                                IPU_MEMORY_OFFSET+0x004084C
+LPM_MEM_SISG_SET_5_ADDR *                                IPU_MEMORY_OFFSET+0x0040850
+LPM_MEM_SISG_SET_6_ADDR *                                IPU_MEMORY_OFFSET+0x0040854
+LPM_MEM_SISG_CLR_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040858
+LPM_MEM_SISG_CLR_2_ADDR *                                IPU_MEMORY_OFFSET+0x004085C
+LPM_MEM_SISG_CLR_3_ADDR *                                IPU_MEMORY_OFFSET+0x0040860
+LPM_MEM_SISG_CLR_4_ADDR *                                IPU_MEMORY_OFFSET+0x0040864
+LPM_MEM_SISG_CLR_5_ADDR *                                IPU_MEMORY_OFFSET+0x0040868
+LPM_MEM_SISG_CLR_6_ADDR *                                IPU_MEMORY_OFFSET+0x004086C
+LPM_MEM_IPU_INT_CTRL_1_ADDR *                            IPU_MEMORY_OFFSET+0x0040870
+LPM_MEM_IPU_INT_CTRL_2_ADDR *                            IPU_MEMORY_OFFSET+0x0040874
+LPM_MEM_IPU_INT_CTRL_3_ADDR *                            IPU_MEMORY_OFFSET+0x0040878
+LPM_MEM_IPU_INT_CTRL_4_ADDR *                            IPU_MEMORY_OFFSET+0x004087C
+LPM_MEM_IPU_INT_CTRL_5_ADDR *                            IPU_MEMORY_OFFSET+0x0040880
+LPM_MEM_IPU_INT_CTRL_6_ADDR *                            IPU_MEMORY_OFFSET+0x0040884
+LPM_MEM_IPU_INT_CTRL_7_ADDR *                            IPU_MEMORY_OFFSET+0x0040888
+LPM_MEM_IPU_INT_CTRL_8_ADDR *                            IPU_MEMORY_OFFSET+0x004088C
+LPM_MEM_IPU_INT_CTRL_9_ADDR *                            IPU_MEMORY_OFFSET+0x0040890
+LPM_MEM_IPU_INT_CTRL_10_ADDR *                           IPU_MEMORY_OFFSET+0x0040894
+LPM_MEM_IPU_INT_CTRL_11_ADDR *                           IPU_MEMORY_OFFSET+0x0040898
+LPM_MEM_IPU_INT_CTRL_12_ADDR *                           IPU_MEMORY_OFFSET+0x004089C
+LPM_MEM_IPU_INT_CTRL_13_ADDR *                           IPU_MEMORY_OFFSET+0x00408A0
+LPM_MEM_IPU_INT_CTRL_14_ADDR *                           IPU_MEMORY_OFFSET+0x00408A4
+LPM_MEM_IPU_INT_CTRL_15_ADDR *                           IPU_MEMORY_OFFSET+0x00408A8
+LPM_MEM_IPU_SDMA_EVENT_1_ADDR *                          IPU_MEMORY_OFFSET+0x00408AC
+LPM_MEM_IPU_SDMA_EVENT_2_ADDR *                          IPU_MEMORY_OFFSET+0x00408B0
+LPM_MEM_IPU_SDMA_EVENT_3_ADDR *                          IPU_MEMORY_OFFSET+0x00408B4
+LPM_MEM_IPU_SDMA_EVENT_4_ADDR *                          IPU_MEMORY_OFFSET+0x00408B8
+LPM_MEM_IPU_SDMA_EVENT_7_ADDR *                          IPU_MEMORY_OFFSET+0x00408BC
+LPM_MEM_IPU_SDMA_EVENT_8_ADDR *                          IPU_MEMORY_OFFSET+0x00408C0
+LPM_MEM_IPU_SDMA_EVENT_11_ADDR *                         IPU_MEMORY_OFFSET+0x00408C4
+LPM_MEM_IPU_SDMA_EVENT_12_ADDR *                         IPU_MEMORY_OFFSET+0x00408C8
+LPM_MEM_IPU_SDMA_EVENT_13_ADDR *                         IPU_MEMORY_OFFSET+0x00408CC
+LPM_MEM_IPU_SDMA_EVENT_14_ADDR *                         IPU_MEMORY_OFFSET+0x00408D0
+LPM_MEM_IPU_SRM_PRI1_ADDR *                              IPU_MEMORY_OFFSET+0x00408D4
+LPM_MEM_IPU_SRM_PRI2_ADDR *                              IPU_MEMORY_OFFSET+0x00408D8
+LPM_MEM_IPU_FS_PROC_FLOW1_ADDR *                         IPU_MEMORY_OFFSET+0x00408DC
+LPM_MEM_IPU_FS_PROC_FLOW2_ADDR *                         IPU_MEMORY_OFFSET+0x00408E0
+LPM_MEM_IPU_FS_PROC_FLOW3_ADDR *                         IPU_MEMORY_OFFSET+0x00408E4
+LPM_MEM_IPU_FS_DISP_FLOW1_ADDR *                         IPU_MEMORY_OFFSET+0x00408E8
+LPM_MEM_IPU_FS_DISP_FLOW2_ADDR *                         IPU_MEMORY_OFFSET+0x00408EC
+LPM_MEM_IPU_SKIP_ADDR *                                  IPU_MEMORY_OFFSET+0x00408F0
+LPM_MEM_IPU_DISP_ALT_CONF_ADDR *                         IPU_MEMORY_OFFSET+0x00408F4
+LPM_MEM_IPU_DISP_GEN_ADDR *                              IPU_MEMORY_OFFSET+0x00408F8
+LPM_MEM_IPU_DISP_ALT1_ADDR *                             IPU_MEMORY_OFFSET+0x00408FC
+LPM_MEM_IPU_DISP_ALT2_ADDR *                             IPU_MEMORY_OFFSET+0x0040900
+LPM_MEM_IPU_DISP_ALT3_ADDR *                             IPU_MEMORY_OFFSET+0x0040904
+LPM_MEM_IPU_DISP_ALT4_ADDR *                             IPU_MEMORY_OFFSET+0x0040908
+LPM_MEM_IPU_SNOOP_ADDR *                                 IPU_MEMORY_OFFSET+0x004090C
+LPM_MEM_IPU_MEM_RST_ADDR *                               IPU_MEMORY_OFFSET+0x0040910
+LPM_MEM_IPU_PM_ADDR *                                    IPU_MEMORY_OFFSET+0x0040914
+LPM_MEM_IPU_GPR_ADDR *                                   IPU_MEMORY_OFFSET+0x0040918
+LPM_MEM_IPU_CH_DB_MODE_SEL_0_ADDR *                      IPU_MEMORY_OFFSET+0x0040984
+LPM_MEM_IPU_CH_DB_MODE_SEL_1_ADDR *                      IPU_MEMORY_OFFSET+0x0040988
+LPM_MEM_IPU_ALT_CH_DB_MODE_SEL_0_ADDR *                  IPU_MEMORY_OFFSET+0x004099C
+LPM_MEM_IPU_ALT_CH_DB_MODE_SEL_1_ADDR *                  IPU_MEMORY_OFFSET+0x00409A0
+LPM_MEM_IPU_CH_TRB_MODE_SEL_0_ADDR *                     IPU_MEMORY_OFFSET+0x00409AC
+LPM_MEM_IPU_CH_TRB_MODE_SEL_1_ADDR *                     IPU_MEMORY_OFFSET+0x00409B0
+LPM_MEM_IDMAC_CONF_ADDR *                                IPU_MEMORY_OFFSET+0x00407E4
+LPM_MEM_IDMAC_CH_EN_1_ADDR *                             IPU_MEMORY_OFFSET+0x00407E8
+LPM_MEM_IDMAC_CH_EN_2_ADDR *                             IPU_MEMORY_OFFSET+0x00407EC
+LPM_MEM_IDMAC_SEP_ALPHA_ADDR *                           IPU_MEMORY_OFFSET+0x00407F0
+LPM_MEM_IDMAC_ALT_SEP_ALPHA_ADDR *                       IPU_MEMORY_OFFSET+0x00407F4
+LPM_MEM_IDMAC_CH_PRI_1_ADDR *                            IPU_MEMORY_OFFSET+0x00407F8
+LPM_MEM_IDMAC_CH_PRI_2_ADDR *                            IPU_MEMORY_OFFSET+0x00407FC
+LPM_MEM_IDMAC_WM_EN_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040800
+LPM_MEM_IDMAC_WM_EN_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040804
+LPM_MEM_IDMAC_LOCK_EN_1_ADDR *                           IPU_MEMORY_OFFSET+0x0040808
+LPM_MEM_IDMAC_LOCK_EN_2_ADDR *                           IPU_MEMORY_OFFSET+0x004080C
+LPM_MEM_IDMAC_BNDM_EN_1_ADDR *                           IPU_MEMORY_OFFSET+0x0040824
+LPM_MEM_IDMAC_BNDM_EN_2_ADDR *                           IPU_MEMORY_OFFSET+0x0040828
+LPM_MEM_IDMAC_SC_CORD_ADDR *                             IPU_MEMORY_OFFSET+0x004082C
+LPM_MEM_IDMAC_SC_CORD1_ADDR *                            IPU_MEMORY_OFFSET+0x0040830
+LPM_MEM_DP_COM_CONF_SYNC_ADDR *                          IPU_MEMORY_OFFSET+0x0040000
+LPM_MEM_DP_GRAPH_WIND_CTRL_SYNC_ADDR *                   IPU_MEMORY_OFFSET+0x0040004
+LPM_MEM_DP_FG_POS_SYNC_ADDR *                            IPU_MEMORY_OFFSET+0x0040008
+LPM_MEM_DP_CUR_POS_SYNC_ADDR *                           IPU_MEMORY_OFFSET+0x004000C
+LPM_MEM_DP_CUR_MAP_SYNC_ADDR *                           IPU_MEMORY_OFFSET+0x0040010
+LPM_MEM_DP_GAMMA_C_SYNC_0_ADDR *                         IPU_MEMORY_OFFSET+0x0040014
+LPM_MEM_DP_GAMMA_C_SYNC_1_ADDR *                         IPU_MEMORY_OFFSET+0x0040018
+LPM_MEM_DP_GAMMA_C_SYNC_2_ADDR *                         IPU_MEMORY_OFFSET+0x004001C
+LPM_MEM_DP_GAMMA_C_SYNC_3_ADDR *                         IPU_MEMORY_OFFSET+0x0040020
+LPM_MEM_DP_GAMMA_C_SYNC_4_ADDR *                         IPU_MEMORY_OFFSET+0x0040024
+LPM_MEM_DP_GAMMA_C_SYNC_5_ADDR *                         IPU_MEMORY_OFFSET+0x0040028
+LPM_MEM_DP_GAMMA_C_SYNC_6_ADDR *                         IPU_MEMORY_OFFSET+0x004002C
+LPM_MEM_DP_GAMMA_C_SYNC_7_ADDR *                         IPU_MEMORY_OFFSET+0x0040030
+LPM_MEM_DP_GAMMA_S_SYNC_0_ADDR *                         IPU_MEMORY_OFFSET+0x0040034
+LPM_MEM_DP_GAMMA_S_SYNC_1_ADDR *                         IPU_MEMORY_OFFSET+0x0040038
+LPM_MEM_DP_GAMMA_S_SYNC_2_ADDR *                         IPU_MEMORY_OFFSET+0x004003C
+LPM_MEM_DP_GAMMA_S_SYNC_3_ADDR *                         IPU_MEMORY_OFFSET+0x0040040
+LPM_MEM_DP_CSCA_SYNC_0_ADDR *                            IPU_MEMORY_OFFSET+0x0040044
+LPM_MEM_DP_CSCA_SYNC_1_ADDR *                            IPU_MEMORY_OFFSET+0x0040048
+LPM_MEM_DP_CSCA_SYNC_2_ADDR *                            IPU_MEMORY_OFFSET+0x004004C
+LPM_MEM_DP_CSCA_SYNC_3_ADDR *                            IPU_MEMORY_OFFSET+0x0040050
+LPM_MEM_DP_CSC_SYNC_0_ADDR *                             IPU_MEMORY_OFFSET+0x0040054
+LPM_MEM_DP_CSC_SYNC_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040058
+LPM_MEM_DP_CUR_POS_ALT_ADDR *                            IPU_MEMORY_OFFSET+0x004005C
+LPM_MEM_DP_COM_CONF_ASYNC0_ADDR *                        IPU_MEMORY_OFFSET+0x0040060
+LPM_MEM_DP_GRAPH_WIND_CTRL_ASYNC0_ADDR *                 IPU_MEMORY_OFFSET+0x0040064
+LPM_MEM_DP_FG_POS_ASYNC0_ADDR *                          IPU_MEMORY_OFFSET+0x0040068
+LPM_MEM_DP_CUR_POS_ASYNC0_ADDR *                         IPU_MEMORY_OFFSET+0x004006C
+LPM_MEM_DP_CUR_MAP_ASYNC0_ADDR *                         IPU_MEMORY_OFFSET+0x0040070
+LPM_MEM_DP_GAMMA_C_ASYNC0_0_ADDR *                       IPU_MEMORY_OFFSET+0x0040074
+LPM_MEM_DP_GAMMA_C_ASYNC0_1_ADDR *                       IPU_MEMORY_OFFSET+0x0040078
+LPM_MEM_DP_GAMMA_C_ASYNC0_2_ADDR *                       IPU_MEMORY_OFFSET+0x004007C
+LPM_MEM_DP_GAMMA_C_ASYNC0_3_ADDR *                       IPU_MEMORY_OFFSET+0x0040080
+LPM_MEM_DP_GAMMA_C_ASYNC0_4_ADDR *                       IPU_MEMORY_OFFSET+0x0040084
+LPM_MEM_DP_GAMMA_C_ASYNC0_5_ADDR *                       IPU_MEMORY_OFFSET+0x0040088
+LPM_MEM_DP_GAMMA_C_ASYNC0_6_ADDR *                       IPU_MEMORY_OFFSET+0x004008C
+LPM_MEM_DP_GAMMA_C_ASYNC0_7_ADDR *                       IPU_MEMORY_OFFSET+0x0040090
+LPM_MEM_DP_GAMMA_S_ASYNC0_0_ADDR *                       IPU_MEMORY_OFFSET+0x0040094
+LPM_MEM_DP_GAMMA_S_ASYNC0_1_ADDR *                       IPU_MEMORY_OFFSET+0x0040098
+LPM_MEM_DP_GAMMA_S_ASYNC0_2_ADDR *                       IPU_MEMORY_OFFSET+0x004009C
+LPM_MEM_DP_GAMMA_S_ASYNC0_3_ADDR *                       IPU_MEMORY_OFFSET+0x00400A0
+LPM_MEM_DP_CSCA_ASYNC0_0_ADDR *                          IPU_MEMORY_OFFSET+0x00400A4
+LPM_MEM_DP_CSCA_ASYNC0_1_ADDR *                          IPU_MEMORY_OFFSET+0x00400A8
+LPM_MEM_DP_CSCA_ASYNC0_2_ADDR *                          IPU_MEMORY_OFFSET+0x00400AC
+LPM_MEM_DP_CSCA_ASYNC0_3_ADDR *                          IPU_MEMORY_OFFSET+0x00400B0
+LPM_MEM_DP_CSC_ASYNC0_0_ADDR *                           IPU_MEMORY_OFFSET+0x00400B4
+LPM_MEM_DP_CSC_ASYNC0_1_ADDR *                           IPU_MEMORY_OFFSET+0x00400B8
+LPM_MEM_DP_COM_CONF_ASYNC1_ADDR *                        IPU_MEMORY_OFFSET+0x00400BC
+LPM_MEM_DP_GRAPH_WIND_CTRL_ASYNC1_ADDR *                 IPU_MEMORY_OFFSET+0x00400C0
+LPM_MEM_DP_FG_POS_ASYNC1_ADDR *                          IPU_MEMORY_OFFSET+0x00400C4
+LPM_MEM_DP_CUR_POS_ASYNC1_ADDR *                         IPU_MEMORY_OFFSET+0x00400C8
+LPM_MEM_DP_CUR_MAP_ASYNC1_ADDR *                         IPU_MEMORY_OFFSET+0x00400CC
+LPM_MEM_DP_GAMMA_C_ASYNC1_0_ADDR *                       IPU_MEMORY_OFFSET+0x00400D0
+LPM_MEM_DP_GAMMA_C_ASYNC1_1_ADDR *                       IPU_MEMORY_OFFSET+0x00400D4
+LPM_MEM_DP_GAMMA_C_ASYNC1_2_ADDR *                       IPU_MEMORY_OFFSET+0x00400D8
+LPM_MEM_DP_GAMMA_C_ASYNC1_3_ADDR *                       IPU_MEMORY_OFFSET+0x00400DC
+LPM_MEM_DP_GAMMA_C_ASYNC1_4_ADDR *                       IPU_MEMORY_OFFSET+0x00400E0
+LPM_MEM_DP_GAMMA_C_ASYNC1_5_ADDR *                       IPU_MEMORY_OFFSET+0x00400E4
+LPM_MEM_DP_GAMMA_C_ASYNC1_6_ADDR *                       IPU_MEMORY_OFFSET+0x00400E8
+LPM_MEM_DP_GAMMA_C_ASYNC1_7_ADDR *                       IPU_MEMORY_OFFSET+0x00400EC
+LPM_MEM_DP_GAMMA_S_ASYNC1_0_ADDR *                       IPU_MEMORY_OFFSET+0x00400F0
+LPM_MEM_DP_GAMMA_S_ASYNC1_1_ADDR *                       IPU_MEMORY_OFFSET+0x00400F4
+LPM_MEM_DP_GAMMA_S_ASYNC1_2_ADDR *                       IPU_MEMORY_OFFSET+0x00400F8
+LPM_MEM_DP_GAMMA_S_ASYNC1_3_ADDR *                       IPU_MEMORY_OFFSET+0x00400FC
+LPM_MEM_DP_CSCA_ASYNC1_0_ADDR *                          IPU_MEMORY_OFFSET+0x0040100
+LPM_MEM_DP_CSCA_ASYNC1_1_ADDR *                          IPU_MEMORY_OFFSET+0x0040104
+LPM_MEM_DP_CSCA_ASYNC1_2_ADDR *                          IPU_MEMORY_OFFSET+0x0040108
+LPM_MEM_DP_CSCA_ASYNC1_3_ADDR *                          IPU_MEMORY_OFFSET+0x004010C
+LPM_MEM_DP_CSC_ASYNC1_0_ADDR *                           IPU_MEMORY_OFFSET+0x0040110
+LPM_MEM_DP_CSC_ASYNC1_1_ADDR *                           IPU_MEMORY_OFFSET+0x0040114
+LPM_MEM_IC_CONF_ADDR *                                   IPU_MEMORY_OFFSET+0x00409B4
+LPM_MEM_IC_PRP_ENC_RSC_ADDR *                            IPU_MEMORY_OFFSET+0x00409B8
+LPM_MEM_IC_PRP_VF_RSC_ADDR *                             IPU_MEMORY_OFFSET+0x00409BC
+LPM_MEM_IC_PP_RSC_ADDR *                                 IPU_MEMORY_OFFSET+0x00409C0
+LPM_MEM_IC_CMBP_1_ADDR *                                 IPU_MEMORY_OFFSET+0x00409C4
+LPM_MEM_IC_CMBP_2_ADDR *                                 IPU_MEMORY_OFFSET+0x00409C8
+LPM_MEM_IC_IDMAC_1_ADDR *                                IPU_MEMORY_OFFSET+0x00409CC
+LPM_MEM_IC_IDMAC_2_ADDR *                                IPU_MEMORY_OFFSET+0x00409D0
+LPM_MEM_IC_IDMAC_3_ADDR *                                IPU_MEMORY_OFFSET+0x00409D4
+LPM_MEM_IC_IDMAC_4_ADDR *                                IPU_MEMORY_OFFSET+0x00409D8
+LPM_MEM_DI0_GENERAL_ADDR *                               IPU_MEMORY_OFFSET+0x0040314
+LPM_MEM_DI0_BS_CLKGEN0_ADDR *                            IPU_MEMORY_OFFSET+0x0040318
+LPM_MEM_DI0_BS_CLKGEN1_ADDR *                            IPU_MEMORY_OFFSET+0x004031C
+LPM_MEM_DI0_SW_GEN0_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040320
+LPM_MEM_DI0_SW_GEN0_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040324
+LPM_MEM_DI0_SW_GEN0_3_ADDR *                             IPU_MEMORY_OFFSET+0x0040328
+LPM_MEM_DI0_SW_GEN0_4_ADDR *                             IPU_MEMORY_OFFSET+0x004032C
+LPM_MEM_DI0_SW_GEN0_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040330
+LPM_MEM_DI0_SW_GEN0_6_ADDR *                             IPU_MEMORY_OFFSET+0x0040334
+LPM_MEM_DI0_SW_GEN0_7_ADDR *                             IPU_MEMORY_OFFSET+0x0040338
+LPM_MEM_DI0_SW_GEN0_8_ADDR *                             IPU_MEMORY_OFFSET+0x004033C
+LPM_MEM_DI0_SW_GEN0_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040340
+LPM_MEM_DI0_SW_GEN1_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040344
+LPM_MEM_DI0_SW_GEN1_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040348
+LPM_MEM_DI0_SW_GEN1_3_ADDR *                             IPU_MEMORY_OFFSET+0x004034C
+LPM_MEM_DI0_SW_GEN1_4_ADDR *                             IPU_MEMORY_OFFSET+0x0040350
+LPM_MEM_DI0_SW_GEN1_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040354
+LPM_MEM_DI0_SW_GEN1_6_ADDR *                             IPU_MEMORY_OFFSET+0x0040358
+LPM_MEM_DI0_SW_GEN1_7_ADDR *                             IPU_MEMORY_OFFSET+0x004035C
+LPM_MEM_DI0_SW_GEN1_8_ADDR *                             IPU_MEMORY_OFFSET+0x0040360
+LPM_MEM_DI0_SW_GEN1_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040364
+LPM_MEM_DI0_SYNC_AS_GEN_ADDR *                           IPU_MEMORY_OFFSET+0x0040368
+LPM_MEM_DI0_DW_GEN_0_ADDR *                              IPU_MEMORY_OFFSET+0x004036C
+LPM_MEM_DI0_DW_GEN_1_ADDR *                              IPU_MEMORY_OFFSET+0x0040370
+LPM_MEM_DI0_DW_GEN_2_ADDR *                              IPU_MEMORY_OFFSET+0x0040374
+LPM_MEM_DI0_DW_GEN_3_ADDR *                              IPU_MEMORY_OFFSET+0x0040378
+LPM_MEM_DI0_DW_GEN_4_ADDR *                              IPU_MEMORY_OFFSET+0x004037C
+LPM_MEM_DI0_DW_GEN_5_ADDR *                              IPU_MEMORY_OFFSET+0x0040380
+LPM_MEM_DI0_DW_GEN_6_ADDR *                              IPU_MEMORY_OFFSET+0x0040384
+LPM_MEM_DI0_DW_GEN_7_ADDR *                              IPU_MEMORY_OFFSET+0x0040388
+LPM_MEM_DI0_DW_GEN_8_ADDR *                              IPU_MEMORY_OFFSET+0x004038C
+LPM_MEM_DI0_DW_GEN_9_ADDR *                              IPU_MEMORY_OFFSET+0x0040390
+LPM_MEM_DI0_DW_GEN_10_ADDR *                             IPU_MEMORY_OFFSET+0x0040394
+LPM_MEM_DI0_DW_GEN_11_ADDR *                             IPU_MEMORY_OFFSET+0x0040398
+LPM_MEM_DI0_DW_SET0_0_ADDR *                             IPU_MEMORY_OFFSET+0x004039C
+LPM_MEM_DI0_DW_SET0_1_ADDR *                             IPU_MEMORY_OFFSET+0x00403A0
+LPM_MEM_DI0_DW_SET0_2_ADDR *                             IPU_MEMORY_OFFSET+0x00403A4
+LPM_MEM_DI0_DW_SET0_3_ADDR *                             IPU_MEMORY_OFFSET+0x00403A8
+LPM_MEM_DI0_DW_SET0_4_ADDR *                             IPU_MEMORY_OFFSET+0x00403AC
+LPM_MEM_DI0_DW_SET0_5_ADDR *                             IPU_MEMORY_OFFSET+0x00403B0
+LPM_MEM_DI0_DW_SET0_6_ADDR *                             IPU_MEMORY_OFFSET+0x00403B4
+LPM_MEM_DI0_DW_SET0_7_ADDR *                             IPU_MEMORY_OFFSET+0x00403B8
+LPM_MEM_DI0_DW_SET0_8_ADDR *                             IPU_MEMORY_OFFSET+0x00403BC
+LPM_MEM_DI0_DW_SET0_9_ADDR *                             IPU_MEMORY_OFFSET+0x00403C0
+LPM_MEM_DI0_DW_SET0_10_ADDR *                            IPU_MEMORY_OFFSET+0x00403C4
+LPM_MEM_DI0_DW_SET0_11_ADDR *                            IPU_MEMORY_OFFSET+0x00403C8
+LPM_MEM_DI0_DW_SET1_0_ADDR *                             IPU_MEMORY_OFFSET+0x00403CC
+LPM_MEM_DI0_DW_SET1_1_ADDR *                             IPU_MEMORY_OFFSET+0x00403D0
+LPM_MEM_DI0_DW_SET1_2_ADDR *                             IPU_MEMORY_OFFSET+0x00403D4
+LPM_MEM_DI0_DW_SET1_3_ADDR *                             IPU_MEMORY_OFFSET+0x00403D8
+LPM_MEM_DI0_DW_SET1_4_ADDR *                             IPU_MEMORY_OFFSET+0x00403DC
+LPM_MEM_DI0_DW_SET1_5_ADDR *                             IPU_MEMORY_OFFSET+0x00403E0
+LPM_MEM_DI0_DW_SET1_6_ADDR *                             IPU_MEMORY_OFFSET+0x00403E4
+LPM_MEM_DI0_DW_SET1_7_ADDR *                             IPU_MEMORY_OFFSET+0x00403E8
+LPM_MEM_DI0_DW_SET1_8_ADDR *                             IPU_MEMORY_OFFSET+0x00403EC
+LPM_MEM_DI0_DW_SET1_9_ADDR *                             IPU_MEMORY_OFFSET+0x00403F0
+LPM_MEM_DI0_DW_SET1_10_ADDR *                            IPU_MEMORY_OFFSET+0x00403F4
+LPM_MEM_DI0_DW_SET1_11_ADDR *                            IPU_MEMORY_OFFSET+0x00403F8
+LPM_MEM_DI0_DW_SET2_0_ADDR *                             IPU_MEMORY_OFFSET+0x00403FC
+LPM_MEM_DI0_DW_SET2_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040400
+LPM_MEM_DI0_DW_SET2_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040404
+LPM_MEM_DI0_DW_SET2_3_ADDR *                             IPU_MEMORY_OFFSET+0x0040408
+LPM_MEM_DI0_DW_SET2_4_ADDR *                             IPU_MEMORY_OFFSET+0x004040C
+LPM_MEM_DI0_DW_SET2_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040410
+LPM_MEM_DI0_DW_SET2_6_ADDR *                             IPU_MEMORY_OFFSET+0x0040414
+LPM_MEM_DI0_DW_SET2_7_ADDR *                             IPU_MEMORY_OFFSET+0x0040418
+LPM_MEM_DI0_DW_SET2_8_ADDR *                             IPU_MEMORY_OFFSET+0x004041C
+LPM_MEM_DI0_DW_SET2_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040420
+LPM_MEM_DI0_DW_SET2_10_ADDR *                            IPU_MEMORY_OFFSET+0x0040424
+LPM_MEM_DI0_DW_SET2_11_ADDR *                            IPU_MEMORY_OFFSET+0x0040428
+LPM_MEM_DI0_DW_SET3_0_ADDR *                             IPU_MEMORY_OFFSET+0x004042C
+LPM_MEM_DI0_DW_SET3_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040430
+LPM_MEM_DI0_DW_SET3_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040434
+LPM_MEM_DI0_DW_SET3_3_ADDR *                             IPU_MEMORY_OFFSET+0x0040438
+LPM_MEM_DI0_DW_SET3_4_ADDR *                             IPU_MEMORY_OFFSET+0x004043C
+LPM_MEM_DI0_DW_SET3_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040440
+LPM_MEM_DI0_DW_SET3_6_ADDR *                             IPU_MEMORY_OFFSET+0x0040444
+LPM_MEM_DI0_DW_SET3_7_ADDR *                             IPU_MEMORY_OFFSET+0x0040448
+LPM_MEM_DI0_DW_SET3_8_ADDR *                             IPU_MEMORY_OFFSET+0x004044C
+LPM_MEM_DI0_DW_SET3_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040450
+LPM_MEM_DI0_DW_SET3_10_ADDR *                            IPU_MEMORY_OFFSET+0x0040454
+LPM_MEM_DI0_DW_SET3_11_ADDR *                            IPU_MEMORY_OFFSET+0x0040458
+LPM_MEM_DI0_STP_REP_1_ADDR *                             IPU_MEMORY_OFFSET+0x004045C
+LPM_MEM_DI0_STP_REP_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040460
+LPM_MEM_DI0_STP_REP_3_ADDR *                             IPU_MEMORY_OFFSET+0x0040464
+LPM_MEM_DI0_STP_REP_4_ADDR *                             IPU_MEMORY_OFFSET+0x0040468
+LPM_MEM_DI0_STP_REP_9_ADDR *                             IPU_MEMORY_OFFSET+0x004046C
+LPM_MEM_DI0_SER_CONF_ADDR *                              IPU_MEMORY_OFFSET+0x0040470
+LPM_MEM_DI0_SSC_ADDR *                                   IPU_MEMORY_OFFSET+0x0040474
+LPM_MEM_DI0_POL_ADDR *                                   IPU_MEMORY_OFFSET+0x0040478
+LPM_MEM_DI0_AW0_ADDR *                                   IPU_MEMORY_OFFSET+0x004047C
+LPM_MEM_DI0_AW1_ADDR *                                   IPU_MEMORY_OFFSET+0x0040480
+LPM_MEM_DI0_SCR_CONF_ADDR *                              IPU_MEMORY_OFFSET+0x0040484
+LPM_MEM_DI1_GENERAL_ADDR *                               IPU_MEMORY_OFFSET+0x0040488
+LPM_MEM_DI1_BS_CLKGEN0_ADDR *                            IPU_MEMORY_OFFSET+0x004048C
+LPM_MEM_DI1_BS_CLKGEN1_ADDR *                            IPU_MEMORY_OFFSET+0x0040490
+LPM_MEM_DI1_SW_GEN0_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040494
+LPM_MEM_DI1_SW_GEN0_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040498
+LPM_MEM_DI1_SW_GEN0_3_ADDR *                             IPU_MEMORY_OFFSET+0x004049C
+LPM_MEM_DI1_SW_GEN0_4_ADDR *                             IPU_MEMORY_OFFSET+0x00404A0
+LPM_MEM_DI1_SW_GEN0_5_ADDR *                             IPU_MEMORY_OFFSET+0x00404A4
+LPM_MEM_DI1_SW_GEN0_6_ADDR *                             IPU_MEMORY_OFFSET+0x00404A8
+LPM_MEM_DI1_SW_GEN0_7_ADDR *                             IPU_MEMORY_OFFSET+0x00404AC
+LPM_MEM_DI1_SW_GEN0_8_ADDR *                             IPU_MEMORY_OFFSET+0x00404B0
+LPM_MEM_DI1_SW_GEN0_9_ADDR *                             IPU_MEMORY_OFFSET+0x00404B4
+LPM_MEM_DI1_SW_GEN1_1_ADDR *                             IPU_MEMORY_OFFSET+0x00404B8
+LPM_MEM_DI1_SW_GEN1_2_ADDR *                             IPU_MEMORY_OFFSET+0x00404BC
+LPM_MEM_DI1_SW_GEN1_3_ADDR *                             IPU_MEMORY_OFFSET+0x00404C0
+LPM_MEM_DI1_SW_GEN1_4_ADDR *                             IPU_MEMORY_OFFSET+0x00404C4
+LPM_MEM_DI1_SW_GEN1_5_ADDR *                             IPU_MEMORY_OFFSET+0x00404C8
+LPM_MEM_DI1_SW_GEN1_6_ADDR *                             IPU_MEMORY_OFFSET+0x00404CC
+LPM_MEM_DI1_SW_GEN1_7_ADDR *                             IPU_MEMORY_OFFSET+0x00404D0
+LPM_MEM_DI1_SW_GEN1_8_ADDR *                             IPU_MEMORY_OFFSET+0x00404D4
+LPM_MEM_DI1_SW_GEN1_9_ADDR *                             IPU_MEMORY_OFFSET+0x00404D8
+LPM_MEM_DI1_SYNC_AS_GEN_ADDR *                           IPU_MEMORY_OFFSET+0x00404DC
+LPM_MEM_DI1_DW_GEN_0_ADDR *                              IPU_MEMORY_OFFSET+0x00404E0
+LPM_MEM_DI1_DW_GEN_1_ADDR *                              IPU_MEMORY_OFFSET+0x00404E4
+LPM_MEM_DI1_DW_GEN_2_ADDR *                              IPU_MEMORY_OFFSET+0x00404E8
+LPM_MEM_DI1_DW_GEN_3_ADDR *                              IPU_MEMORY_OFFSET+0x00404EC
+LPM_MEM_DI1_DW_GEN_4_ADDR *                              IPU_MEMORY_OFFSET+0x00404F0
+LPM_MEM_DI1_DW_GEN_5_ADDR *                              IPU_MEMORY_OFFSET+0x00404F4
+LPM_MEM_DI1_DW_GEN_6_ADDR *                              IPU_MEMORY_OFFSET+0x00404F8
+LPM_MEM_DI1_DW_GEN_7_ADDR *                              IPU_MEMORY_OFFSET+0x00404FC
+LPM_MEM_DI1_DW_GEN_8_ADDR *                              IPU_MEMORY_OFFSET+0x0040500
+LPM_MEM_DI1_DW_GEN_9_ADDR *                              IPU_MEMORY_OFFSET+0x0040504
+LPM_MEM_DI1_DW_GEN_10_ADDR *                             IPU_MEMORY_OFFSET+0x0040508
+LPM_MEM_DI1_DW_GEN_11_ADDR *                             IPU_MEMORY_OFFSET+0x004050C
+LPM_MEM_DI1_DW_SET0_0_ADDR *                             IPU_MEMORY_OFFSET+0x0040510
+LPM_MEM_DI1_DW_SET0_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040514
+LPM_MEM_DI1_DW_SET0_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040518
+LPM_MEM_DI1_DW_SET0_3_ADDR *                             IPU_MEMORY_OFFSET+0x004051C
+LPM_MEM_DI1_DW_SET0_4_ADDR *                             IPU_MEMORY_OFFSET+0x0040520
+LPM_MEM_DI1_DW_SET0_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040524
+LPM_MEM_DI1_DW_SET0_6_ADDR *                             IPU_MEMORY_OFFSET+0x0040528
+LPM_MEM_DI1_DW_SET0_7_ADDR *                             IPU_MEMORY_OFFSET+0x004052C
+LPM_MEM_DI1_DW_SET0_8_ADDR *                             IPU_MEMORY_OFFSET+0x0040530
+LPM_MEM_DI1_DW_SET0_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040534
+LPM_MEM_DI1_DW_SET0_10_ADDR *                            IPU_MEMORY_OFFSET+0x0040538
+LPM_MEM_DI1_DW_SET0_11_ADDR *                            IPU_MEMORY_OFFSET+0x004053C
+LPM_MEM_DI1_DW_SET1_0_ADDR *                             IPU_MEMORY_OFFSET+0x0040540
+LPM_MEM_DI1_DW_SET1_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040544
+LPM_MEM_DI1_DW_SET1_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040548
+LPM_MEM_DI1_DW_SET1_3_ADDR *                             IPU_MEMORY_OFFSET+0x004054C
+LPM_MEM_DI1_DW_SET1_4_ADDR *                             IPU_MEMORY_OFFSET+0x0040550
+LPM_MEM_DI1_DW_SET1_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040554
+LPM_MEM_DI1_DW_SET1_6_ADDR *                             IPU_MEMORY_OFFSET+0x0040558
+LPM_MEM_DI1_DW_SET1_7_ADDR *                             IPU_MEMORY_OFFSET+0x004055C
+LPM_MEM_DI1_DW_SET1_8_ADDR *                             IPU_MEMORY_OFFSET+0x0040560
+LPM_MEM_DI1_DW_SET1_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040564
+LPM_MEM_DI1_DW_SET1_10_ADDR *                            IPU_MEMORY_OFFSET+0x0040568
+LPM_MEM_DI1_DW_SET1_11_ADDR *                            IPU_MEMORY_OFFSET+0x004056C
+LPM_MEM_DI1_DW_SET2_0_ADDR *                             IPU_MEMORY_OFFSET+0x0040570
+LPM_MEM_DI1_DW_SET2_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040574
+LPM_MEM_DI1_DW_SET2_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040578
+LPM_MEM_DI1_DW_SET2_3_ADDR *                             IPU_MEMORY_OFFSET+0x004057C
+LPM_MEM_DI1_DW_SET2_4_ADDR *                             IPU_MEMORY_OFFSET+0x0040580
+LPM_MEM_DI1_DW_SET2_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040584
+LPM_MEM_DI1_DW_SET2_6_ADDR *                             IPU_MEMORY_OFFSET+0x0040588
+LPM_MEM_DI1_DW_SET2_7_ADDR *                             IPU_MEMORY_OFFSET+0x004058C
+LPM_MEM_DI1_DW_SET2_8_ADDR *                             IPU_MEMORY_OFFSET+0x0040590
+LPM_MEM_DI1_DW_SET2_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040594
+LPM_MEM_DI1_DW_SET2_10_ADDR *                            IPU_MEMORY_OFFSET+0x0040598
+LPM_MEM_DI1_DW_SET2_11_ADDR *                            IPU_MEMORY_OFFSET+0x004059C
+LPM_MEM_DI1_DW_SET3_0_ADDR *                             IPU_MEMORY_OFFSET+0x00405A0
+LPM_MEM_DI1_DW_SET3_1_ADDR *                             IPU_MEMORY_OFFSET+0x00405A4
+LPM_MEM_DI1_DW_SET3_2_ADDR *                             IPU_MEMORY_OFFSET+0x00405A8
+LPM_MEM_DI1_DW_SET3_3_ADDR *                             IPU_MEMORY_OFFSET+0x00405AC
+LPM_MEM_DI1_DW_SET3_4_ADDR *                             IPU_MEMORY_OFFSET+0x00405B0
+LPM_MEM_DI1_DW_SET3_5_ADDR *                             IPU_MEMORY_OFFSET+0x00405B4
+LPM_MEM_DI1_DW_SET3_6_ADDR *                             IPU_MEMORY_OFFSET+0x00405B8
+LPM_MEM_DI1_DW_SET3_7_ADDR *                             IPU_MEMORY_OFFSET+0x00405BC
+LPM_MEM_DI1_DW_SET3_8_ADDR *                             IPU_MEMORY_OFFSET+0x00405C0
+LPM_MEM_DI1_DW_SET3_9_ADDR *                             IPU_MEMORY_OFFSET+0x00405C4
+LPM_MEM_DI1_DW_SET3_10_ADDR *                            IPU_MEMORY_OFFSET+0x00405C8
+LPM_MEM_DI1_DW_SET3_11_ADDR *                            IPU_MEMORY_OFFSET+0x00405CC
+LPM_MEM_DI1_STP_REP_1_ADDR *                             IPU_MEMORY_OFFSET+0x00405D0
+LPM_MEM_DI1_STP_REP_2_ADDR *                             IPU_MEMORY_OFFSET+0x00405D4
+LPM_MEM_DI1_STP_REP_3_ADDR *                             IPU_MEMORY_OFFSET+0x00405D8
+LPM_MEM_DI1_STP_REP_4_ADDR *                             IPU_MEMORY_OFFSET+0x00405DC
+LPM_MEM_DI1_STP_REP_9_ADDR *                             IPU_MEMORY_OFFSET+0x00405E0
+LPM_MEM_DI1_SER_CONF_ADDR *                              IPU_MEMORY_OFFSET+0x00405E4
+LPM_MEM_DI1_SSC_ADDR *                                   IPU_MEMORY_OFFSET+0x00405E8
+LPM_MEM_DI1_POL_ADDR *                                   IPU_MEMORY_OFFSET+0x00405EC
+LPM_MEM_DI1_AW0_ADDR *                                   IPU_MEMORY_OFFSET+0x00405F0
+LPM_MEM_DI1_AW1_ADDR *                                   IPU_MEMORY_OFFSET+0x00405F4
+LPM_MEM_DI1_SCR_CONF_ADDR *                              IPU_MEMORY_OFFSET+0x00405F8
+LPM_MEM_DC_READ_CH_CONF_ADDR *                           IPU_MEMORY_OFFSET+0x004061C
+LPM_MEM_DC_RL0_CH_0_ADDR *                               IPU_MEMORY_OFFSET+0x0040624
+LPM_MEM_DC_RL1_CH_0_ADDR *                               IPU_MEMORY_OFFSET+0x0040628
+LPM_MEM_DC_RL2_CH_0_ADDR *                               IPU_MEMORY_OFFSET+0x004062C
+LPM_MEM_DC_RL3_CH_0_ADDR *                               IPU_MEMORY_OFFSET+0x0040630
+LPM_MEM_DC_RL4_CH_0_ADDR *                               IPU_MEMORY_OFFSET+0x0040634
+LPM_MEM_DC_WR_CH_CONF_1_ADDR *                           IPU_MEMORY_OFFSET+0x0040638
+LPM_MEM_DC_RL0_CH_1_ADDR *                               IPU_MEMORY_OFFSET+0x0040640
+LPM_MEM_DC_RL1_CH_1_ADDR *                               IPU_MEMORY_OFFSET+0x0040644
+LPM_MEM_DC_RL2_CH_1_ADDR *                               IPU_MEMORY_OFFSET+0x0040648
+LPM_MEM_DC_RL3_CH_1_ADDR *                               IPU_MEMORY_OFFSET+0x004064C
+LPM_MEM_DC_RL4_CH_1_ADDR *                               IPU_MEMORY_OFFSET+0x0040650
+LPM_MEM_DC_WR_CH_CONF_2_ADDR *                           IPU_MEMORY_OFFSET+0x0040654
+LPM_MEM_DC_RL0_CH_2_ADDR *                               IPU_MEMORY_OFFSET+0x004065C
+LPM_MEM_DC_RL1_CH_2_ADDR *                               IPU_MEMORY_OFFSET+0x0040660
+LPM_MEM_DC_RL2_CH_2_ADDR *                               IPU_MEMORY_OFFSET+0x0040664
+LPM_MEM_DC_RL3_CH_2_ADDR *                               IPU_MEMORY_OFFSET+0x0040668
+LPM_MEM_DC_RL4_CH_2_ADDR *                               IPU_MEMORY_OFFSET+0x004066C
+LPM_MEM_DC_CMD_CH_CONF_3_ADDR *                          IPU_MEMORY_OFFSET+0x0040670
+LPM_MEM_DC_CMD_CH_CONF_4_ADDR *                          IPU_MEMORY_OFFSET+0x0040674
+LPM_MEM_DC_WR_CH_CONF_5_ADDR *                           IPU_MEMORY_OFFSET+0x0040678
+LPM_MEM_DC_RL0_CH_5_ADDR *                               IPU_MEMORY_OFFSET+0x0040680
+LPM_MEM_DC_RL1_CH_5_ADDR *                               IPU_MEMORY_OFFSET+0x0040684
+LPM_MEM_DC_RL2_CH_5_ADDR *                               IPU_MEMORY_OFFSET+0x0040688
+LPM_MEM_DC_RL3_CH_5_ADDR *                               IPU_MEMORY_OFFSET+0x004068C
+LPM_MEM_DC_RL4_CH_5_ADDR *                               IPU_MEMORY_OFFSET+0x0040690
+LPM_MEM_DC_WR_CH_CONF_6_ADDR *                           IPU_MEMORY_OFFSET+0x0040694
+LPM_MEM_DC_RL0_CH_6_ADDR *                               IPU_MEMORY_OFFSET+0x004069C
+LPM_MEM_DC_RL1_CH_6_ADDR *                               IPU_MEMORY_OFFSET+0x00406A0
+LPM_MEM_DC_RL2_CH_6_ADDR *                               IPU_MEMORY_OFFSET+0x00406A4
+LPM_MEM_DC_RL3_CH_6_ADDR *                               IPU_MEMORY_OFFSET+0x00406A8
+LPM_MEM_DC_RL4_CH_6_ADDR *                               IPU_MEMORY_OFFSET+0x00406AC
+LPM_MEM_DC_WR_CH_CONF1_8_ADDR *                          IPU_MEMORY_OFFSET+0x00406B0
+LPM_MEM_DC_WR_CH_CONF2_8_ADDR *                          IPU_MEMORY_OFFSET+0x00406B4
+LPM_MEM_DC_RL1_CH_8_ADDR *                               IPU_MEMORY_OFFSET+0x00406B8
+LPM_MEM_DC_RL2_CH_8_ADDR *                               IPU_MEMORY_OFFSET+0x00406BC
+LPM_MEM_DC_RL3_CH_8_ADDR *                               IPU_MEMORY_OFFSET+0x00406C0
+LPM_MEM_DC_RL4_CH_8_ADDR *                               IPU_MEMORY_OFFSET+0x00406C4
+LPM_MEM_DC_RL5_CH_8_ADDR *                               IPU_MEMORY_OFFSET+0x00406C8
+LPM_MEM_DC_RL6_CH_8_ADDR *                               IPU_MEMORY_OFFSET+0x00406CC
+LPM_MEM_DC_WR_CH_CONF1_9_ADDR *                          IPU_MEMORY_OFFSET+0x00406D0
+LPM_MEM_DC_WR_CH_CONF2_9_ADDR *                          IPU_MEMORY_OFFSET+0x00406D4
+LPM_MEM_DC_RL1_CH_9_ADDR *                               IPU_MEMORY_OFFSET+0x00406D8
+LPM_MEM_DC_RL2_CH_9_ADDR *                               IPU_MEMORY_OFFSET+0x00406DC
+LPM_MEM_DC_RL3_CH_9_ADDR *                               IPU_MEMORY_OFFSET+0x00406E0
+LPM_MEM_DC_RL4_CH_9_ADDR *                               IPU_MEMORY_OFFSET+0x00406E4
+LPM_MEM_DC_RL5_CH_9_ADDR *                               IPU_MEMORY_OFFSET+0x00406E8
+LPM_MEM_DC_RL6_CH_9_ADDR *                               IPU_MEMORY_OFFSET+0x00406EC
+LPM_MEM_DC_GEN_ADDR *                                    IPU_MEMORY_OFFSET+0x00406F0
+LPM_MEM_DC_DISP_CONF1_0_ADDR *                           IPU_MEMORY_OFFSET+0x00406F4
+LPM_MEM_DC_DISP_CONF1_1_ADDR *                           IPU_MEMORY_OFFSET+0x00406F8
+LPM_MEM_DC_DISP_CONF1_2_ADDR *                           IPU_MEMORY_OFFSET+0x00406FC
+LPM_MEM_DC_DISP_CONF1_3_ADDR *                           IPU_MEMORY_OFFSET+0x0040700
+LPM_MEM_DC_DISP_CONF2_0_ADDR *                           IPU_MEMORY_OFFSET+0x0040704
+LPM_MEM_DC_DISP_CONF2_1_ADDR *                           IPU_MEMORY_OFFSET+0x0040708
+LPM_MEM_DC_DISP_CONF2_2_ADDR *                           IPU_MEMORY_OFFSET+0x004070C
+LPM_MEM_DC_DISP_CONF2_3_ADDR *                           IPU_MEMORY_OFFSET+0x0040710
+LPM_MEM_DC_DI0_CONF_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040714
+LPM_MEM_DC_DI0_CONF_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040718
+LPM_MEM_DC_DI1_CONF_1_ADDR *                             IPU_MEMORY_OFFSET+0x004071C
+LPM_MEM_DC_DI1_CONF_2_ADDR *                             IPU_MEMORY_OFFSET+0x0040720
+LPM_MEM_DC_MAP_CONF_0_ADDR *                             IPU_MEMORY_OFFSET+0x0040724
+LPM_MEM_DC_MAP_CONF_1_ADDR *                             IPU_MEMORY_OFFSET+0x0040728
+LPM_MEM_DC_MAP_CONF_2_ADDR *                             IPU_MEMORY_OFFSET+0x004072C
+LPM_MEM_DC_MAP_CONF_3_ADDR *                             IPU_MEMORY_OFFSET+0x0040730
+LPM_MEM_DC_MAP_CONF_4_ADDR *                             IPU_MEMORY_OFFSET+0x0040734
+LPM_MEM_DC_MAP_CONF_5_ADDR *                             IPU_MEMORY_OFFSET+0x0040738
+LPM_MEM_DC_MAP_CONF_6_ADDR *                             IPU_MEMORY_OFFSET+0x004073C
+LPM_MEM_DC_MAP_CONF_7_ADDR *                             IPU_MEMORY_OFFSET+0x0040740
+LPM_MEM_DC_MAP_CONF_8_ADDR *                             IPU_MEMORY_OFFSET+0x0040744
+LPM_MEM_DC_MAP_CONF_9_ADDR *                             IPU_MEMORY_OFFSET+0x0040748
+LPM_MEM_DC_MAP_CONF_10_ADDR *                            IPU_MEMORY_OFFSET+0x004074C
+LPM_MEM_DC_MAP_CONF_11_ADDR *                            IPU_MEMORY_OFFSET+0x0040750
+LPM_MEM_DC_MAP_CONF_12_ADDR *                            IPU_MEMORY_OFFSET+0x0040754
+LPM_MEM_DC_MAP_CONF_13_ADDR *                            IPU_MEMORY_OFFSET+0x0040758
+LPM_MEM_DC_MAP_CONF_14_ADDR *                            IPU_MEMORY_OFFSET+0x004075C
+LPM_MEM_DC_MAP_CONF_15_ADDR *                            IPU_MEMORY_OFFSET+0x0040760
+LPM_MEM_DC_MAP_CONF_16_ADDR *                            IPU_MEMORY_OFFSET+0x0040764
+LPM_MEM_DC_MAP_CONF_17_ADDR *                            IPU_MEMORY_OFFSET+0x0040768
+LPM_MEM_DC_MAP_CONF_18_ADDR *                            IPU_MEMORY_OFFSET+0x004076C
+LPM_MEM_DC_MAP_CONF_19_ADDR *                            IPU_MEMORY_OFFSET+0x0040770
+LPM_MEM_DC_MAP_CONF_20_ADDR *                            IPU_MEMORY_OFFSET+0x0040774
+LPM_MEM_DC_MAP_CONF_21_ADDR *                            IPU_MEMORY_OFFSET+0x0040778
+LPM_MEM_DC_MAP_CONF_22_ADDR *                            IPU_MEMORY_OFFSET+0x004077C
+LPM_MEM_DC_MAP_CONF_23_ADDR *                            IPU_MEMORY_OFFSET+0x0040780
+LPM_MEM_DC_MAP_CONF_24_ADDR *                            IPU_MEMORY_OFFSET+0x0040784
+LPM_MEM_DC_MAP_CONF_25_ADDR *                            IPU_MEMORY_OFFSET+0x0040788
+LPM_MEM_DC_MAP_CONF_26_ADDR *                            IPU_MEMORY_OFFSET+0x004078C
+LPM_MEM_DC_UGDE0_0_ADDR *                                IPU_MEMORY_OFFSET+0x0040790
+LPM_MEM_DC_UGDE0_1_ADDR *                                IPU_MEMORY_OFFSET+0x0040794
+LPM_MEM_DC_UGDE0_2_ADDR *                                IPU_MEMORY_OFFSET+0x0040798
+LPM_MEM_DC_UGDE0_3_ADDR *                                IPU_MEMORY_OFFSET+0x004079C
+LPM_MEM_DC_UGDE1_0_ADDR *                                IPU_MEMORY_OFFSET+0x00407A0
+LPM_MEM_DC_UGDE1_1_ADDR *                                IPU_MEMORY_OFFSET+0x00407A4
+LPM_MEM_DC_UGDE1_2_ADDR *                                IPU_MEMORY_OFFSET+0x00407A8
+LPM_MEM_DC_UGDE1_3_ADDR *                                IPU_MEMORY_OFFSET+0x00407AC
+LPM_MEM_DC_UGDE2_0_ADDR *                                IPU_MEMORY_OFFSET+0x00407B0
+LPM_MEM_DC_UGDE2_1_ADDR *                                IPU_MEMORY_OFFSET+0x00407B4
+LPM_MEM_DC_UGDE2_2_ADDR *                                IPU_MEMORY_OFFSET+0x00407B8
+LPM_MEM_DC_UGDE2_3_ADDR *                                IPU_MEMORY_OFFSET+0x00407BC
+LPM_MEM_DC_UGDE3_0_ADDR *                                IPU_MEMORY_OFFSET+0x00407C0
+LPM_MEM_DC_UGDE3_1_ADDR *                                IPU_MEMORY_OFFSET+0x00407C4
+LPM_MEM_DC_UGDE3_2_ADDR *                                IPU_MEMORY_OFFSET+0x00407C8
+LPM_MEM_DC_UGDE3_3_ADDR *                                IPU_MEMORY_OFFSET+0x00407CC
+LPM_MEM_DC_LLA0_ADDR *                                   IPU_MEMORY_OFFSET+0x00407D0
+LPM_MEM_DC_LLA1_ADDR *                                   IPU_MEMORY_OFFSET+0x00407D4
+LPM_MEM_DC_R_LLA0_ADDR *                                 IPU_MEMORY_OFFSET+0x00407D8
+LPM_MEM_DC_R_LLA1_ADDR *                                 IPU_MEMORY_OFFSET+0x00407DC
+LPM_MEM_DMFC_RD_CHAN_ADDR *                              IPU_MEMORY_OFFSET+0x00405FC
+LPM_MEM_DMFC_WR_CHAN_ADDR *                              IPU_MEMORY_OFFSET+0x0040600
+LPM_MEM_DMFC_WR_CHAN_DEF_ADDR *                          IPU_MEMORY_OFFSET+0x0040604
+LPM_MEM_DMFC_DP_CHAN_ADDR *                              IPU_MEMORY_OFFSET+0x0040608
+LPM_MEM_DMFC_DP_CHAN_DEF_ADDR *                          IPU_MEMORY_OFFSET+0x004060C
+LPM_MEM_DMFC_GENERAL1_ADDR *                             IPU_MEMORY_OFFSET+0x0040610
+LPM_MEM_DMFC_GENERAL2_ADDR *                             IPU_MEMORY_OFFSET+0x0040614
+LPM_MEM_DMFC_IC_CTRL_ADDR *                              IPU_MEMORY_OFFSET+0x0040618
+
+; IDMAC CPMemory Field Words
+; refers to field to be accessed in cpmem 160 bit megaword, and its width
+; built as cpmem word (0|1)<<0 + startbit<<8 + field width<<16
+CP_XV   *       (0<<0) + (10<<8)  + (0<<16)
+CP_YV   *       (0<<0) + (9<<8)   + (10<<16)
+CP_XB   *       (0<<0) + (19<<8)  + (13<<16)
+CP_YB   *       (0<<0) + (32<<8)  + (12<<16)
+CP_NSB_B *      (0<<0) + (44<<8)  + (1<<16)
+CP_CF   *       (0<<0) + (45<<8)  + (1<<16)
+;stuff for non interleaved
+CPN_UBO *       (0<<0) + (46<<8)  + (22<<16)
+CPN_VBO *       (0<<0) + (68<<8)  + (22<<16)
+CPN_IOX *       (0<<0) + (90<<8)  + (4<<16)
+CPN_RDRW *      (0<<0) + (94<<8)  + (1<<16)
+;stuff for interleaved
+CPI_SX  *       (0<<0) + (46<<8)  + (12<<16)
+CPI_SY  *       (0<<0) + (58<<8)  + (11<<16)
+CPI_NS  *       (0<<0) + (69<<8)  + (10<<16)
+CPI_SDX *       (0<<0) + (79<<8)  + (7<<16)
+CPI_SM  *       (0<<0) + (86<<8)  + (10<<16)
+CPI_SCC *       (0<<0) + (96<<8)  + (1<<16)
+CPI_SCE *       (0<<0) + (97<<8)  + (1<<16)
+CPI_SDY *       (0<<0) + (98<<8)  + (7<<16)
+CPI_SDRX *      (0<<0) + (105<<8) + (1<<16)
+CPI_SDRY *      (0<<0) + (106<<8) + (1<<16)
+CPI_BPP *       (0<<0) + (107<<8) + (3<<16)
+CPI_DEC_SEL *   (0<<0) + (110<<8) + (2<<16)
+CPI_DIM *       (0<<0) + (112<<8) + (1<<16)
+;
+CP_SO   *       (0<<0) + (113<<8) + (1<<16)
+CP_BNDM *       (0<<0) + (114<<8) + (3<<16)
+CP_BM   *       (0<<0) + (117<<8) + (2<<16)
+CP_ROT  *       (0<<0) + (119<<8) + (1<<16)
+CP_HF   *       (0<<0) + (120<<8) + (1<<16)
+CP_VF   *       (0<<0) + (121<<8) + (1<<16)
+CP_THE  *       (0<<0) + (122<<8) + (1<<16)
+CP_CAP  *       (0<<0) + (123<<8) + (1<<16)
+CP_CAE  *       (0<<0) + (124<<8) + (1<<16)
+CP_FW   *       (0<<0) + (125<<8) + (13<<16)
+CP_FH   *       (0<<0) + (138<<8) + (12<<16)
+CP_EOLI *       (0<<0) + (150<<8) + (1<<16)
+CP_EAB0 *       (1<<0) + (0<<8)   + (29<<16)
+CP_EAB1 *       (1<<0) + (29<<8)  + (29<<16)
+CP_ILO  *       (1<<0) + (58<<8)  + (20<<16)
+CP_NPB  *       (1<<0) + (78<<8)  + (7<<16)
+CP_PFS  *       (1<<0) + (85<<8)  + (4<<16)
+CP_ALU  *       (1<<0) + (89<<8)  + (1<<16)
+CP_ALB  *       (1<<0) + (90<<8)  + (3<<16)
+CP_ID   *       (1<<0) + (93<<8)  + (2<<16)
+CP_TH   *       (1<<0) + (95<<8)  + (7<<16)
+; Stuff for non interleave
+CPN_SLY *       (1<<0) + (102<<8) + (14<<16)
+; stuff for interleave
+CPI_SL *        (1<<0) + (102<<8) + (14<<16)
+CPI_WID0 *      (1<<0) + (116<<8) + (3<<16)
+CPI_WID1 *      (1<<0) + (119<<8) + (3<<16)
+CPI_WID2 *      (1<<0) + (122<<8) + (3<<16)
+;
+CP_WID3 *       (1<<0) + (125<<8) + (3<<16)
+; stuff for non interleave
+CPN_SLUV *      (1<<0) + (128<<8) + (14<<16)
+; stuff for interleave
+CPI_OFS0 *      (1<<0) + (128<<8) + (5<<16)
+CPI_OFS1 *      (1<<0) + (133<<8) + (5<<16)
+CPI_OFS2 *      (1<<0) + (138<<8) + (5<<16)
+CPI_OFS3 *      (1<<0) + (143<<8) + (5<<16)
+CPI_SZYS *      (1<<0) + (148<<8) + (1<<16)
+;
+CP_CRE  *       (1<<0) + (149<<8 + (1<<16) )
+; interleaved stuff
+CPI_DEC_SEL2  * (1<<0) + (148<<8) + (1<<16)
+
+;IDMAC config structure ipu_idmac_info_t
+                ^       0,v3
+ipu_idmac_info  #       0
+iii_channel     #       4
+iii_addr0       #       4
+iii_addr1       #       4
+iii_width       #       4
+iii_height      #       4
+iii_npb #               4
+iii_pixel_format #      4
+iii_sl  #               0          ; sl for interleaved modes,
+iii_sly #               4          ; sly for non interleaved modes
+iii_u_offset    #       4
+iii_bpp #               4
+iii_so  #               4
+iii_ilo #               4
+iii_bm  #               4
+iii_rot #               4
+iii_hf  #               4
+iii_vf  #               4
+ipu_idmac_info_size * (:INDEX:@ - :INDEX:ipu_idmac_info)
+
+; pixel types (ips_dma_colorimetry_e)
+NON_INTERLEAVED_YUV444          * &0
+NON_INTERLEAVED_YUV422          * &1
+NON_INTERLEAVED_YUV420          * &2
+PARTIAL_INTERLEAVED_YUV422      * &3
+PARTIAL_INTERLEAVED_YUV420      * &4
+INTERLEAVED_LUT                 * &5
+INTERLEAVED_GENERIC             * &6
+INTERLEAVED_ARGB8888            * &7 | (0 << 4)
+INTERLEAVED_RGB                 * &7
+INTERLEAVED_RGB565              * &7 | (1 << 4)
+INTERLEAVED_ABGR8888            * &7 | (2 << 4)
+INTERLEAVED_BGR                 * &7 | (3 << 4)
+INTERLEAVED_BGR565              * &7 | (4 << 4)
+INTERLEAVED_ABGR1555            * &7 | (5 << 4)
+INTERLEAVED_TBGR1555            * &7 | (6 << 4)
+INTERLEAVED_RGBLUT8             * &7 | (7 << 4)
+INTERLEAVED_Y1U1Y2V1            * &8
+INTERLEAVED_Y2U1Y1V1            * &9
+INTERLEAVED_U1Y1V1Y2            * &A
+INTERLEAVED_U1Y2V1Y1            * &B
+
+; fifo types
+DMFC_FIFO_512X128               * 0
+DMFC_FIFO_256X128               * 1
+DMFC_FIFO_128X128               * 2
+DMFC_FIFO_64X128                * 3
+DMFC_FIFO_32X128                * 4
+DMFC_FIFO_16X128                * 5
+DMFC_FIFO_8X128                 * 6
+DMFC_FIFO_4X128                 * 7
+
+; burst types
+DMFC_BURST_32X128               * 0
+DMFC_BURST_16X128               * 1
+DMFC_BURST_8X128                * 2
+DMFC_BURST_4X128                * 3
+
+; Colorimetry type
+DCMAP_RGB565                    * 0
+DCMAP_RGB666                    * 1
+DCMAP_RGB666H                   * 2
+DCMAP_RGB666L                   * 3
+DCMAP_RGB888                    * 4
+DCMAP_GBR888                    * 5
+DCMAP_BRG888                    * 6
+DCMAP_YUV888                    * 7
+DCMAP_UVY888                    * 8
+DCMAP_VYU888                    * 9
+DCMAP_RGBA8888                  * 10
+DCMAP_YUVA8888                  * 11
+
+; generic
+MEM_RGB                         * 0
+MEM_YUV                         * 1
+
+; csc types
+CSC_NO_CSC                      * 0
+CSC_RGB_YUV                     * 1
+CSC_YUV_RGB                     * 2
+
+; idmac dma channels
+CSI_TO_MEM_CH0                  * 0
+CSI_TO_MEM_CH1                  * 1
+CSI_TO_MEM_CH2                  * 2
+CSI_TO_MEM_CH3                  * 3
+MEM_TO_VDI_CH8                  * 8
+MEM_TO_VDI_CH9                  * 9
+MEM_TO_VDI_CH10                 * 10
+MEM_TO_IC_PP_RES_CH11           * 11
+MEM_TO_IC_PRP_RES_CH12          * 12
+VDI_TO_MEM_CH13                 * 13
+MEM_TO_IC_PPR_GPLANE_CH14       * 14
+MEM_TO_IC_PP_GPLANE_CH15        * 15
+MEM_TO_IC_PRP_ALPHA_CH17        * 17
+MEM_TO_IC_PRP_ALPHA_CH18        * 18
+IC_PRPENC_RES_TO_MEM_CH20       * 20
+IC_PRPVF_RES_TO_MEM_CH21        * 21
+IC_PP_RES_TO_MEM_CH22           * 22
+MEM_TO_DP_BG_CH23               * 23
+MEM_TO_DP_FG_CH27               * 27
+MEM_TO_DC_CH28                  * 28
+MEM_TO_IC_PRPENC_ROT_CH45       * 45
+MEM_TO_IC_PRPVF_ROT_CH46        * 46
+MEM_TO_IC_PP_ROT_CH47           * 47
+IC_PRPENC_ROT_TO_MEM_CH48       * 48
+IC_PRPVF_ROT_TO_MEM_CH49        * 49
+IC_PP_ROT_TO_MEM_CH50           * 50
+
+
+ ]
+
+        END

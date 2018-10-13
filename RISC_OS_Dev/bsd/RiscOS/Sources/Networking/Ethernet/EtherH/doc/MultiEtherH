@@ -1,0 +1,73 @@
+The multicast filtering doesn't work in EtherH 4.41 unless you've got a 
+podule style network card. The code abused the 16 bit word steering on 
+the IO bus and only stored the multicast filter bits in byte 2, this 
+worked on the 2875 stb (which the EtherH multicast filtering was 
+implemented for) because it used podule style cards. The podule cards 
+work due to the top 16 bits of the data bus being steered down to the 
+bottom 16 bits on writes.  On a network slot card there is no steering 
+and writes are taken from the  bottom 8 bits as god intended. This and 
+many other problems are fixed in my final version of EtherH, which was 
+EtherH 4.52 22 Nov 2002. As well as using the 64 entry hardware hash 
+filter (which EtherH  4.41 used), there is a supplementary software 
+filter (as used in the DSL  4000 "2tv" EtherI driver) to efficiently 
+discard any undesired multicasts  which get past the hash table (1 in 64 
+gets past depending on multicast MAC address). *ehinfo shows the activity 
+of the software filter, both the list of addresses and the number of 
+packets allowed and discarded. 
+
+
+An additional problem is which version of the Internet module is in use. 
+The most common ones are Internet 5.02 (RO 3.70 main ROM) and Internet 
+5.04 (ANT suite and others), but neither of these make multicast filter 
+requests down to the DCI drivers. I recommend Internet 5.44 minimum as 
+used on the DSL 4000, but there are earlier versions which sort of work 
+(eg. the one in the 3875). I've no idea what versions of the Internet 
+module are present in RISC OS 4 or how well any of them work. 
+
+
+On top of that if you use a late enough MBufManager (0.22 is certainly 
+late enough) you can change NVRAM byte 46 to affect how much memory the 
+MBufManager thinks the machine has and allocate a larger number of MBufs 
+(the Iyonix and DB220 are better still and allow individual NVRAM 
+configuration of both large and small mbufs, but in NVRAM bytes above 256 
+so inappropriate for Risc PC). Setting NVRAM byte 46 to 14 (both decimal) 
+gives 512 large and 512 small mbufs for example (this uses up 1.5 MB of 
+RMA). 
+
+
+I've attached a Sparkive ZIP file containing EtherH16 and EtherH8 4.52, 
+Internet 5.45 and MBufManager 0.22. These are all 26 bit compiled which 
+RISC OS 4 module headers (fast service entry) and work fine on RISC OS 
+3.70 with a StrongARM. They've also been tested by me on an A540 and 
+A3010/A3020, plus Design IT tested it on RISC OS 4. This is using Risc PC 
+network slot cards, the newer version of the podule card (4 layer PCB), 
+and the A3000 syle internal mini podule (I couldn't get my A3020 network 
+slot card to work, I think the PAL was blank). 
+
+
+Soft loading Internet and MBufManager can be difficult. You have to 
+*unplug all of Internet, MBufManager and EtherhH and maybe more, and then 
+after loading these modules you may need to either RMReInit other network 
+modules (if attempting to use ROM versions) or you may need to soft load 
+the rest of the network stack. It is definitely possible to get this to 
+work at least on RISC OS 3.70 as I've done it. You must ensure that the 
+Internet and MBufManager modules in both the existing podule flash and 
+the main ROM are unplugged, if you end up with one copy unplugged but not 
+the other it may be necessary to do a power-on NVRAM reset and start 
+again. 
+
+
+I do have new flash images for the i-Cubed network cards with these 
+modules in and they work, but I am not in a position to issue either the 
+images or the flash programming code necessary to blow them. Only Design 
+IT have the authority to do that. In addition a lot of i-Cubed cards 
+either have OTP ROM in them (there was a shortage of flash at one stage) 
+or the flash is too small to take the latest images, so reblowing the 
+flash can often require a new chip to be purchased anyway. 
+
+
+The modules attached below are the current standard released versions (or 
+were 2 years ago), so they are validly distributable to anyone with an 
+iCubed or DesignIT ethernet card. 
+
+

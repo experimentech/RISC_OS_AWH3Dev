@@ -1,0 +1,92 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+; 
+#include "Global/Services.h"
+#include "../VersionNum"
+
+initialisation-code:    module_init
+
+finalisation-code:      module_final
+
+service-call-handler:   module_services Service_ResourceFSStarting,
+                                        Service_DeviceFSStarting,
+                                        Service_DeviceFSDying,
+                                        Service_USB,
+                                        Service_PreReset
+title-string:           USBDriver
+
+help-string:            USBDriver Module_MajorVersion_CMHG
+
+date-string:            Module_Date_CMHG
+
+international-help-file: "Resources:$.Resources.USBDriver.Messages"
+
+command-keyword-table:  module_commands
+
+#ifdef USB_DEBUG
+USBDebug(       min-args:1, max-args:3,
+                help-text:     "*USBDebug sets the debug level for general usb, hub and mouse output.",
+                invalid-syntax:"*USBDebug <usb> [<hub> [<mouse>]]"),
+#endif
+
+USBBuses(       min-args:0, max-args:0,
+                international:,help-text:"HUSBBUS",invalid-syntax:"SUSBBUS"),
+
+USBDevices(     min-args:0, max-args:0,
+                international:,help-text:"HUSBDEV",invalid-syntax:"SUSBDEV"),
+
+USBDevInfo(     min-args:1, max-args:1,
+                international:,help-text:"HUSBDIN",invalid-syntax:"SUSBDIN"),
+
+USBConfInfo(    min-args:1, max-args:1,
+                international:,help-text:"HUSBCIN",invalid-syntax:"SUSBCIN"),
+
+USBSetConfig(   min-args:2, max-args:2,
+                international:,help-text:"HUSBCON",invalid-syntax:"SUSBCON"),
+
+USBSetInterface(min-args:3, max-args:3,
+                international:,help-text:"HUSBINT",invalid-syntax:"SUSBINT"),
+
+#ifdef USB_DEBUG
+USBDiscover(    min-args:0, max-args:0,
+                help-text:     "*USBDiscover forces a search for new devices on all buses.",
+                invalid-syntax:"Syntax: *USBDiscover"),
+#endif
+
+USBReset(       min-args:1, max-args:1,
+                international:,help-text:"HUSBRES",invalid-syntax:"SUSBRES"),
+
+USBQuirk(       min-args:1, max-args:5,
+                international:,help-text:"HUSBQRK",invalid-syntax:"SUSBQRK")
+
+swi-chunk-base-number:  0x54a40
+
+swi-handler-code:       module_swis
+
+swi-decoding-table:     USBDriver,
+                        RegisterBus,
+                        DeregisterBus,
+                        InsertTransfer,
+                        TransferComplete,
+                        ScheduleSoftInterrupt,
+                        Version
+
+generic-veneers:        driver_entry/driver
+
+vector-handlers:        pointerv_entry/pointerv,
+                        keyv_entry/keyv,
+                        softintr_entry/softintr

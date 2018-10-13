@@ -1,0 +1,237 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+;hdr2h safe
+
+        [       :LNOT: :DEF: __HAL_USB_HDR__
+        GBLL    __HAL_USB_HDR__
+
+; USBTLL registers - relative to L4_USBTLL
+
+;Builds, boots. No idea if it works. Don't get excited.
+;TODO: USB OTG port has not been included. It needs some special treatment.
+
+
+;Offsets from USB_Host_BaseAddr
+;This is wrong.
+USB_HCI0_Offset                  *       &0000
+USB_HCI1_Offset                  *       &1000
+USB_HCI2_Offset                  *       &2000
+USB_HCI3_Offset                  *       &3000
+
+
+; USB_HCI1  &01C1B000
+; USB_HCI2  &01C1C000
+; USB_HCI3  &01C1D000
+;Entries are wrong unless otherwise marked.
+;USBTLL_REVISION                 *       &0000
+;USBTLL_HWINFO                   *       &0004
+;USBTLL_SYSCONFIG                *       &0010
+;USBTLL_SYSSTATUS                *       &0014
+;USBTLL_IRQSTATUS                *       &0018
+;USBTLL_IRQENABLE                *       &001C
+;TLL_SHARED_CONF                 *       &0030
+;TLL_CHANNEL_CONF_0              *       &0040
+;TLL_CHANNEL_CONF_1              *       &0044
+;USBTLL_SAR_CNTX_0               *       &0400
+;USBTLL_SAR_CNTX_1               *       &0404
+;USBTLL_SAR_CNTX_2               *       &0408
+;USBTLL_SAR_CNTX_3               *       &040C
+;USBTLL_SAR_CNTX_4               *       &0410
+;USBTLL_SAR_CNTX_5               *       &0414
+;USBTLL_SAR_CNTX_6               *       &0418
+
+; ULPI register groups - relative to L4_USBTLL
+;ULPI_BASE                       *       &0800
+;ULPI_SIZE                       *       &0100
+;ULPI_NUM                        *       2
+
+;ULPI_VENDOR_ID_LO               *       &0000 ; All registers are byte sized!
+;ULPI_VENDOR_ID_HI               *       &0001
+;ULPI_PRODUCT_ID_LO              *       &0002
+;ULPI_PRODUCT_ID_HI              *       &0003
+;ULPI_FUNCTION_CTRL              *       &0004
+;ULPI_FUNCTION_CTRL_SET          *       &0005
+;ULPI_FUNCTION_CTRL_CLR          *       &0006
+;ULPI_INTERFACE_CTRL             *       &0007
+;ULPI_INTERFACE_CTRL_SET         *       &0008
+;ULPI_INTERFACE_CTRL_CLR         *       &0009
+;ULPI_OTG_CTRL                   *       &000A
+;ULPI_OTG_CTRL_SET               *       &000B
+;ULPI_OTG_CTRL_CLR               *       &000C
+;ULPI_USB_INT_EN_RISE            *       &000D
+;ULPI_USB_INT_EN_RISE_SET        *       &000E
+;ULPI_USB_INT_EN_RISE_CLR        *       &000F
+;ULPI_USB_INT_EN_FALL            *       &0010
+;ULPI_USB_INT_EN_FALL_SET        *       &0011
+;ULPI_USB_INT_EN_FALL_CLR        *       &0012
+;ULPI_USB_INT_STATUS             *       &0013
+;ULPI_USB_INT_LATCH              *       &0014
+;ULPI_DEBUG                      *       &0015
+;ULPI_SCRATCH_REGISTER           *       &0016
+;ULPI_SCRATCH_REGISTER_SE        *       &0017
+;ULPI_SCRATCH_REGISTER_CL        *       &0018
+;ULPI_EXTENDED_SET_ACCESS        *       &002F
+;ULPI_UTMI_VCONTROL_EN           *       &0030
+;ULPI_UTMI_VCONTROL_EN_SET       *       &0031
+;ULPI_UTMI_VCONTROL_EN_CLR       *       &0032
+;ULPI_UTMI_VCONTROL_STATUS       *       &0033
+;ULPI_UTMI_VCONTROL_LATCH        *       &0034
+;ULPI_UTMI_VSTATUS               *       &0035
+;ULPI_UTMI_VSTATUS_SET           *       &0036
+;ULPI_UTMI_VSTATUS_CLR           *       &0037
+;ULPI_USB_INT_LATCH_NOCLR        *       &0038
+;ULPI_VENDOR_INT_EN              *       &003B
+;ULPI_VENDOR_INT_EN_SET          *       &003C
+;ULPI_VENDOR_INT_EN_CLR          *       &003D
+;ULPI_VENDOR_INT_STATUS          *       &003E
+;ULPI_VENDOR_INT_LATCH           *       &003F
+
+; USB host registers - relative to L4_USB_Host
+;UHH_REVISION                    *       &0000
+;UHH_HWINFO                      *       &0004
+;UHH_SYSCONFIG                   *       &0010
+;UHH_SYSSTATUS                   *       &0014
+;UHH_HOSTCONFIG                  *       &0040
+;UHH_DEBUG_CSR                   *       &0044
+;UHH_SAR_CNTX_i                  *       &0100   ; i = 0 - 383
+OHCI_BASE                       *       &0400   ;Changed
+EHCI_BASE                       *       &0000   ;Changed
+
+; OHCI registers - relative to OHCI_BASE
+;What a pain.
+OHCI_HCREVISION                 *       &0000   ;good
+OHCI_HCCONTROL                  *       &0004   ;good
+OHCI_HCCOMANDSTATUS             *       &0008   ;good
+OHCI_HCINTERRUPTSTATUS          *       &000C   ;good
+OHCI_HCINTERRUPTENABLE          *       &0010   ;good
+OHCI_HCINTERRUPTDISABLE         *       &0014   ;good
+
+OHCI_HCHCCA                     *       &0018   ;good
+OHCI_HCPERIODCURRENTED          *       &001C   ;good
+OHCI_HCCONTROLHEADED            *       &0020   ;good
+OHCI_HCCONTROLCURRENTED         *       &0024   ;good
+OHCI_HCBULKHEADED               *       &0028   ;good
+OHCI_HCBULKCURRENTED            *       &002C   ;good
+OHCI_HCDONEHEAD                 *       &0030   ;good
+OHCI_HCFMINTERVAL               *       &0034   ;good
+OHCI_HCFMREMAINING              *       &0038   ;good
+OHCI_HCFMNUMBER                 *       &003C   ;good
+OHCI_HCPERIODICSTART            *       &0040   ;good
+OHCI_HCLSTHRESHOLD              *       &0044   ;good
+OHCI_HCRHDESCRIPTORA            *       &0048   ;good
+OHCI_HCRHDESCRIPTORB            *       &004C   ;good
+OHCI_HCRHSTATUS                 *       &0050   ;good
+OHCI_HCRHPORTSTATUS             *       &0054   ;name altered
+;OHCI_HCRHPORTSTATUS_2           *       &0058  ;removed
+;OHCI_HCRHPORTSTATUS_3          *       &005C ; reserved on OMAP44xx
+
+; EHCI registers - relative to EHCI_BASE
+EHCI_HCCAPBASE                  *       &0000   ;E_CAPLENGTH
+                                                ;E_HCIVERSIOn &002
+EHCI_HCSPARAMS                  *       &0004   ;Good
+EHCI_HCCPARAMS                  *       &0008   ;good
+EHCI_HCSPPORTROUTE              *       &000C
+;EHCI Operational Register
+EHCI_USBCMD                     *       &0010   ;good
+EHCI_USBSTS                     *       &0014
+EHCI_USBINTR                    *       &0018
+EHCI_FRINDEX                    *       &001C
+EHCI_CTRLDSSEGMENT              *       &0020
+EHCI_PERIODICLISTBASE           *       &0024
+EHCI_ASYNCLISTADDR              *       &0028
+EHCI_CONFIGFLAG                 *       &0050
+EHCI_PORTSC_0                   *       &0054   ;/good
+
+;EHCI_PORTSC_1                   *       &0058
+;EHCI_PORTSC_2                   *       &005C
+
+;EHCI_INSNREG00                  *       &0090
+;EHCI_INSNREG01                  *       &0094
+;EHCI_INSNREG02                  *       &0098
+;EHCI_INSNREG03                  *       &009C
+;EHCI_INSNREG04                  *       &00A0
+;EHCI_INSNREG05_UTMI             *       &00A4 ; mode dependend bit fields (UTMI mode)
+;EHCI_INSNREG05_ULPI             *       &00A4 ; mode dependend bit fields (ULPI mode)
+;EHCI_INSNREG06                  *       &00A8
+;EHCI_INSNREG07                  *       &00AC
+;EHCI_INSNREG08                  *       &00B0
+
+; OTG registers - relative to L4_USB_OTG
+OTG_BASE                        *       &0400
+; OTG registers - relative to OTG_BASE
+OTG_REVISION                    *       &0000
+OTG_SYSCONFIG                   *       &0004
+OTG_SYSSTATUS                   *       &0008
+OTG_INTERFSEL                   *       &000C
+OTG_SIMENABLE                   *       &0010
+OTG_FORCESTDBY                  *       &0014
+OTG_BIGENDIAN                   *       &0018
+
+;Other things per controller. Relative to HCIn_BASE
+HCI_ICR                         *       &0800
+HSIC_STATUS                     *       &0804
+
+;Pretty sure these don't exist here.
+; OCP2SCP registers - relative to L4_USBPHY
+;OCP2SCP_REVISION                *       &0000
+;OCP2SCP_SYSCONFIG               *       &0010
+;OCP2SCP_SYSSTATUS               *       &0014
+;OCP2SCP_TIMING                  *       &0018
+
+
+;Found the PHY! It lives in CCU
+
+;either way, no equivalent.
+; USBPHY registers - relative to L4_USBPHY
+;USBPHY_BASE                     *       &0080
+; USBPHY registers - relative to USBPHY_BASE
+;USBPHY_TERMINATION_CONTROL      *       &0000
+;USBPHY_RX_CALIB                 *       &0004
+;USBPHY_DLLHS_2                  *       &0008
+;USBPHY_RX_TEST_2                *       &000C
+;USBPHY_TX_TEST_CHRG_DET         *       &0010
+;USBPHY_CHRG_DET                 *       &0014
+;USBPHY_PWR_CNTL                 *       &0018
+;USBPHY_UTMI_INTERFACE_CNTL_1    *       &001C
+;USBPHY_UTMI_INTERFACE_CNTL_2    *       &0020
+;USBPHY_BIST                     *       &0024
+;USBPHY_BIST_CRC                 *       &0028
+;USBPHY_CDR_BIST2                *       &002C
+;USBPHY_GPIO                     *       &0030
+;USBPHY_DLLHS                    *       &0034
+;USBPHY_USB2PHYCM_TRIM           *       &0038
+;USBPHY_USB2PHYCM_CONFIG         *       &003C
+;USBPHY_USBOTG                   *       &0040
+;USBPHY_AD_INTERFACE_REG1        *       &0044
+;USBPHY_AD_INTERFACE_REG2        *       &0048
+;USBPHY_AD_INTERFACE_REG3        *       &004C
+;USBPHY_ANA_CONFIG1              *       &0050
+;USBPHY_ANA_CONFIG2              *       &0054
+
+USB_CONNECT_DETECT               *       1 << 17
+USB_CONNECT_INT                  *       1 << 16
+USB_AHB_INCR16_EN                *       1 << 11
+USB_AHB_INCR8_EN                 *       1 << 10
+USB_AHB_INCR4_BURST_EN           *       1 <<  9
+USB_AHB_INCRX_ALIGN_EN           *       1 <<  8
+USB_ULPI_BYPASS_EN               *       1 <<  0
+
+        ] ; __HAL_USB_HDR__
+
+        END

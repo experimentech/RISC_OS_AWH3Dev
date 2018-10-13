@@ -1,0 +1,158 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+; 
+        SUBT Exported SPIDriver constants
+
+
+OldOpt  SETA    {OPT}
+        OPT     OptNoList+OptNoP1List
+
+SWIClass        SETS    SPIDriverSWI_Name
+
+        ^       SPIDriverSWI_Base
+
+        AddSWI Version          ; +0   &59880
+        AddSWI Initialise       ; +1   &59881
+        AddSWI Control          ; +2   &59882
+        AddSWI Transfer         ; +3   &59883
+        AddSWI Status           ; +4   &59884
+
+;        ^       SPIDriverSWI_Base + &3E
+;        AddSWI Deregister       ; +3E  &598BE
+;        AddSWI Register         ; +3F  &598BF
+
+; Swi reason codes in r0/a1
+; SWI Initialise
+        ^       0
+SWII_ListDevices               #       1
+SWII_ReadCapabilities          #       1
+SWII_SetConfiguration          #       1
+SWII_PinMap                    #       1
+;
+; SWI Control
+        ^       0
+SWIC_1                         #       1
+;
+; SWI Transfer
+        ^       0
+SWIT_1                         #       1        
+
+
+; SPI_Capabilities - offsets into C structure defined in h.SPIDriver
+; C struct in RMA filled out by driver to indicate capabilities
+; Ownership does not change
+        ^       0
+SPIR_spidevice                 #       4       ; pointer to owning device
+SPIR_fastclock                 #       4       ; fullspeed system clock Hz
+SPIR_slowclock                 #       4       ; slow delay clock Hz or 0
+SPIR_maxburstbitlength         #       4       ; max burst length (bits) 
+;
+SPIR_maxhtbits                 #       4       ;
+SPIR_rxfifosize                #       4       ;
+SPIR_txfifosize                #       4       ;
+SPIR_msgdatafifosize           #       4       ;
+;
+SPIR_maxdelaySS2CLK            #       4       ;
+SPIR_maxSPdelay                #       4       ;
+SPIR_wrfifoaddr                #       4       ;
+SPIR_rdfifoaddr                #       4       ;
+;
+SPIR_wrpolladdr                #       4       ;
+SPIR_wrpollmask                #       4       ;
+SPIR_rdpolladdr                #       4       ;
+SPIR_rdpollmask                #       4       ;
+;
+; all below are unsigned char                  
+SPIR_datawidth                 #       1       ;
+SPIR_SPIClockprediv            #       1       ;
+SPIR_SPIClockpostdiv           #       1       ;
+SPIR_mastermode                #       1       ;
+;                                              
+SPIR_slavemode                 #       1       ;
+SPIR_modes                     #       1       ;
+SPIR_SCLKrest                  #       1       ;
+SPIR_SDATArest                 #       1       ;
+;                                              
+SPIR_SSpol                     #       1       ;
+SPIR_SSctl                     #       1       ;
+SPIR_SCLKpol                   #       1       ;
+SPIR_SSCLKphase                #       1       ;
+;                                              
+                               #       0       ; align to 4
+        ASSERT  ((:INDEX:@):AND:3) = 0               
+
+; SPI_Settings - keep in sync with spi_settings struct in h.SPIDriver
+; C struct sent by driver to set up device parameters
+        ^        0
+SPIS_spidevice                 #       4       ; intended device
+SPIS_clock                     #       4       ;
+SPIS_delayclock                #       4       ;
+SPIS_burstlength               #       4       ;
+; all below are unsigned char in groups of 4 
+SPIS_drcontrol                 #       1       ;
+SPIS_mode                      #       1       ;
+SPIS_modebits                  #       1       ;
+SPIS_SCLKlevel                 #       1       ;
+;
+SPIS_SDATAlevel                #       1       ;
+SPIS_SSlevel                   #       1       ;
+SPIS_SPIburst                  #       1       ;
+SPIS_SCLKpol                   #       1       ;
+;
+SPIS_SCLKphase                 #       1       ;
+
+SPIS_pad1                      #       1       ; align to 4
+SPIS_pad2                      #       1       ; align to 4
+SPIS_pad3                      #       1       ; align to 4
+
+        ASSERT  ((:INDEX:@):AND:3) = 0               
+
+; SPI_Transfer - keep in sync with spi_transfer struct in h.SPIDriver
+; C struct sent by driver to set up device parameters
+        ^        0
+SPIT_spisettings               #       4       ; intended device/settings
+SPIT_wr_addr                   #       4       ;
+SPIT_rd_addr                   #       4       ;
+SPIT_cb_addr                   #       4       ;
+SPIT_burstlength               #       4       ;
+SPIT_timeout                   #       4       ;
+; all below are unsigned char in groups of 4 
+SPIT_dma_mode                  #       1       ;
+SPIT_channel                   #       1       ; on a per-transfer basis
+SPIT_pad1                      #       1       ; align to 4
+SPIT_pad2                      #       1       ; align to 4
+;SPIT_pad3                      #       1       ; align to 4
+
+        ASSERT  ((:INDEX:@):AND:3) = 0               
+
+; SPI_PinMap structure to define name and pin spec for available i/o
+; SPI_PinMap - keep in sync with spi_pinmap struct in h.SPIDriver
+; C Struct read by driver
+        ^       0
+SPIP_pin                      #       4       ; pin# + (gpio<<5) + (state<<8)
+SPIP_internal1                #       4       ; unmapped pad mux address
+SPIP_internal2                #       4       ; unmapped pad ctl address
+SPIP_internal3                #       4       ; pad mux info
+SPIP_name                     #       12      ; null terminated text name
+SPIP_len                      #       0       ; length of structure (28)
+                                              ; keep len syncd with hdr.StaticWS
+
+        ASSERT  ((:INDEX:@):AND:3) = 0               
+        
+        OPT     OldOpt
+
+        END

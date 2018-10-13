@@ -1,0 +1,29 @@
+This is a one controller to many interfaces driver
+ cpsw -> mac0 -> ecp0 
+         mac1 -> ecp1
+plus optionally a virtual interface per port.
+
+This makes it a bit of a frankenstein as some of the NetBSD code zaps the top level CPSW controller when really only dealing with one of the two MACs.
+
+Specifically, this implicates 
+ cpsw_start(ifp)
+   enables top level CPSW, only call once!
+ cpsw_ioctl(ifp)
+   boilerplate
+ cpsw_init(ifp)
+   resets top level CPSW, only call once!
+ cpsw_stop(ifp)
+   disables top level CPSW, only call once!
+ cpsw_watchdog(ifp)
+   may call cpsw_init() and cpsw_start() 
+ mii_attach(mii)
+   need to fudge mii_ifp to be one of two
+   should probably use the LIST_FOREACH stuff
+ mii_mediachg(mii)
+   need to fudge mii_ifp to be one of two
+   should probably use the LIST_FOREACH stuff
+ mii_down(mii)
+   unused
+ mii_tick(mii)
+   iterates over the two ifps
+

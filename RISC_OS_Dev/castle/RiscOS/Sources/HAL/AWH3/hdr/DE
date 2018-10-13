@@ -1,0 +1,45 @@
+;DE2.0. Registers based on H3 version
+
+;DE       *    &01000000
+
+DE_DISPLAY_SYSTEM    *    &000000
+DE_RT_WB             *    &010000
+DE_RT_MIXER0         *    &100000
+DE_RT_MIXER1         *    &200000
+
+;--Display system registers--
+
+SCLK_GATE            *    &000
+HCLK_GATE            *    &004
+AHB_RESET            *    &008
+SCLK_DIV             *    &00C
+DE2TCON_MUX          *    &010
+
+;--Frontend registers--
+
+; http://linux-sunxi.org/Display_Controller_Register_Guide
+;--Backend registers--
+BE_RES0           *    &000
+BE_MODE_CTL           *    &800
+BE_COLOUR_CTL     *    &804
+BE_DISP_SIZE      *    &808
+BE_ERROR_CORRECTION           *    &80C
+BE_LAYER0_SIZE       *    &810
+BE_LAYER1_SIZE       *    &814
+BE_LAYER2_SIZE       *    &818
+BE_LAYER3_SIZE       *    &81C
+BE_LAYER0_POS        *    &820
+BE_LAYER1_POS        *    &824
+BE_LAYER2_POS        *    &828
+BE_LAYER3_POS        *    &82C
+;... continue
+
+;--LCD registers--
+
+;--TVEC Registers--
+
+;--HDMI Registers--
+
+
+
+    END

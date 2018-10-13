@@ -1,0 +1,351 @@
+REM 
+REM Copyright (c) 2012, RISC OS Open Ltd
+REM All rights reserved.
+REM 
+REM Redistribution and use in source and binary forms, with or without
+REM modification, are permitted provided that the following conditions are met: 
+REM     * Redistributions of source code must retain the above copyright
+REM       notice, this list of conditions and the following disclaimer.
+REM     * Redistributions in binary form must reproduce the above copyright
+REM       notice, this list of conditions and the following disclaimer in the
+REM       documentation and/or other materials provided with the distribution.
+REM     * Neither the name of RISC OS Open Ltd nor the names of its contributors
+REM       may be used to endorse or promote products derived from this software
+REM       without specific prior written permission.
+REM 
+REM THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+REM AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+REM IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+REM ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+REM LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+REM CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+REM SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+REM INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+REM CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+REM ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+REM POSSIBILITY OF SUCH DAMAGE.
+REM 
+ON ERROR PRINT REPORT$;" at ";ERL : END
+
+REM Create blank CMOS file
+
+DIM cmos% 2052
+FOR a%=0 TO 2044 STEP 4 : cmos%!a%=0 : NEXT a%
+cmos%!2048 = 510 : REM Current Boot$OSVersion, just in case something cares about it in the future
+loadedcmos%=FALSE
+
+REM Grab command line from DDEUtils
+
+SYS "DDEUtils_GetCLSize" TO clsize%
+DIM cl% clsize%
+SYS "DDEUtils_GetCl",cl%
+clpos%=0
+
+REM Find output type, name
+
+type$=FNgetarg
+IF type$="CMOS" THEN loadedcmos%=TRUE : PROCloadCMOS(FNgetarg) : type$=FNgetarg
+IF type$="disc" THEN disc%=TRUE ELSE IF type$="file" THEN disc%=FALSE ELSE PRINT "Unknown output type '"+type$+"'"
+IF disc%=TRUE THEN
+  discno%=VAL(FNgetarg)
+  IF discno%<0 OR discno%>7 THEN PRINT "Bad SCSI drive number"
+  sdimage$="SCSI::"+STR$(discno%)+".$"
+  PROCCheckDisc
+ELSE
+  sdimage$=FNgetarg
+  IF sdimage$="" THEN PRINT "No output filename given" 
+ENDIF
+wand%=FALSE : REM Assume no special Wandboard handling
+
+REM Validate the other command line args
+
+pos%=clpos%
+outfile$=FNgetarg
+IF outfile$="image" THEN
+  infile$=FNgetarg
+  REM Try to deduce if Wandboard special processing required
+  wand%=FNCheckWand(infile$,&400)
+  REM Write a prepared image to SD
+  PROCwrite(infile$)
+  REM Write CMOS file if necessary
+  IF loadedcmos%=TRUE THEN PROCwriteCMOS : PROCdismount
+  PRINT "Done"
+  END
+ENDIF
+WHILE outfile$<>""
+  infile$=FNgetarg
+  PROCCheckFile(outfile$,infile$)
+  outfile$=FNgetarg
+ENDWHILE
+
+REM Now do it for real
+
+clpos%=pos%
+IF wand% THEN
+  PROCdecompress("<SDCreate$Dir>.blankwand")
+ELSE
+  PROCdecompress("<SDCreate$Dir>.blank")
+ENDIF
+REM Process other command line args
+outfile$=FNgetarg
+WHILE outfile$<>""
+  infile$=FNgetarg
+  IF outfile$="UIMAGE" THEN
+    PRINT "Generating UIMAGE"
+    WAIT
+    F%=OPENIN(infile$)
+    IF F%=0 THEN PRINT "File '"+infile$+"' not found" : END
+    L%=EXT#F%
+    CLOSE#F%
+    SYS "Wimp_StartTask","mkimage -A arm -O linux -T kernel -C none -a 0x81000000 -e 0x81000064 -n ""RISC OS "" -d "+infile$+" "+sdimage$+".UIMAGE > null:"
+    REM Check it worked, uimage should be 64 bytes larger than the ROM
+    F%=OPENIN(sdimage$+".uimage")
+    IF F%<>0 THEN E%=EXT#F% : CLOSE#F% ELSE E%=0
+    IF F%=0 OR E%<>L%+64 THEN PRINT "Failed to create uimage" : END
+  ELSE
+    IF wand% AND outfile$="RISCOS" THEN
+      REM RISC OS ROM only, hidden in a special sector
+      PROCwriteWandROM(sdimage$,infile$,&400)
+    ELSE
+      PRINT "Copying "+outfile$
+      OSCLI("copy "+infile$+" "+sdimage$+"."+outfile$+" A~C~DF~N~V")
+    ENDIF
+  ENDIF
+  outfile$=FNgetarg
+ENDWHILE
+PROCwriteCMOS
+IF disc%=TRUE THEN
+  PROCdismount
+ELSE
+  REM The frontend module doesn't seem to consider an image file as a valid output file, so set type to data :(
+  SYS "OS_File",18,sdimage$,&FFD
+ENDIF
+PRINT "Done"
+END 
+
+DEF FNgetarg
+  LOCAL arg$
+  arg$=""
+  WHILE clpos%<clsize% AND cl%?clpos%=32
+    clpos%+=1
+  ENDWHILE
+  WHILE clpos%<clsize% AND cl%?clpos%>32
+    arg$=arg$+CHR$(cl%?clpos%)
+    clpos%+=1
+  ENDWHILE
+=arg$
+
+DEF PROCdecompress(infile$)
+  LOCAL F%,size%,sqsh%,buf%,worksize%,work%,flags%,in%,in_remain%,discaddr%,O%,stat%,out_end%,unwritten%
+  F%=OPENIN(infile$)
+  size%=EXT#F%
+  DIM sqsh% LOCAL size%
+  SYS "OS_GBPB",4,F%,sqsh%,size%
+  CLOSE#F%
+  IF sqsh%!0<>&48535153 THEN PRINT "Compressed file corrupt?" : END
+  DIM buf% LOCAL 128*1024
+  SYS "Squash_Decompress",8,-1 TO worksize%
+  DIM work% LOCAL worksize%
+  
+  REM Decompress to temp buffer & write out
+  flags%=0
+  in%=sqsh%+20
+  in_remain%=size%-20
+  discaddr%=0
+  IF disc%=TRUE THEN PROCdismount ELSE O%=OPENOUT(sdimage$)
+  PRINT "Decompressing blank image...";
+  REPEAT
+    SYS "Squash_Decompress",flags%,work%,in%,in_remain%,buf%,128*1024 TO stat%,,in%,in_remain%,out_end%
+    IF stat%<>2 AND stat%<>0 THEN PRINT '"Funny status returned by Squash" : END
+    IF out_end%-buf% > 0 THEN
+      IF disc%=TRUE THEN
+        SYS "SCSIFS_DiscOp",,2,discaddr% OR (discno%<<29),buf%,out_end%-buf% TO ,,discaddr%,,unwritten%
+      ELSE
+        SYS "OS_GBPB",2,O%,buf%,out_end%-buf% TO ,,,unwritten%
+      ENDIF
+      IF unwritten%>0 THEN PRINT '"Failed to write correct data length" : END
+    ENDIF
+    PRINT ".";
+    flags%=1
+  UNTIL stat%=0
+  IF disc%=FALSE THEN CLOSE#O% : SYS "OS_File",18,sdimage$,&FC8
+  PRINT
+ENDPROC
+
+DEF PROCCheckFile(outfile$,infile$)
+  LOCAL F%,L%
+  IF infile$="" THEN PRINT "Bad command line parameters" : END
+  F%=OPENIN(infile$)
+  IF F%=0 THEN PRINT "File '"+infile$+"' not found" : END
+  L%=EXT#F%
+  CLOSE#F%
+  REM Try to deduce if Wandboard special processing required
+  IF outfile$="RISCOS" THEN wand%=FNCheckWand(infile$,0)
+  REM Simplistic error checks
+  CASE outfile$ OF
+    WHEN "RISCOS","UIMAGE" : IF L%<1024*1024 OR (L% AND 3)<>0 THEN PRINT "File '"+infile$+"' doesn't look like a valid ROM image to me" : END
+    WHEN "BOOT/SCR","BOOT/INI","RESET/SCR","UENV/TXT" : IF L%>1024 THEN PRINT "File '"+infile$+"' doesn't look like a boot script to me" : END
+    WHEN "README/TXT" : IF L%>32768 THEN PRINT "File '"+infile$+"' doesn't look like a brief introduction to me" : END
+    WHEN "MLO" : IF L%>64*1024 OR L%<8*1024 THEN PRINT "File '"+infile$+"' doesn't look like a copy of x-loader to me" : END
+    WHEN "U-BOOT/BIN" : IF L%>512*1024 OR L%<64*1024 THEN PRINT "File '"+infile$+"' doesn't look like a copy of u-boot to me" : END
+    OTHERWISE PRINT "Don't know how to handle output file '"+outfile$+"'" : END
+  ENDCASE
+ENDPROC
+
+DEF PROCwrite(infile$)
+  LOCAL F%,size%,discaddr%,read%,buf%,unread%
+  PROCdismount
+  F%=OPENIN(infile$)
+  size%=EXT#F%
+  DIM buf% LOCAL 128*1024
+  discaddr%=0
+  PRINT "Writing image...";
+  REPEAT
+    IF size%>128*1024 THEN read%=128*1024 ELSE read%=size%
+    SYS "OS_GBPB",4,F%,buf%,read% TO ,,,unread%
+    IF unread%>0 THEN PRINT '"Failed to read from image file!" : CLOSE#F% : END
+    SYS "SCSIFS_DiscOp",,2,discaddr% OR (discno%<<29),buf%,read% TO ,,discaddr%,,unwritten%
+    IF unwritten%>0 THEN PRINT '"Failed to write correct data length" : CLOSE#F% : END
+    PRINT ".";
+    size%-=read%
+  UNTIL size%=0
+  CLOSE#F%
+  PROCdismount
+  PRINT
+ENDPROC
+
+DEF PROCloadCMOS(infile$)
+  LOCAL F%,L%,pos%
+  IF infile$="" THEN PRINT "Bad command line parameters" : END
+  F%=OPENIN(infile$)
+  IF F%=0 THEN PRINT "File '"+infile$+"' not found" : END
+  L%=EXT#F%
+  REM Accept all sizes saved by *SaveCMOS
+  IF L%<>240 AND L%<>244 AND L%<>260 AND L%<>2052 THEN PRINT "File '"+infile$+"' doesn't look like a valid CMOS file to me" : END
+  IF L%=244 THEN L%=240
+  IF L%=260 THEN L%=256
+  PRINT "Loading CMOS image"
+  pos%=0
+  WHILE pos%<L%
+    cmos%?pos%=BGET#F%
+    pos%+=1
+  ENDWHILE
+  CLOSE#F%
+ENDPROC
+
+DEF PROCwriteCMOS
+  PRINT "Writing CMOS image"
+  IF wand% THEN
+    REM First 256 bytes only, hidden in a special sector, and in physical byte order
+    LOCAL unwritten%,I%,O%
+    DIM phycmos% LOCAL 256
+    FOR I%=0 TO 255
+      CASE I%>>4 OF
+        WHEN&F :       O%=&00+(I% AND&F)
+        WHEN&C,&D,&E : O%=&10+I%-&C0
+        OTHERWISE :    O%=&40+I%
+      ENDCASE
+      phycmos%?O%=cmos%?I%
+    NEXT
+    IF disc% THEN
+      SYS "SCSIFS_DiscOp",,2,&1200 OR (discno%<<29),phycmos%,256 TO ,,,,unwritten%
+    ELSE
+      F%=OPENUP(sdimage$)
+      SYS "OS_GBPB",1,F%,phycmos%,256,&1200 TO,,,unwritten%
+      CLOSE#F%
+    ENDIF
+    IF unwritten%>0 THEN PRINT '"Failed to write correct data length"
+  ELSE
+    SYS "OS_File",10,sdimage$+".CMOS",&ff2,,cmos%,cmos%+2052
+  ENDIF
+ENDPROC
+
+DEF PROCwriteWandROM(sdimage$,infile$,offset%)
+  LOCAL raw%,rom%,size%,read%,unread%,unwritten%
+  DIM buf% LOCAL 128*1024
+  raw%=OPENUP(sdimage$)
+  rom%=OPENIN(infile$)
+  size%=EXT#rom%
+  PTR#raw%=offset%
+  PRINT "Overlaying ROM image...";
+  REPEAT
+    IF size%>128*1024 THEN read%=128*1024 ELSE read%=size%
+    SYS "OS_GBPB",4,rom%,buf%,read% TO ,,,unread%
+    IF unread%>0 THEN PRINT '"Failed to read from ROM file!" : CLOSE#raw% : CLOSE#rom% : END
+    SYS "OS_GBPB",2,raw%,buf%,read% TO ,,,unwritten%
+    IF unwritten%>0 THEN PRINT '"Failed to overlay data in the image" : CLOSE#raw% : CLOSE#rom% : END
+    PRINT ".";
+    size%-=read%
+  UNTIL size%=0
+  CLOSE#raw%
+  CLOSE#rom%
+  PRINT
+ENDPROC
+
+DEF PROCdismount
+  LOCAL A$
+  IF disc%=FALSE THEN ENDPROC
+  REM Fat32Fs may be loaded, make sure that dismounts the drive as well
+  A$="-Fat32Fs-%dismount :"+STR$ discno%
+  SYS "XOS_CLI",A$
+  SYS "XOS_CLI",A$
+  REM Dismount twice to ensure FileCore forgets the disc
+  A$="-SCSI-%dismount :"+STR$ discno%
+  OSCLI(A$)
+  OSCLI(A$)
+ENDPROC
+
+DEF FNCheckWand(infile$,offset%)
+  LOCAL F%,unread%,wand%,flags%
+  DIM buf% LOCAL 32
+  F%=OPENIN(infile$)
+  IF F%<>0 THEN
+    SYS "XOS_GBPB",3,F%,buf%,32,offset% TO,,,unread%;flags%
+    IF (flags% AND 1) = 0 AND unread% = 0 THEN
+      REM Inspect the IVT section header
+      IF buf%!0=&402000D1 AND buf%!4=&17801000 AND buf%!8=0 AND buf%!24=0 AND buf%!28=0 THEN
+        wand%=TRUE
+      ENDIF
+    ENDIF
+    CLOSE#F%
+  ENDIF
+  =wand%
+
+DEF PROCCheckDisc
+  LOCAL buf1%,buf2%,flags%,pos%,bad%,fs%,default%,result%
+  bad%=FALSE
+  DIM buf1% LOCAL 4096
+  DIM buf2% LOCAL 4096
+  REM Pop up a generic confirmation message
+  buf1%!0 = 0
+  $(buf1%+4) = "All existing data on drive "+sdimage$+" will be lost. Proceed?"+CHR$(0)
+  SYS "Wimp_ReportError",buf1%,&517,"SDCreate","!sdcreate" TO ,result%
+  IF result%<>1 THEN PRINT "User cancelled operation" : END
+  REM Check that the selected disc (discno%, sdimage$) is safe to write to
+  REM i.e. doesn't look like the boot drive!
+  SYS "XOS_FSControl",37,"<Boot$Dir>",buf1%,,,4096 TO ;flags%
+  IF (flags% AND 1) = 0 THEN
+    SYS "XOS_FSControl",37,sdimage$,buf2%,,,4096 TO ;flags%
+    IF (flags% AND 1) = 0 THEN
+      pos%=0
+      WHILE (buf1%?pos% = buf2%?pos%) AND (buf2%?pos%<>ASC("$"))
+        pos%=pos%+1
+      ENDWHILE
+      IF (buf1%?pos%=ASC("$")) AND (buf2%?pos%=ASC("$")) THEN bad%=TRUE
+    ENDIF
+  ENDIF
+  REM Also check configured boot drive?
+  IF bad%=FALSE THEN
+    SYS "OS_Byte",161,5 TO ,,fs%
+    IF fs%=26 THEN
+      SYS "SCSIFS_Drives" TO default%
+      IF default%=discno% THEN bad%=TRUE
+    ENDIF
+  ENDIF
+  IF bad%=TRUE THEN
+    buf1%!0 = 0
+    $(buf1%+4) = sdimage$+" appears to be the boot drive. Are you sure you want to proceed? All existing data will be lost"+CHR$(0)
+    SYS "Wimp_ReportError",buf1%,&517,"SDCreate","!sdcreate" TO ,result%
+    IF result%<>1 THEN PRINT "User cancelled operation" : END
+  ENDIF
+ENDPROC

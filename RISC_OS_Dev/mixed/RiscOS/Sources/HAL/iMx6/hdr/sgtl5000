@@ -1,0 +1,93 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_SGTL5000_REGS__
+        GBLL    __HAL_SGTL5000_REGS__
+
+SGTL5000_CHIP_ID                * &0000
+SGTL5000_CHIP_DIG_POWER         * &0002
+SGTL5000_CHIP_CLK_CTRL          * &0004
+SGTL5000_CHIP_I2S_CTRL          * &0006
+SGTL5000_CHIP_SSS_CTRL          * &000a
+SGTL5000_CHIP_ADCDAC_CTRL       * &000e
+SGTL5000_CHIP_DAC_VOL           * &0010
+SGTL5000_CHIP_PAD_STRENGTH      * &0014
+SGTL5000_CHIP_ANA_ADC_CTRL      * &0020
+SGTL5000_CHIP_ANA_HP_CTRL       * &0022
+SGTL5000_CHIP_ANA_CTRL          * &0024
+SGTL5000_CHIP_LINREG_CTRL       * &0026
+SGTL5000_CHIP_REF_CTRL          * &0028
+SGTL5000_CHIP_MIC_CTRL          * &002a
+SGTL5000_CHIP_LINE_OUT_CTRL     * &002c
+SGTL5000_CHIP_LINE_OUT_VOL      * &002e
+SGTL5000_CHIP_ANA_POWER         * &0030
+SGTL5000_CHIP_PLL_CTRL          * &0032
+SGTL5000_CHIP_CLK_TOP_CTRL      * &0034
+SGTL5000_CHIP_ANA_STATUS        * &0036
+SGTL5000_CHIP_SHORT_CTRL        * &003c
+SGTL5000_CHIP_ANA_TEST2         * &003a
+SGTL5000_DAP_CTRL               * &0100
+SGTL5000_DAP_PEQ                * &0102
+SGTL5000_DAP_BASS_ENHANCE       * &0104
+SGTL5000_DAP_BASS_ENHANCE_CTRL  * &0106
+SGTL5000_DAP_AUDIO_EQ           * &0108
+SGTL5000_DAP_SURROUND           * &010a
+SGTL5000_DAP_FLT_COEF_ACCESS    * &010c
+SGTL5000_DAP_COEF_WR_B0_MSB     * &010e
+SGTL5000_DAP_COEF_WR_B0_LSB     * &0110
+SGTL5000_DAP_EQ_BASS_BAND0      * &0116
+SGTL5000_DAP_EQ_BASS_BAND1      * &0118
+SGTL5000_DAP_EQ_BASS_BAND2      * &011a
+SGTL5000_DAP_EQ_BASS_BAND3      * &011c
+SGTL5000_DAP_EQ_BASS_BAND4      * &011e
+SGTL5000_DAP_MAIN_CHAN          * &0120
+SGTL5000_DAP_MIX_CHAN           * &0122
+SGTL5000_DAP_AVC_CTRL           * &0124
+SGTL5000_DAP_AVC_THRESHOLD      * &0126
+SGTL5000_DAP_AVC_ATTACK         * &0128
+SGTL5000_DAP_AVC_DECAY          * &012a
+SGTL5000_DAP_COEF_WR_B1_MSB     * &012c
+SGTL5000_DAP_COEF_WR_B1_LSB     * &012e
+SGTL5000_DAP_COEF_WR_B2_MSB     * &0130
+SGTL5000_DAP_COEF_WR_B2_LSB     * &0132
+SGTL5000_DAP_COEF_WR_A1_MSB     * &0134
+SGTL5000_DAP_COEF_WR_A1_LSB     * &0136
+SGTL5000_DAP_COEF_WR_A2_MSB     * &0138
+SGTL5000_DAP_COEF_WR_A2_LSB     * &013a
+
+; SGTL5000_CHIP_ANA_POWER
+
+SGTL5000_CHIP_ANA_POWER_DAC_STEREO                    * &4000
+SGTL5000_CHIP_ANA_POWER_LINREG_SIMPLE_POWERUP         * &2000
+SGTL5000_CHIP_ANA_POWER_STARTUP_POWERUP               * &1000
+SGTL5000_CHIP_ANA_POWER_VDDC_CHRGPMP_POWERUP          * &0800
+SGTL5000_CHIP_ANA_POWER_PLL_POWERUP                   * &0400
+SGTL5000_CHIP_ANA_POWER_LINEREG_D_POWERUP             * &0200
+SGTL5000_CHIP_ANA_POWER_VCOAMP_POWERUP                * &0100
+SGTL5000_CHIP_ANA_POWER_VAG_POWERUP                   * &0080
+SGTL5000_CHIP_ANA_POWER_ADC_STEREO                    * &0040
+SGTL5000_CHIP_ANA_POWER_REFTOP_POWERUP                * &0020
+SGTL5000_CHIP_ANA_POWER_HP_POWERUP                    * &0010
+SGTL5000_CHIP_ANA_POWER_DAC_POWERUP                   * &0008
+SGTL5000_CHIP_ANA_POWER_CAPLESS_HP_POWERUP            * &0004
+SGTL5000_CHIP_ANA_POWER_ADC_POWERUP                   * &0002
+SGTL5000_CHIP_ANA_POWER_LINE_OUT_POWERUP              * &0001
+
+        ] ;__HAL_SGTL5000_REGS__
+
+        END

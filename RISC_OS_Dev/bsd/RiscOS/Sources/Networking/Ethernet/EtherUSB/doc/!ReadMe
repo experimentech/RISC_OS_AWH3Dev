@@ -1,0 +1,367 @@
+                                 EtherUSB
+                                 ========
+
+Introduction
+------------
+EtherUSB is a DeviceFS USB driver for handling Ethernet style devices.
+
+When the module is started, it scans the USB bus for suitable devices and
+creates network interfaces ej0, ej1, ... for each one. Network interfaces
+are created and destroyed as devices are added and removed from the bus,
+though interface names don't change during this process. 
+
+Please note that this driver has only been tested with a few devices, The
+author makes no guarantee that the driver is compatible with any specific
+device. Please read the disclaimer at the end of this document.
+
+
+Basic Usage
+-----------
+In any order, load the module and plug in a USB ethernet adapter. If the
+device is recognised then it will show up when running '*EJInfo'. You can
+then use ifconfig, DHCP or whatever to configure the device.
+
+EtherUSB contains an internal list mapping a USB vendor and product ID to
+a backend to use. Many devices can only be recognised by EtherUSB if they
+are on this list, the list can be extended by setting system variables, see
+below.
+
+Logging information and errors on device start up are sent to the 'EtherUSB'
+SysLog log, if you have SysLog installed. Any errors occurring when starting
+a recognised device will appear here.
+
+
+Hardware Currently Supported
+----------------------------
+The module contains drivers for different types of USB ethernet hardware.
+These drivers are referred to as 'backends'. Most USB ethernet devices can
+only be identified by the USB vendor and product IDs, such devices will
+only be picked up by EtherUSB if there is an entry in its products table,
+see below.
+
+The following backends are present:
+
+  * AX88172:
+      Asix USB2 ethernet adapters used by many different manufacturers.
+      Identified by vendor and product IDs. Currently always reports link
+      speed as 100Mb
+
+  * AX88772:
+      Asix USB2 ethernet adapters used by many different manufacturers.
+      Identified by vendor and product IDs.
+            
+  * MCS7830:
+      MosChip USB2 ethernet adapters. Identified by vendor and product IDs.  
+      Basic support only.
+      
+  * Pegasus:
+      This driver deals with a multitude of devices which use the ADMtek
+      AN986 or AN8511 chipsets. Devices are identified by differing
+      Product/Vendor IDs. In addition, some devices need extra options
+      specifying - these are specified as a comma-seperated list in the
+      options string:
+      
+        PII    Pegasus II chip
+        PNA    Has Home PNA (Note: Currently does nothing)
+        LSYS   Use Linksys reset
+
+  * SMSC95xx:
+      Identified by vendor and product IDs. Supports the LAN 9514 as used on
+      the Beagleboard xM. It may also work with LAN9500(i), LAN9500A(i),
+      LAN9512 and LAN9514i, though this hasn't been tested.
+      
+      Because the BeagleBoard xM does not set the MAC address, this backend
+      sets one itself. This means that by default, multiple BeagleBoard xM
+      machines on the same ethernet segment will not work. To work around
+      this the MAC address can be overridden by setting a system variable,
+      for example:
+      
+        *Set EtherUSB$MAC_Configured 00:01:02:03:04:05
+        
+      This variable is only respected by this backend. It should be set 
+      before loading EtherUSB.
+      
+  * CDC Ethernet:
+      USB standard for ethernet devices.
+      Identified by USB class 2, subclass 0, protocol 0 + USB descriptors.
+      Not functional.
+
+    
+Products Reported to Work
+-------------------------
+SiteCom LN-029                 AX88172     
+ADMTek USB To LAN Converter    Pegasus "PII"
+BeagleBoard xM                 SMSC95xx
+
+                       
+Identification by Product/Vendor
+--------------------------------
+There is an internal list of known devices, identified by the USB product and
+vendor IDs, which are only passed to a single backend. Devices not on this
+list are passed to each backend in turn to see if any can handle it.
+
+You can force devices not on this list to be treated in the same way by
+setting system variables, before EtherUSB is started, of the form:
+
+  *Set EtherUSB$Product_VVVV_PPPP <backend>[:<options>]
+  
+Where VVVV and PPPP are the 4 digit hexadecimal vendor and product codes, as
+shown by *USBDevInfo. <backend> is a one of the backends listed by *EJInfo -v
+and <options> are backend dependant options.
+
+For example:
+
+  *Set EtherUSB$Product_6189_182D AX88172
+  *Set EtherUSB$Product_6189_182D AX88172:OptionsGoHere
+
+To stop EtherUSB attempting to handle a device at all, in case another
+driver should handle it instead, you can use:
+
+  *Set EtherUSB$Product_6189_182D ""
+  
+Products set this way override any matching ones on the internal list.
+
+If you find you can make a product work (or work better) by setting these
+variables, please consider sending me the details for inclusion in the
+internal list.
+
+You can cause a device to be rechecked by unplugging and reinserting it or
+by *RMReinit EtherUSB.
+
+
+Configuration by MAC address
+----------------------------
+Each device can be configured automatically based on its MAC address by
+setting a system variable of the form:
+
+  *Set EtherUSB$MAC_XXXXXXXXXX <unit-no>|any <options>
+
+Where XXXXXXXXXX is the uppercase hex MAC address of the device you want
+to configure. If the backend supports *EJConfig, see below, then any
+valid *EJConfig options can be passed. The unit-number, if not 'any' is
+reserved for a device with this MAC, so the interface name is always
+ej<unit-no> and no other devices will be given that interface name.
+
+
+CLI Commands
+------------
+  *EJProducts
+      Shows the current product settings. Ones added by system variable are
+      prefixed by a '+' and internal ones which have been overriden or
+      disabled by system variables (and so will be ignored) are marked by
+      a '-'.
+
+  *EJInfo [<unit-number>] [-v]
+      Show information about the EtherUSB module and the status of all
+      interfaces. Further statistics can be obtained via *ShowStat. '-v'
+      outputs more infomation.
+
+  *EJConfig <unit-number> [<options>]  
+      Reconfigure a device. If a device doesn't support configuration or
+      an unrecognised option passed, then a 'not supported' error will be
+      generated. All options are case insensitive. Available options are
+      as follows:
+         auto        - Auto negotiate link settings (default)
+         noauto      - Disable use of auto-negotiation
+         half        - Half duplex link
+         full        - Full duplex link
+         10          - 10Mb link speed
+         100         - 100Mb link speed
+         multicast   - Force multicast to accept multicast packets.
+         promiscuous - Force controller to accept all packets.
+
+      The speed and duplex options must be used if 'noauto' is used. They
+      may also be used with auto-negotiation, in which case they restrict
+      the acceptible types of link.
+
+      Note that EtherUSB will (eventually) automatically enable multicast
+      or promiscuous modes if any of the networking modules using it
+      require them. The options here are intended to aid backend
+      development and debugging.
+
+
+To Do List
+----------
+  * Function in products.h to aid parsing of options.
+  * Multicast support.
+  * Enable promiscuous/multicast as per DCI.
+  * Profiling and performance testing.
+  * Use machine ID and when inventing a MAC address.
+  
+
+Compiling and Adding Backends
+-----------------------------
+You need a recent version of Norcroft as the code uses some C99 features and
+the inline assembler. An AMU makefile is provided. An example backed is in
+ax88172.{c|h}. The important headers are usb.h and net.h which should be
+reasonably well documented. Error messages are declared in module.h.
+
+The 'backend' is only responsible for talking to the USB device, the
+EtherUSB module handles insertion and removal of USB devices and
+interactions with other networking modules.
+
+If you add backends or make improvements please feed them back to the
+address below. If people are really interested in helping out, get in touch
+and I'll see about sorting out a CVS or Subversion repository.
+
+
+DCI Conformance
+---------------
+Network devices provided by EtherUSB have DCI slot ID '201' for 'USB';
+the slot's 'minor' field is set to the unit number.
+
+Due to the nature of USB, network devices may appear and disappear at any
+time. The DCI specification doesn't expect such behaviour. Possible problems
+are as follows:
+
+  * Unit numbers may not be consecutive, i.e. it is possible to have ej1
+    and then ej3 without ej0 and ej2.
+    
+  * By inserting and removing different devices, a give ej<n> interfaces
+    can have different MAC addresses. Some software may not expect this
+    behaviour. If it causes problems, you can hard-wire a MAC address to
+    a DCI unit number by setting EtherUSB$MAC_* before EtherUSB is started
+    or any relevant USB devices are plugged in. See above.
+    
+  * The DCI spec says that at start up, each driver should set the system
+    variable Inet$EtherType regardless or not of whether it was already
+    set. I don't know why any software should depend on such a primitive
+    mechanism, or indeed care, but it appears some does.
+
+    On the assumption that this variable needs to point to an existing
+    interface then when a USB ethernet device is detected, EtherUSB only
+    sets this variable if it was not already set.
+    
+    The intent here is that for machines such as the Iyonix with onboard
+    ethernet, the variable points to an existing interface, even if a USB
+    device is removed.
+    
+    
+Contact Details
+---------------
+If you have any bug reports, suggestions or comments, feel free to send
+them to jip22gm@gmail.com. The latest version will be available
+from http://effarig.co.uk/riscos
+
+Please note, please don't request help with networking issues not directly
+related to EtherUSB (eg routing, ifconfig, etc...), I probably won't be able
+to help.
+
+In addition there is a EtherUSB thread on the forums at www.riscosopen.org
+where this module is discussed.
+
+
+Changes
+-------
+0.01 (18 Jun 2006):
+  * Initial version, Asix AX88172 support.
+
+0.02 (23 Jun 2006):
+  * Added callback to prod writes, to help stop stalls.
+  
+0.03 (25 Jun 2006):
+  * Abstracted MII operations out of ax88172.c
+  * Reintroduced CDC backend code, this is incomplete as the Iyonix USB
+    system objects to my NTL cable modem.
+
+0.04 (05 Jun 2009):
+  * Fix potential infinite loop in USB device scanning.
+  * Added shell for a pegasus backend.
+  * Fixed misleading comments, mostly in net.h.
+  * Added scratch space before and after Tx packets passed to backends.
+
+0.05 (10 Aug 2009):
+  * Basic Asix AX88772 support.
+  * Basic MosChip MCS7830 support.
+  * Device configuration interface and *EJConfig implemented.
+  * EJInfo options implemented.
+  * Reworked status reporting.
+  * Introduced ability flags for devices.
+  * Removed code for invoking up/down scripts, better done outside EtherUSB.
+  * Unhook USB pipe callbacks before closing it, fixes occasional crashes.
+  * Improved MII support.
+
+0.06 (04 Oct 2009):
+  * Pegasus backend ported from NetBSD (if_aue.c), thanks to Jeffrey Lee.
+
+0.07 (01 Nov 2009):
+  * Compiler settings changed to be ARMv7 safe.
+
+0.08 (04 Apr 2010):
+  * Added EtherUSB$MAC_* for automating device specific configuration.
+  * Some nasty bugs fixed.
+  
+0.09 (09 Nov 2010) [Alpha]:
+  * Now requires USBDriver 0.49 and will fail to start without it.
+  * No need to access USBDriver workspace due to API extensions in 0.49. 
+  * Removal of unused code.
+  * Changes to USB API wrapper to allow multiple packets in output buffer.
+  * Experimental change to AX88772 backend to improve upload rates.
+
+0.10 (27 Jan 2011) [Alpha]:
+  * Support for SMSC95xx devices added, thanks to Thomas Milius. 
+
+0.11 (06 Feb 2011) [Alpha]:
+  * No longer have internal inconsistency if new device configuration fails.
+  * Config flags added for multicast and promiscuous modes.
+  * MII auto-negotiation properly implemented.
+  * AX88172, AX88772 and MCS7830 now use MII configuration.
+  * Added 'noauto', 'promiscuous' and 'multicast' to *EJConfig.
+
+0.12 (19 May 2011):
+  * Disabled some debug logging when not doing a DEBUG build.
+  * Added currently unused function to generate MAC address from machine ID.
+  * Delay starting backend callbacks to give the devices a chance to settle.
+
+0.13 (13 May 2012):
+  * Sets Inet$EtherType, if not already set when a new device appears.
+  * Added notes on DCI conformance to !ReadMe.
+
+0.14 and later: See CVS log at https://www.riscosopen.org/viewer/view/bsd/RiscOS/Sources/Networking/Ethernet/EtherUSB/VersionNum
+
+
+Acknowledgements
+----------------
+The Pegasus backend was ported from NetBSD by Jeffrey Lee. It includes
+software developed by Bill Paul.
+
+The SMSC backend was developed by Thomas Milius, Raik Fischer and Rainer
+Schubert with thanks to SMSC for providing the required information and
+support for queries.
+
+Thanks go to Stephen Leary for tracking down a particularly subtle and 
+nasty bug.
+
+
+License
+-------
+Copyright (C) 2012, James Peacock.
+All rights reserved.
+
+See individual files for further copywrite notices from contributers.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+  
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+   
+ * Neither the name of the author nor the names of its contributors may be
+   used to endorse or promote products derived from this software without
+   specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.

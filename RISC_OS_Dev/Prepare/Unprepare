@@ -1,0 +1,19 @@
+Set Base$Dir <Obey$Dir>.^
+Set Cstl$Dir <Base$Dir>.castle.RiscOS
+
+Wipe <Base$Dir>.Apps ~cfr~v
+Wipe <Base$Dir>.bsd.RiscOS.Apps ~cfr~v
+Wipe <Base$Dir>.BuildSys ~cfr~v
+Wipe <Base$Dir>.Env ~cfr~v
+Wipe <Base$Dir>.Export ~cfr~v
+Wipe <Base$Dir>.Images ~cfr~v
+Wipe <Base$Dir>.Install ~cfr~v
+Wipe <Base$Dir>.Library ~cfr~v
+Wipe <Base$Dir>.mixed.RiscOS.Apps ~cfr~v
+Wipe <Base$Dir>.Modules ~cfr~v
+Wipe <Cstl$Dir>.BuildSys.Logs ~cfr~v
+Wipe <Cstl$Dir>.BuildSys.Shadow ~cfr~v
+Wipe <Cstl$Dir>.castle ~cfr~v
+Wipe <Cstl$Dir>.Export.APCS-32 ~cfr~v
+Wipe <Cstl$Dir>.Images ~cfr~v
+Wipe <Cstl$Dir>.Install ~cfr~v

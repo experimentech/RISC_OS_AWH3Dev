@@ -1,0 +1,156 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+; hdr2h safe
+
+;Misc registers file.
+
+    ;CPU
+
+    ;CPUCFG &01F01C00   In AllWinnerH3.hdr as R_CPUCFG
+CPUS_RST_CTRL_REG    *    &0000
+
+CPU0_RST_CTRL        *    &0040
+CPU0_CTRL_REG        *    &0044
+CPU0_STATUS_REG      *    &0048
+CPU1_RST_CTRL        *    &0080
+CPU1_CTRL_REG        *    &0084
+CPU1_STATUS_REG      *    &0088
+CPU2_RST_CTRL        *    &00C0
+CPU2_CTRL_REG        *    &00C4
+CPU2_STATUS_REG      *    &00C8
+CPU3_RST_CTRL        *    &0100
+CPU3_CTRL_REG        *    &0104
+CPU3_STATUS_REG      *    &0108
+
+CPU_SYS_RST_REG      *    &0140
+CPU_CLK_GATING_REG   *    &0144
+GENER_CTRL_REG       *    &0184
+SUP_STAN_FLAG_REG    *    &01A0
+
+CNT64_CTRL_REG       *    &0280
+CNT64_LOW_REG        *    &0284
+CNT64_HIGH_REG       *    &0288
+
+
+    ;REGISTER BITS
+
+    ;CPUS_RST_CTRL_REG
+CPUS_RESET           *    2_1
+
+;Removed CPU specific numbering. All bit locations are the same.
+
+    ;CPU_RST_CTRL_REG
+CPU_CORE_REST       *    2_10
+CPU_RESET           *    2_01
+
+    ;CPU_CTRL_REG
+CPU_CP15_WRITE_DISABLE   *    2_1
+
+    ;CPU_STATUS_REG      R
+STANDBYWFI           *    2_100
+STANDBYWFE           *    2_010
+SMP_AMP              *    2_001
+
+    ;CPU_SYS_RST_REG
+CPU_SYS_RST          *    2_1 ;0 is assert
+
+    ;CPU_CLK_GATING_REG
+L2_CLK_GATING        *    2_100000000 ;b8
+CPU_CLK_GATING       *    2_000001000 ;b3
+
+    ;GENERAL_CTRL_REG
+CFGDISABLE           *    2_100000000 ;B8
+ACINACTM             *    2_001000000 ;B6
+L2_RST               *    2_000100000 ;B5
+L2_RST_DISABLE       *    2_000010000 ;B4
+L1_RST_DISABLE       *    2_000001111 ;B3-0
+
+    ;SUP_STAN_FLAG_REG
+    ;needs special writes to use. See datasheet.
+SUP_STANDBY_FLAG     *    &FFFF0000 ;top 16 bits
+SUP_STANDBY_FLAG_DATA *   &0000FFFF
+
+
+
+
+;-------USB
+
+;duplicates with different names. How did that happen!
+
+    ;EHCI capability register
+;E_CAPLENGTH          *    &000
+;E_HCIVERSION         *    &002
+;E_HCSPARAMS          *    &004
+;E_HCCPARAMS          *    &008
+;E_HCSPPORTROUTE      *    &00C
+
+    ;EHCI Operational register
+;E_USBCMD             *    &010
+;E_USBSTS             *    &014
+;E_USBINTR            *    &018
+;E_FRINDEX            *    &01C
+;E_CTRLDSSEGMENT      *    &020
+;E_PERIODICLISTBASE   *    &024
+;E_ASYNCLISTADDR      *    &028
+;E_CONFIGFLAG         *    &050
+;E_PORTSC             *    &054
+
+;OHCI control and status partition register
+
+O_HCREVISION         *    &400
+O_HCCONTROL          *    &404
+O_HCCOMMANDSTATUS    *    &408
+O_HCINTERRUPTSTATUS  *    &40C
+O_HCINTERRUPTENABLE  *    &410
+O_HCINTERRUPTDISABLE *    &414
+
+;OHCI Memory pointer partition register
+O_HCHCCA             *    &418
+O_HCPERIODCURRENTED  *    &41C
+O_HCCONTROLHEADED    *    &420
+O_HCCONTROLCURRENTED *    &424
+O_HCBULKHEADED       *    &428
+O_HCBULKCURRENTED    *    &42C
+O_HCDONEHEAD         *    &430
+
+;OHCI frame counter partition register
+O_HCFMINTERVAL       *    &434
+O_HCFMREMAINING      *    &438
+O_HCFMNUMBER         *    &43C
+O_HCLSTHRESHOLD      *    &444
+
+;OHCI root hub partition register
+O_HCRHDESCRIPTORA    *    &448
+O_HCRHDESCRIPTORB    *    &44C
+O_HCRHSTATUS         *    &450
+O_HCRHPORTSTATUS     *    &454
+
+;TODO: Finish doing the bitmasks.
+
+
+;CCU - partial. Add when needed, or whatever. 0x01C20000
+
+USBPHY_CFG_REG       *    &00CC ;USB
+
+AHB2_CLK_CFG         *    &005C ;USB
+BUS_CLK_GATING_REG0  *    &0060 ;USB
+
+BUS_SOFT_RST_REG0    *    &02C0 ;USB
+
+    END
+    

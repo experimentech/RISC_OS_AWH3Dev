@@ -1,0 +1,234 @@
+file_format:1
+monitor_title:IMX6-Builtin
+DPMS_state:3
+
+# Mode: 1080P basic  1920 x 1080 @ 67.5Hz
+startmode
+ mode_name:1920 x 1080
+ x_res:1920
+ y_res:1080
+ pixel_rate:148500
+ h_timings:44,148,0,1920,0,88
+ v_timings:5,36,0,1080,0,4
+ sync_pol:0
+EndMode
+
+# Mode: 720P basic  1280 x 720 @ 45Hz
+startmode
+ mode_name:1280 x 720
+ x_res:1280
+ y_res:720
+ pixel_rate:74250
+ h_timings:40,220,0,1280,0,110
+ v_timings:5,20,0,720,0,5
+ sync_pol:0
+EndMode
+
+# Standard numbered modes copied from AKF50 MDF
+# Without these, RISC OS will try falling back to mode 0, and fail badly
+
+# 640 x 200 (60Hz - Modes 44,45,46)
+startmode
+mode_name:
+x_res:640
+y_res:200
+pixel_rate:16000
+h_timings:72,146,16,640,16,130
+v_timings:3,34,0,200,0,25
+sync_pol:0
+endmode
+
+# 320 x 250 (50Hz - Modes 6,7)
+startmode
+mode_name:
+x_res:320
+y_res:250
+pixel_rate:8000
+h_timings:36,30,44,320,44,38
+v_timings:3,16,20,250,20,3
+sync_pol:0
+endmode
+
+# 640 x 250 (50Hz - Modes 3,11,14)
+startmode
+mode_name:
+x_res:640
+y_res:250
+pixel_rate:16000
+h_timings:72,62,88,640,88,74
+v_timings:3,16,20,250,20,3
+sync_pol:0
+endmode
+
+# 320 x 256 (50Hz - Modes 1,2,5,9,10,13)
+startmode
+mode_name:
+x_res:320
+y_res:256
+pixel_rate:8000
+h_timings:36,30,44,320,44,38
+v_timings:3,16,17,256,17,3
+sync_pol:0
+endmode
+
+# 640 x 256 (50Hz - Modes 0,4,8,12,15)
+startmode
+mode_name:
+x_res:640
+y_res:256
+pixel_rate:16000
+h_timings:72,62,88,640,88,74
+v_timings:3,16,17,256,17,3
+sync_pol:0
+endmode
+
+# 640 x 352 (60Hz - Modes 41,42,43)
+startmode
+mode_name:
+x_res:640
+y_res:352
+pixel_rate:16783
+h_timings:76,20,16,640,16,0
+v_timings:3,9,0,352,0,0
+sync_pol:2
+endmode
+
+# 1056 x 250 (50Hz - Modes 17)
+startmode
+mode_name:
+x_res:1056
+y_res:250
+pixel_rate:24000
+h_timings:108,72,106,1056,106,88
+v_timings:3,16,20,250,20,3
+sync_pol:0
+endmode
+
+# 1056 x 256 (50Hz - Modes 16,24)
+startmode
+mode_name:
+x_res:1056
+y_res:256
+pixel_rate:24000
+h_timings:108,72,106,1056,106,88
+v_timings:3,16,17,256,17,3
+sync_pol:0
+endmode
+
+# 768 x 288 (50Hz - Modes 22,33,34,35,36)
+startmode
+mode_name:
+x_res:768
+y_res:288
+pixel_rate:16000
+h_timings:76,66,16,768,16,82
+v_timings:3,19,0,288,0,2
+sync_pol:0
+endmode
+
+# 896 x 352 (60Hz - Modes 37,38,39,40)
+startmode
+mode_name:
+x_res:896
+y_res:352
+pixel_rate:24000
+h_timings:118,38,20,896,20,8
+v_timings:3,9,0,352,0,0
+sync_pol:2
+endmode
+
+# 320 x 480 (60Hz - Games modes 48,49)
+startmode
+mode_name:
+x_res:320
+y_res:480
+pixel_rate:12587
+h_timings:42,14,12,320,12,0
+v_timings:2,32,0,480,0,11
+sync_pol:3
+endmode
+
+# 360 x 480 (60Hz - PCSoft mode 47)
+startmode
+mode_name:
+x_res:360
+y_res:480
+pixel_rate:16783
+h_timings:64,46,16,360,16,30
+v_timings:2,32,0,480,0,11
+sync_pol:3
+endmode
+
+# 640 x 480 (60Hz - Modes 25,26,27,28)
+startmode
+mode_name:640 x 480
+x_res:640
+y_res:480
+pixel_rate:25175
+h_timings:94,22,22,640,22,0
+v_timings:2,32,0,480,0,11
+sync_pol:3
+endmode
+
+# 640 x 512 (50Hz - Modes 18,19,20,21)
+startmode
+mode_name:
+x_res:640
+y_res:512
+pixel_rate:24000
+h_timings:56,92,20,640,20,68
+v_timings:3,18,0,512,0,1
+sync_pol:0
+endmode
+
+# 800 x 600 (56Hz - Modes 29,30,31)
+startmode
+mode_name:800 x 600
+x_res:800
+y_res:600
+pixel_rate:36000
+h_timings:72,84,34,800,34,0
+#    VESA:72,128,0,800,0,24
+v_timings:2,22,0,600,0,1
+sync_pol:0
+endmode
+
+# Mode: VESA 800 x 600 @ 60Hz
+# Bounds: H 37.88kHz, V 60.32Hz DClock 40.00MHz
+startmode
+ mode_name:800 x 600
+ x_res:800
+ y_res:600
+ pixel_rate:40000
+ h_timings:128,88,0,800,0,40
+ v_timings:4,23,0,600,0,1
+ sync_pol:0
+EndMode
+
+# Mode: 1280 x 800 @ 59.9Hz
+# Bounds: H kHz, V 59.9Hz DClock 71.00MHz
+startmode
+ mode_name:1280 x 800
+ x_res:1280
+ y_res:800
+ pixel_rate:71000
+ h_timings:32,80,0,1280,0,48
+ v_timings:6,14,0,800,0,3
+ sync_pol:1
+EndMode
+
+# Mode: 1024 x 768 @ 60Hz
+# Bounds: H kHz, V 60Hz DClock 65.00MHz
+startmode
+ mode_name:1024 x 768
+ x_res:1024
+ y_res:768
+ pixel_rate:65000
+ h_timings:136,160,0,1024,0,24
+ v_timings:6,29,0,768,0,3
+ sync_pol:1
+EndMode
+
+
+
+#End

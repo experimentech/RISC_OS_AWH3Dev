@@ -1,0 +1,57 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+; 
+#include "Global/RISCOS.h"
+#include "Global/Services.h"
+#include "VersionNum"
+
+initialisation-code:    module_init
+
+finalisation-code:      module_final
+
+service-call-handler:   module_services Service_ResourceFSStarting,
+                                        Service_USB,
+                                        Service_PreReset
+
+title-string:           EHCIDriver
+
+help-string:            EHCIDriver Module_MajorVersion_CMHG
+
+date-string:            Module_Date_CMHG
+
+international-help-file: "Resources:$.Resources.EHCIDriver.Messages"
+
+#ifdef EHCI_DEBUG
+command-keyword-table:  module_commands
+
+EHCIRegs(   min-args:0, max-args:0,
+            help-text: "*EHCIRegs reads the registers from the EHCI controller\n",
+            add-syntax:, invalid-syntax: "Syntax: *EHCIRegs"),
+
+EHCIEDS(),
+
+EHCIWrite(  min-args:2, max-args:2,
+            help-text: "*EHCIWrite writes to a register in the EHCI controller.\n",
+            add-syntax:, invalid-syntax: "Syntax: *EHCIWrite <offset> <value>"),
+EHCIDebug(  min-args:1, max-args:2,
+            help-text: "*EHCIDebug sets the debug level for debuglib output, optionally also setting the debug level for output controlled by the usbdebug variable within the ohcidriver.\n",
+            add-syntax:, invalid-syntax: "Syntax: EHCIDebug <ehci> [<usb>]")
+#endif
+
+vector-handlers:        usb_irq_entry/usb_irq_handler,
+                        softintr_entry/softintr
+generic-veneers:        callout_entry/callout_handler

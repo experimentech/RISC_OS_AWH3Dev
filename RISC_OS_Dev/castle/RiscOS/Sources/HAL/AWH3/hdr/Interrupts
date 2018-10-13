@@ -1,0 +1,557 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+
+;hdr2h safe
+
+
+;Section taken from iMx6 iMx6qReg.
+;Needs to be rewritten to suit AWH3 hardware properly.
+;#########################################
+;# ARM INTERRUPT CONTROLLER
+;#########################################
+;GIC 400 functional blocks
+;&0000 - &0FFF      Reserved
+;&1000 - &1FFF      Distributor
+;&2000 - &3FFF      CPU Interfaces
+;&4000 - &4FFF      current Processor specific Virtual Interface Control block
+;&5000 - &5FFF      VIC block for processor selected by addr bits [11:9]
+;---
+;&5000 - &51FF      Processor 0
+;&5200 - &53FF      Processor 1
+; ... and so on.
+;&6000 - &7FFF      Virtual CPU Interfaces.
+
+;these are totally different to the GIC390. Oh dear.
+;IC_DIST
+;MPU_INTC_DIST = GIC_DIST  = SCU + &1000
+;MPU_INTC_CPU  = GIC_CPUIF   SCU + &2000
+; my additions are tagged with a semicolon at the end
+;Is IRQDi_Log the same as MPU_INTC_Log???
+
+GIC_DIST_CTRL   * GICD_CTLR ;OMAP4
+GICD_CTLR       * &000
+
+GIC_DIST_CTR    * GICD_TYPER ; OMAP4
+GICD_TYPER      * &004
+
+GIC_DIST_IIDR   * GICD_IIDR
+GICD_IIDR       * &008
+
+GICD_IGROUP     * &080
+GICD_IGROUPR0   * &080
+GICD_IGROUPR1   * &084
+GICD_IGROUPR2   * &088
+GICD_IGROUPR3   * &08c
+GICD_IGROUPR4   * &090
+GICD_IGROUPR5   * &094
+GICD_IGROUPR6   * &098
+GICD_IGROUPR7   * &09c
+GICD_IGROUPR8   * &0a0
+GICD_IGROUPR9   * &0a4
+GICD_IGROUPR10  * &0a8
+GICD_IGROUPR11  * &0ac
+GICD_IGROUPR12  * &0b0
+GICD_IGROUPR13  * &0b4
+GICD_IGROUPR14  * &0b8
+GICD_IGROUPR15  * &0bc
+
+;suffix-less for readability when using offsets.
+GIC_DIST_ENABLE_SET * GICD_ISENABLER
+GICD_ISENABLER   *    &100
+GICD_ISENABLER0  *    &100
+GICD_ISENABLER1 *    &104
+GICD_ISENABLER2 *    &108
+GICD_ISENABLER3 *    &10c
+GICD_ISENABLER4 *    &110
+GICD_ISENABLER5 *    &114
+GICD_ISENABLER6 *    &118
+GICD_ISENABLER7 *    &11c
+GICD_ISENABLER8 *    &120
+GICD_ISENABLER9 *    &124
+GICD_ISENABLER10 *    &128
+GICD_ISENABLER11 *    &12c
+GICD_ISENABLER12 *    &130
+GICD_ISENABLER13 *    &134
+GICD_ISENABLER14 *   &138
+GICD_ISENABLER15 *   &13c
+
+;I get it. 0 resets to &0000FFFF but the rest to &00000000
+GIC_DIST_ENABLE_CLEAR * GICD_ICENABLER ; OMAP4
+GICD_ICENABLER   *    &180
+GICD_ICENABLER0  *    &180
+GICD_ICENABLER1  *    &184
+GICD_ICENABLER2  *    &188
+GICD_ICENABLER3  *    &18c
+GICD_ICENABLER4  *    &190
+GICD_ICENABLER5  *    &194
+GICD_ICENABLER6  *    &198
+GICD_ICENABLER7  *    &19c
+GICD_ICENABLER8  *    &1A0
+GICD_ICENABLER9  *    &1A4
+GICD_ICENABLER10  *    &1A8
+GICD_ICENABLER11  *    &1AC
+GICD_ICENABLER12  *    &1B0
+GICD_ICENABLER13  *    &1B4
+GICD_ICENABLER14  *    &1B8
+GICD_ICENABLER15  *    &1BC
+
+GICD_ISPENDR       *    &200
+GICD_ISPENDR0      *    &200
+GICD_ISPENDR1      *    &204
+GICD_ISPENDR2      *    &208
+GICD_ISPENDR3      *    &20c
+GICD_ISPENDR4      *    &210
+GICD_ISPENDR5      *    &214
+GICD_ISPENDR6      *    &218
+GICD_ISPENDR7      *    &21c
+GICD_ISPENDR8      *    &220
+GICD_ISPENDR9      *    &224
+GICD_ISPENDR10      *    &228
+GICD_ISPENDR11      *    &22c
+GICD_ISPENDR12      *    &230
+GICD_ISPENDR13      *    &234
+GICD_ISPENDR14      *    &238
+GICD_ISPENDR15      *    &23c
+
+GIC_DIST_PENDING_CLEAR * GICD_ICPENDR ; OMAP4/5
+GICD_ICPENDR       *    &280
+GICD_ICPENDR0      *    &280
+GICD_ICPENDR1      *    &284
+GICD_ICPENDR2      *    &288
+GICD_ICPENDR3      *    &28c
+GICD_ICPENDR4      *    &290
+GICD_ICPENDR5      *    &294
+GICD_ICPENDR6      *    &298
+GICD_ICPENDR7      *    &29c
+GICD_ICPENDR8      *    &2a0
+GICD_ICPENDR9      *    &2a4
+GICD_ICPENDR10      *    &2a8
+GICD_ICPENDR11      *    &2ac
+GICD_ICPENDR12      *    &2b0
+GICD_ICPENDR13     *    &2b4
+GICD_ICPENDR14      *    &2b8
+GICD_ICPENDR15      *    &2bc
+
+GICD_ISACTIVER     *    &300
+GICD_ISACTIVER0    *    &300
+GICD_ISACTIVER1    *    &304
+GICD_ISACTIVER2    *    &308
+GICD_ISACTIVER3    *    &30c
+GICD_ISACTIVER4    *    &310
+GICD_ISACTIVER5    *    &304
+GICD_ISACTIVER6    *    &318
+GICD_ISACTIVER7    *    &31c
+GICD_ISACTIVER8    *    &320
+GICD_ISACTIVER9    *    &324
+GICD_ISACTIVER10    *    &328
+GICD_ISACTIVER11    *    &32c
+GICD_ISACTIVER12    *    &330
+GICD_ISACTIVER13    *    &334
+GICD_ISACTIVER14    *    &338
+GICD_ISACTIVER15    *    &33c
+
+GIC_DIST_ACTIVE_BIT *    GICD_ICACTIVER ; OMAP4
+GICD_ICACTIVER      *    &380
+GICD_ICACTIVER0     *    &380
+GICD_ICACTIVER1     *    &384
+GICD_ICACTIVER2     *    &388
+GICD_ICACTIVER3     *    &38c
+GICD_ICACTIVER4     *    &390
+GICD_ICACTIVER5     *    &394
+GICD_ICACTIVER6     *    &398
+GICD_ICACTIVER7     *    &39c
+GICD_ICACTIVER8     *    &3a0
+GICD_ICACTIVER9     *    &3a4
+GICD_ICACTIVER10     *    &3a8
+GICD_ICACTIVER11     *    &3ac
+GICD_ICACTIVER12     *    &3b0
+GICD_ICACTIVER13     *    &3b4
+GICD_ICACTIVER14     *    &3b8
+GICD_ICACTIVER15     *    &3bc
+
+;see the BASIC program listgen in the root of AWH3 HAL for generating lists
+
+GIC_DIST_PRI        *    GICD_IPRIORITYR ; OMAP4/5
+GICD_IPRIORITYR     *    &400
+GICD_IPRIORITYR0    *    &400
+GICD_IPRIORITYR1    *    &404
+GICD_IPRIORITYR2    *    &408
+GICD_IPRIORITYR3    *    &40C
+GICD_IPRIORITYR4    *    &410
+GICD_IPRIORITYR5    *    &414
+GICD_IPRIORITYR6    *    &418
+GICD_IPRIORITYR7    *    &41C
+GICD_IPRIORITYR8    *    &420
+GICD_IPRIORITYR9    *    &424
+GICD_IPRIORITYR10    *    &428
+GICD_IPRIORITYR11    *    &42C
+GICD_IPRIORITYR12    *    &430
+GICD_IPRIORITYR13    *    &434
+GICD_IPRIORITYR14    *    &438
+GICD_IPRIORITYR15    *    &43C
+GICD_IPRIORITYR16    *    &440
+GICD_IPRIORITYR17    *    &444
+GICD_IPRIORITYR18    *    &448
+GICD_IPRIORITYR19    *    &44C
+GICD_IPRIORITYR20    *    &450
+GICD_IPRIORITYR21    *    &454
+GICD_IPRIORITYR22    *    &458
+GICD_IPRIORITYR23    *    &45C
+GICD_IPRIORITYR24    *    &460
+GICD_IPRIORITYR25    *    &464
+GICD_IPRIORITYR26    *    &468
+GICD_IPRIORITYR27    *    &46C
+GICD_IPRIORITYR28    *    &470
+GICD_IPRIORITYR29    *    &474
+GICD_IPRIORITYR30    *    &478
+GICD_IPRIORITYR31    *    &47C
+GICD_IPRIORITYR32    *    &480
+GICD_IPRIORITYR33    *    &484
+GICD_IPRIORITYR34    *    &488
+GICD_IPRIORITYR35    *    &48C
+GICD_IPRIORITYR36    *    &490
+GICD_IPRIORITYR37    *    &494
+GICD_IPRIORITYR38    *    &498
+GICD_IPRIORITYR39    *    &49C
+GICD_IPRIORITYR40    *    &4A0
+GICD_IPRIORITYR41    *    &4A4
+GICD_IPRIORITYR42    *    &4A8
+GICD_IPRIORITYR43    *    &4AC
+GICD_IPRIORITYR44    *    &4B0
+GICD_IPRIORITYR45    *    &4B4
+GICD_IPRIORITYR46    *    &4B8
+GICD_IPRIORITYR47    *    &4BC
+GICD_IPRIORITYR48    *    &4C0
+GICD_IPRIORITYR49    *    &4C4
+GICD_IPRIORITYR50    *    &4C8
+GICD_IPRIORITYR51    *    &4CC
+GICD_IPRIORITYR52    *    &4D0
+GICD_IPRIORITYR53    *    &4D4
+GICD_IPRIORITYR54    *    &4D8
+GICD_IPRIORITYR55    *    &4DC
+GICD_IPRIORITYR56    *    &4E0
+GICD_IPRIORITYR57    *    &4E4
+GICD_IPRIORITYR58    *    &4E8
+GICD_IPRIORITYR59    *    &4EC
+GICD_IPRIORITYR60    *    &4F0
+GICD_IPRIORITYR61    *    &4F4
+GICD_IPRIORITYR62    *    &4F8
+GICD_IPRIORITYR63    *    &4FC
+GICD_IPRIORITYR64    *    &500
+GICD_IPRIORITYR65    *    &504
+GICD_IPRIORITYR66    *    &508
+GICD_IPRIORITYR67    *    &50C
+GICD_IPRIORITYR68    *    &510
+GICD_IPRIORITYR69    *    &514
+GICD_IPRIORITYR70    *    &518
+GICD_IPRIORITYR71    *    &51C
+GICD_IPRIORITYR72    *    &520
+GICD_IPRIORITYR73    *    &524
+GICD_IPRIORITYR74    *    &528
+GICD_IPRIORITYR75    *    &52C
+GICD_IPRIORITYR76    *    &530
+GICD_IPRIORITYR77    *    &534
+GICD_IPRIORITYR78    *    &538
+GICD_IPRIORITYR79    *    &53C
+GICD_IPRIORITYR80    *    &540
+GICD_IPRIORITYR81    *    &544
+GICD_IPRIORITYR82    *    &548
+GICD_IPRIORITYR83    *    &54C
+GICD_IPRIORITYR84    *    &550
+GICD_IPRIORITYR85    *    &554
+GICD_IPRIORITYR86    *    &558
+GICD_IPRIORITYR87    *    &55C
+GICD_IPRIORITYR88    *    &560
+GICD_IPRIORITYR89    *    &564
+GICD_IPRIORITYR90    *    &568
+GICD_IPRIORITYR91    *    &56C
+GICD_IPRIORITYR92    *    &570
+GICD_IPRIORITYR93    *    &574
+GICD_IPRIORITYR94    *    &578
+GICD_IPRIORITYR95    *    &57C
+GICD_IPRIORITYR96    *    &580
+GICD_IPRIORITYR97    *    &584
+GICD_IPRIORITYR98    *    &588
+GICD_IPRIORITYR99    *    &58C
+GICD_IPRIORITYR100    *    &590
+GICD_IPRIORITYR101    *    &594
+GICD_IPRIORITYR102    *    &598
+GICD_IPRIORITYR103    *    &59C
+GICD_IPRIORITYR104    *    &5A0
+GICD_IPRIORITYR105    *    &5A4
+GICD_IPRIORITYR106    *    &5A8
+GICD_IPRIORITYR107    *    &5AC
+GICD_IPRIORITYR108    *    &5B0
+GICD_IPRIORITYR109    *    &5B4
+GICD_IPRIORITYR110    *    &5B8
+GICD_IPRIORITYR111    *    &5BC
+GICD_IPRIORITYR112    *    &5C0
+GICD_IPRIORITYR113    *    &5C4
+GICD_IPRIORITYR114    *    &5C8
+GICD_IPRIORITYR115    *    &5CC
+GICD_IPRIORITYR116    *    &5D0
+GICD_IPRIORITYR117    *    &5D4
+GICD_IPRIORITYR118    *    &5D8
+GICD_IPRIORITYR119    *    &5DC
+GICD_IPRIORITYR120    *    &5E0
+GICD_IPRIORITYR121    *    &5E4
+GICD_IPRIORITYR122    *    &5E8
+GICD_IPRIORITYR123    *    &5EC
+GICD_IPRIORITYR124    *    &5F0
+GICD_IPRIORITYR125    *    &5F4
+GICD_IPRIORITYR126    *    &5F8
+GICD_IPRIORITYR127    *    &5FC
+
+GIC_DIST_TARGET    *    GICD_ITARGETSR ;OMAP4/5
+GICD_ITARGETSR     *    &800
+GICD_ITARGETSR0    *    &800
+GICD_ITARGETSR1    *    &804
+GICD_ITARGETSR2    *    &808
+GICD_ITARGETSR3    *    &80C
+GICD_ITARGETSR4    *    &810
+GICD_ITARGETSR5    *    &814
+GICD_ITARGETSR6    *    &818
+GICD_ITARGETSR7    *    &81C
+
+GIC_DIST_CONFIG *   GICD_ICFGR ;OMAP4/5
+GICD_ICFGR     *    &C00
+GICD_ICFGR0    *    &C00
+GICD_ICFGR1    *    &C04
+GICD_ICFGR2    *    &C08
+GICD_ICFGR3    *    &C0C
+GICD_ICFGR4    *    &C10
+GICD_ICFGR5    *    &C14
+GICD_ICFGR6    *    &C18
+GICD_ICFGR7    *    &C1C
+GICD_ICFGR8    *    &C20
+GICD_ICFGR9    *    &C24
+GICD_ICFGR10    *    &C28
+GICD_ICFGR11    *    &C2C
+GICD_ICFGR12    *    &C30
+GICD_ICFGR13    *    &C34
+GICD_ICFGR14    *    &C38
+GICD_ICFGR15    *    &C3C
+GICD_ICFGR16    *    &C40
+GICD_ICFGR17    *    &C44
+GICD_ICFGR18    *    &C48
+GICD_ICFGR19    *    &C4C
+GICD_ICFGR20    *    &C50
+GICD_ICFGR21    *    &C54
+GICD_ICFGR22    *    &C58
+GICD_ICFGR23    *    &C5C
+GICD_ICFGR24    *    &C60
+GICD_ICFGR25    *    &C64
+GICD_ICFGR26    *    &C68
+GICD_ICFGR27    *    &C6C
+GICD_ICFGR28    *    &C70
+GICD_ICFGR29    *    &C74
+
+GICD_PPISR       *    &D00
+
+GICD_SPISR     *    &D04
+GICD_SPISR0    *    &D04
+GICD_SPISR1    *    &D08
+GICD_SPISR2    *    &D0C
+GICD_SPISR3    *    &D10
+GICD_SPISR4    *    &D14
+GICD_SPISR5    *    &D18
+GICD_SPISR6    *    &D1C
+GICD_SPISR7    *    &D20
+GICD_SPISR8    *    &D24
+GICD_SPISR9    *    &D28
+GICD_SPISR10    *    &D2C
+GICD_SPISR11    *    &D30
+GICD_SPISR12    *    &D34
+GICD_SPISR13    *    &D38
+GICD_SPISR14    *    &D3C
+
+GICD_SGIR       *    &F00
+
+GICD_CPENDSGIR     *    &F10
+GICD_CPENDSGIR0    *    &F10
+GICD_CPENDSGIR1    *    &F11
+GICD_CPENDSGIR2    *    &F12
+GICD_CPENDSGIR3    *    &F13
+GICD_CPENDSGIR4    *    &F14
+GICD_CPENDSGIR5    *    &F15
+GICD_CPENDSGIR6    *    &F16
+GICD_CPENDSGIR7    *    &F17
+GICD_CPENDSGIR8    *    &F18
+GICD_CPENDSGIR9    *    &F19
+GICD_CPENDSGIR10    *    &F1A
+GICD_CPENDSGIR11    *    &F1B
+GICD_CPENDSGIR12    *    &F1C
+
+;OMAP5 has C/SPENDSGIR listed as &F10.
+GICD_SPENDSGIR     *    &F20
+GICD_SPENDSGIR0    *    &F20
+GICD_SPENDSGIR1    *    &F24
+GICD_SPENDSGIR2    *    &F28
+GICD_SPENDSGIR3    *    &F2C
+
+
+;ICDDCR          * &000
+;ICDICTR         * &004
+;ICDIIDR         * &008
+;ICDISR          * &080
+;ICDISER         * &100
+;GICD_ISENABLERn  regs from &104 to &13c  ;int set
+;ICDICER         * &180
+;GICD_ICENABLRn &104 - &13c               ;int clear
+;ICDISPR         * &200
+;GICD_ISPENDRn regs from &200 - &23c
+;ICDICPR         * &280
+
+;ICDABR          * &300
+;ICDIPR          * &400
+;ICDIPTR         * &800
+;ICDICFR         * &C00
+;ICD_PPI_STAT    * &D00
+;ICD_SPI_STAT_0  * &D04
+;ICD_SPI_STAT_1  * &D08
+;ICD_SPI_STAT_2  * &D0C
+;ICD_SPI_STAT_3  * &D10
+;ICDSGIR         * &F00
+
+;why?
+GICD_PIDR       * &FD0 ;NOT SURE IF THIS ONE WILL BE USED
+GICD_PIDR4      * &FD0 ;Peripheral ID reg 4
+GICD_PIDR5      * &FD4 ; id 5
+GICD_PIDR6      * &FD8 ;ID 6
+GICD_PIDR7      * &FDC
+GICD_PIDR0      * &FE0 ;ID0
+GICD_PIDR1      * &FE4
+GICD_PIDR2      * &FE8
+GICD_PIDR3      * &FEC
+
+GICD_CIDR     *    &FF0
+GICD_CIDR0    *    &FF0
+GICD_CIDR1    *    &FF1
+GICD_CIDR2    *    &FF2
+GICD_CIDR3    *    &FF3
+GICD_CIDR4    *    &FF4
+GICD_CIDR5    *    &FF5
+GICD_CIDR6    *    &FF6
+GICD_CIDR7    *    &FF7
+GICD_CIDR8    *    &FF8
+GICD_CIDR9    *    &FF9
+GICD_CIDR10    *    &FFA
+GICD_CIDR11    *    &FFB
+GICD_CIDR12    *    &FFC
+
+
+
+;--------------GICC REGISTERS!!!!!!
+GICD_BASE     *    &1000 ; GIC Distributor base offset from SCU
+GICC_BASE     *    &2000 ; GIC CPU interface base.
+
+
+GICC_CTLR     *    &0000
+GICC_PMR      *    &0004
+GICC_BPR      *    &0008
+
+GICC_IAR      *    &000C
+GICC_EOIR     *    &0010
+GICC_RPR      *    &0014
+GICC_HPPIR    *    &0018
+GICC_ABPR     *    &001C
+GICC_AIAR     *    &0020
+GICC_AHPPIR   *    &0028
+GICC_APR0     *    &00D0
+GICC_NSAPR0   *    &00E0
+GICC_IIDR     *    &00FC
+GICC_DIR      *    &1000
+
+
+
+
+
+
+;Poached from OMAP4. Need to find where I put the rest of these!
+;AWH3IRQs.hdr
+;ICDDCR_ENABLE           *       (1 << 0)
+; bits in Distributor Control Register (ICDDCR)
+GICD_CTLR_ENABLE           *       1 << 0
+ICDDCR_ENABLE              *       GICD_CTLR_ENABLE ;OMAP4
+ICDDCR_ENABLE_GRP0         *       1 << 0 ;OMAP5
+ICDDCR_ENABLE_GRP1         *       1 << 1 ;OMAP5
+
+
+; offsets of register in GIC Processor Interface (relative to MPU_GIC_PI)
+GIC_CPU_CTRL            *       &000 ; CPU Interface Control Register (ICCICR)
+GIC_CPU_PRIMASK         *       &004 ; Interrupt Priority Mask Register (ICCPMR)
+GIC_CPU_BINPOINT        *       &008 ; Binary Point Register (ICCBPR)
+GIC_CPU_INTACK          *       &00C ; Interrupt Acknowledge Register (ICCIAR)
+GIC_CPU_EOI             *       &010 ; End of Interrupt Register (ICCEOIR)
+GIC_CPU_RUNNINGPRI      *       &014 ; Running Priority Register (ICCRPR)
+GIC_CPU_HIGHPRI         *       &018 ; Highest Pending Interrupt Register (ICCHPIR)
+GIC_CPU_ALIAS_BINPOINT  *       &01C ; Aliased Binary Point Register (ICCABPR)
+
+; bits in CPU Interface Control Register (ICCICR)
+;AWH3IRQs.hdr
+;ICCICR_ENABLE           *       (1 << 0)
+ICCICR_ENABLE_GRP1      *        1 << 0
+; bits in CPU Interface Control Register (ICCICR)
+GICC_CTLR_ENABLE           *       1 << 0
+ICCICR_ENABLE              *       GICC_CTLR_ENABLE ;OMAP4
+
+; bits in Interrupt Acknowledge Register (ICCIAR)
+;ICCIAR_ACKINTID         *       (&3FF << 0)
+;ICCIAR_CPUID            *       (7 << 10)
+
+; bits in End of Interrupt Register (ICCEOIR)
+;ICCEOIR_EOIINTID        *       (&3FF << 0)
+;ICCEOIR_CPUID           *       (7 << 10)
+
+; bits in Interrupt Controller Type Register (ICDICTR)
+ICDICTR_ITLINES         *       31 << 0  ; maximum number of interrupts [32 * (N+1)]
+ICDICTR_CPU_NUMBER      *        7 << 5  ; number of implemented CPU interfaces (-1)
+ICDICTR_SECUR_EXTN      *        1 << 10 ; Security Extension implemented
+ICDICTR_LSPI            *       31 << 11 ; number of lockable SPI
+
+
+; bits in Interrupt Acknowledge Register (ICCIAR)
+ICCIAR_ACKINTID         *       &3FF << 0
+ICCIAR_CPUID            *          7 << 10
+
+; bits in End of Interrupt Register (ICCEOIR)
+ICCEOIR_EOIINTID        *       &3FF << 0
+ICCEOIR_CPUID           *       7 << 10
+
+;---------end poached from OMAP4
+
+;GIC_DIST defined in hdr.AllWinnerH3
+;SCU              *        &01C80000
+;GIC_DIST         *        SCU+&1000 ;Distributor
+;GIC_CPUIF        *        SCU+&2000 ;CPU interface
+;INTERRUPT_MAX     *     156
+INTERRUPT_MAX     *        160 ;next clean multiple of 16
+
+;IMX_INTERRUPT_COUNT     *        INTERRUPT_MAX
+;ARM_PERIPHBASE          *        SCU_BASE_ADDR   ;Or SCU. Same thing
+;IC_DISTRIBUTOR_BASE_ADDR *       GIC_DIST
+;ARM_PERIPHBASE	*	         SCU_BASE_ADDR
+
+;IC_INTERFACES_BASE_ADDR *       (ARM_PERIPHBASE+0x0100)
+;GIC_CPUIF * (SCU + 2000) as defined in hdr.AllWinnerH3
+;there's the problem. Wrong offset.
+
+
+
+
+	END
+	

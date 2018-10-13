@@ -1,0 +1,127 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+;hdr2h safe
+
+
+;Does this file even get used any more?
+
+; Board configuration struct
+
+;;                         ^ 0
+;;BoardConfig_DebugUART    # 4 ; Physical address of debug UART
+
+;;BoardConfig_HALUART      # 4*4 ; Physical addresses of UARTs, in HAL API order
+;;BoardConfig_HALUARTIRQ   # 4 ; 4 bytes of IRQ numbers for HAL UARTs
+;;BoardConfig_DefaultUART  # 1 ; Default UART index
+;BoardConfig_NameOMAP3    # 1 ; Offset of board name from BoardConfigNames (n.;b. offset rather than pointer so name can be output during pre-MMU phase)
+;BoardConfig_NameDM37x    # 1
+;;                         # 1 ; Spare
+
+;BoardConfig_HALI2C       # 4*3 ; Physical addresses of I2Cs, in HAL API order
+;BoardConfig_HALI2CIRQ    # 3 ; 3 bytes of IRQ numbers of HAL I2Cs
+;BoardConfig_NumI2C       # 1 ; Number of I2Cs to expose via HAL
+
+;BoardConfig_VideoI2C     # 1 ; Index of video I2C bus in above tables, 255 for ;none
+;BoardConfig_APLL_CTL     # 1 ; APLL_CTL value for TPS audio
+;BoardConfig_VideoGPIO    # 1 ; GPIOx of DVI framer, 255 for none
+;BoardConfig_USBGPIO      # 1 ; GPIOx of USB PHY, 255 for none
+
+;BoardConfig_MixerChans   # 1 ; Mask of disabled mixer channels
+;BoardConfig_VBC_Flags    # 1 ; VideoBoardConfig flags
+;BoardConfig_VBC_LCDNum   # 1 ; Number of LCD configs
+;;BoardConfig_NumUART      # 1 ; Number of UARTs to expose via HAL
+
+;BoardConfig_VBC_LCDPtr   # 4 ; Pointer to LCD config list
+;;BoardConfig_Init         # 4 ; Board-specific code for HAL_Init
+;;BoardConfig_InitDevices  # 4 ; Board-specific version of HAL_InitDevices
+;;BoardConfig_PowerOff     # 4 ; Board-specific power off routine
+;;BoardConfig_MachID       # 4 ; Linux machine ID, as per arch/arm/tools/mach-types
+;;Blah                     # 2
+
+;;BoardConfig_Size         # 0
+;        ASSERT (BoardConfig_Size :AND: 3) = 0
+
+; Linux machine IDs:
+
+MachID_OrangePiZero       * 5110
+MachID_OrangePiPC         * 4137 ; This list is in decimal, right?
+
+
+
+
+
+; todo - SDRC register settings? function pointers for more flexible setup? ;(board revision detection, USB PHY, DVI framer, HAL devices, etc.)
+
+; Video configuration structs - these must match up with the definitions in the ;OMAPVideo driver
+ ;DELETE THIS LCD STUFF!
+;                          ^ 0
+;LCDTimings_PixelRate      # 4 ; Required pixel rate (Hz)
+;LCDTimings_HSW            # 2
+;LCDTimings_HFP            # 2
+;LCDTimings_HBP            # 2
+;LCDTimings_Width          # 2
+;LCDTimings_VSW            # 2
+;LCDTimings_VFP            # 2
+;LCDTimings_VBP            # 2
+;LCDTimings_Height         # 2
+;LCDTimings_SyncPol        # 4 ; vidclist3 syncpol flags
+;LCDTimings_Size           # 0
+
+;                          ^ 0
+;LCDConfig_DSI_BPP         # 1 ; BPP of DSI output
+;LCDConfig_DSI_LANES       # 1 ; Number of data lanes of DSI output
+;LCDConfig_ACBias_Freq     # 1 ; AC bias pin frequency
+;LCDConfig_LCDType         # 1 ; LCD type
+;LCDConfig_Flags           # 4 ; Extra flags
+;LCDConfig_Power           # 4 ; Function ptr to enable/disable power to ;panel/output path/etc. R0=hal device, R1=brightness (0-65536)
+;LCDConfig_LCDTimings      # 4 ; Pointer to required timings, if fixed panel
+;LCDConfig_Max_PixelRate   # 4 ; Max pixel rate (Hz), if flexible panel
+;LCDConfig_Size            # 0
+
+
+;LCDConfig_LCDType_None       * 0
+;LCDConfig_LCDType_TFT        * 1
+;LCDConfig_LCDType_STN_Colour * 2
+;LCDConfig_LCDType_STN_Mono4  * 3
+;LCDConfig_LCDType_STN_Mono8  * 4
+;
+;LCDConfig_Flags_RF           * 1
+;LCDConfig_Flags_IEO          * 2
+;LCDConfig_Flags_IPC          * 4
+;LCDConfig_Flags_Brightness   * 8 ; LCDConfig_Power can be used to control ;backlight brightness
+
+
+;                                 ^ 0
+;VideoBoardConfig_sys_clk         # 4 ; System clock frequency
+;VideoBoardConfig_Max_Porch       # 2 ; Max porch value
+;VideoBoardConfig_Max_Sync        # 2 ; Max sync value
+;VideoBoardConfig_DMA_Ptr         # 4 ; Pointer to SDMA registers
+;VideoBoardConfig_DMA_Device      # 4 ; SDMA IRQ number
+;VideoBoardConfig_DMA_Chans       # 4 ; Mask of available SDMA channels
+;VideoBoardConfig_Flags           # 1 ; Extra flags
+;VideoBoardConfig_Num_LCDs        # 1 ; Number of LCD outputs available
+;VideoBoardConfig_MySize          # 2 ; sizeof(VideoBoardConfig), or 0 for old ;HAL
+;VideoBoardConfig_LCD_Configs     # 4 ; Pointer to list of LCD configs
+;VideoBoardConfig_TVDet_Func      # 4 ; Function to poll TV detection signal
+;VideoBoardConfig_TVPower_Func    # 4 ; Function to control TV out power. ;R0=hal device, R1=on/off flag
+;VideoBoardConfig_Size            # 0
+
+;VideoBoardConfig_Flags_SVideo    * 1
+;VideoBoardConfig_Flags_Composite * 2
+
+        END

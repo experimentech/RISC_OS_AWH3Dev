@@ -1,0 +1,124 @@
+;HDMI regs
+;I.MX6 section 33.5
+
+;HDMI_PHY offset is to be added to HDMI_BASE _ONLY_ when
+;the controller is still scrambled.
+
+;scrambled outer (PHY) is offset &10000 from the HDMI base.
+;Special H3 regs.
+;offset from HDMI_BaseAddr
+HDMI_PHY                  *    &10000
+
+;HDMI_READ_EN              *    &10
+;values
+HDMI_READ_ENABLE          *    &54524545
+HDMI_READ_DISABLE         *    &57415452
+
+;Offset
+;HDMI_UNSCRAMBLE_ADDR      *    &14
+;Values
+HDMI_UNSCRAMBLE_ENABLE    *    &42494E47
+HDMI_UNSCRAMBLE_DISABLE   *    &0
+
+;--HDMI TX PHY registers--
+
+PHY_POL         *   &00
+PHY_RES1        *   &04
+;Anything at &8?
+PHY_READ_EN     *   &10
+PHY_UNSCRAMBLE  *   &14
+PHY_RES2        *   &18
+;PHY_CTRL        *   &20
+ANA_CFG1        *   &20
+;PHY_UNK1        *   &24
+ANA_CFG2        *   &24
+;PHY_UNK2        *   &28
+ANA_CFG3        *   &28
+;PHY_PLL         *   &2c
+PLL_CFG1        *   &2c
+;PHY_CLK         *   &30
+PLL_CFG2        *   &30
+;PHY_UNK3        *   &34
+PLL_CFG3        *   &34
+;PHY_STATUS      *   &38
+ANA_STS         *   &38
+CEC             *   &3c
+
+
+;HDMI_UNSCRAMBLE_ADDR  *    PHY_UNSCRAMBLE
+;HDMI_READ_ENABLE      *    PHY_READ_EN
+
+
+;HDMI TX PHY Register descriptions
+;--CEC--
+CEC_CTRL_SEL          *    1 << 7
+CEC_INPUT_DATA        *    1 << 1
+CEC_OUTPUT_DATA       *    1 << 0
+
+;--ANA_CFG1--
+ENRCAL                *    1 << 19
+ENCALOG               *    1 << 18
+TMDSCLK_EN            *    1 << 16
+BIASEN                *    &F << 8
+ENP2S                 *    &7 << 4 ;0111
+CKEN                  *    1 << 3
+LDOEN                 *    1 << 2
+ENVBS                 *    1 << 1
+
+
+
+;--ANA_STS--
+B_OUT                 *    2_111111 << 11 ;R
+RCALEND2D             *    1 << 7  ;R
+;overlap. Check.
+RESDO2D               *    2_111111 ;b5:0  R. Seems fine
+
+
+;--PLL_CFG1--
+REG_OD1               *    1 << 31
+REG_OD0               *    1 << 30
+PLLEN                 *    1 << 25
+B_IN                  *    2_111111
+
+
+;--
+;--ANA_CFG1 from Wiki--
+HDMI_TDMS_CLK_OUTPUT_EN *  1 << 15
+HDMI_TDMS_2_OUTPUT_EN   *  1 << 14
+HDMI_TDMS_1_OUTPUT_EN   *  1 << 13
+HDMI_TDMS_0_OUTPUT_EN   *  1 << 12
+
+
+;--end PHY regs
+
+
+
+;The following are initially hidden behind Allwinner PHY obfuscation.
+;These come from the iMX6 manual, chapter 33: HDMI Transmitter.
+
+;Register name             ;offset
+HDMI_DESIGN_ID        *    &0000
+HDMI_REVISION_ID      *    &0001
+HDMI_PRODUCT_ID0      *    &0002
+HDMI_PRODUCT_ID1      *    &0003
+HDMI_CONFIG0_ID       *    &0004
+HDMI_CONFIG1_ID       *    &0005
+HDMI_CONFIG2_ID       *    &0006
+HDMI_CONFIG3_ID       *    &0007
+HDMI_IH_FC_STAT0      *    &0100
+HDMI_IH_FC_STAT1      *    &0101
+HDMI_IH_FC_STAT2      *    &0102
+HDMI_IH_AS_STAT0      *    &0103
+HDMI_IH_PHY_STAT0     *    &0104
+HDMI_IH_I2CM_STAT0    *    &0105
+
+
+HDMI_FC_HSYNCINWIDTH0 *    &100A
+HDMI_FC_HSYNCINWIDTH1 *    &100B
+HDMI_FC_VSYNCINDELAY  *    &100C
+HDMI_FC_VSYNCINWIDTH  *    &100D
+
+;This interface has a very large number of registers.
+;This is a work in progress.
+
+                      END

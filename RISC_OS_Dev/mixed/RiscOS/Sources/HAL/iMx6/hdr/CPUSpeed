@@ -1,0 +1,56 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_iMx6_CPUClk_HDR__
+        GBLL    __HAL_iMx6_CPUClk_HDR__
+
+        GET     hdr:CPUClkDevice
+
+                ^       0
+CPUSpeedTab     #       0
+CPUST_Freq      #       4               ; Frequency in MHz
+CPUST_vddvpu    #       4               ; in mV  reg1- VPU/GPU domain
+CPUST_vddsoc    #       4               ; in mV  reg2- SOC domain
+CPUST_vddarm    #       4               ; in mV  reg0- arm core
+CPUST_Size      #       0               ; table size
+
+CPUST_Format    *       1               ; format 1
+
+CPUST_Max       *       8               ; Max CPU Speed table entries
+
+
+; the device as we use it
+                ^       0, a1
+; obvious public bits
+CPUClkDevice    #       HALDevice_CPUClk_Size
+; our more private bits
+CPUClkNewSpeedIdx #     1               ; index to speed 0=slowest
+CPUClkCurSpeedIdx #     1               ; index to table 0=slowest
+CPUClknSpeeds   #       1               ; speed index range 0->CPUClknSpeeds-1
+CPUMinSpeedIndex #      1               ; minimum cpu speed index in use
+CPUMaxSpeedIndex #      1               ; max cpu speed index in use
+CPUClkSpare     #       3               ; align
+;CPUClkTable    #       (CPUST_Size*CPUST_Max)
+; overall size
+HALClkSB        #       4               ; so we can get to it later
+CPUClkTableEnd  #       0
+
+CPUClkDeviceSize *      (CPUClkTableEnd-CPUClkDevice)
+
+        ]
+        END

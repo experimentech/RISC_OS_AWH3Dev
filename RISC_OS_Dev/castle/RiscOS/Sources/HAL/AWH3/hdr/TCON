@@ -1,0 +1,22 @@
+;TCON registers
+;TCON0    *    &01C0C000
+
+TCON_GCTL_REG    *    &000 ;TCON global control
+TCON_GINT0_REG   *    &004 ;TCON global interrupt register 0
+TCON_GINT1_REG   *    &008 ;TCON global interrupt register 1
+TCON_CTL_REG     *    &090 ; TCON1 control
+TCON1_BASIC0_REG *    &094 ; TCON1 basic timing reg 0
+TCON1_BASIC1_REG *    &098
+TCON1_BASIC2_REG *    &09c
+TCON1_BASIC3_REG *    &0a0
+TCON1_BASIC4_REG *    &0a4
+TCON1_BASIC5_REG *    &0a8
+TCON1_PS_SYNC_REG *   &0b0 ;TCON1 SYNC
+TCON1_IO_POL_REG *    &0f0 ;TCON1 IO polarity
+TCON1_IO_TRI_REG *    &0f4 ;TCON1 IO control
+TCON_ECC_FIFO_REG *   &0f8 ;TCON1 ECC FIFO
+TCON_CEU_CTL_REG  *   &100 ;TCON CEU control
+TCON_CEU_COEF_MUL_REG * 0 ;I give up for now. TODO later.
+
+
+    END

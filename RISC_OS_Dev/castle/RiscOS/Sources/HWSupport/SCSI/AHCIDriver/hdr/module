@@ -1,0 +1,282 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+;
+        GBLL    Debug
+Debug   SETL    {FALSE};{TRUE};
+
+        GBLL    Debug_DADebug
+Debug_DADebug   SETL {FALSE}
+
+        GBLL    Multi_AHCI_Ports
+Multi_AHCI_Ports SETL  {TRUE} ;{FALSE}
+
+ [ Multi_AHCI_Ports
+MaxDevCount             *       16
+ |
+MaxDevCount             *       1
+ ]
+
+MaxCmdTimeout           *       256     ; timeout used if no timeout requested
+                                        ; (in CS)
+
+
+AHCIDriverSWI_Base      *       &59700
+
+; Whether to use OS_Memory 19 or OS_Memory 0 for DMA prep
+ [ :LNOT: :DEF: OSMem19
+        GBLL    OSMem19
+OSMem19 SETL    {FALSE}
+ ]
+
+; Value to check scatter entry addresses against to determine if they indicate
+; loop back
+                GBLA    ScatterListThresh
+ScatterListThresh SETA  -&10000
+
+ [ :LNOT: OSMem19
+; ceiling above which we won't fiddle with ram cachability
+DirectAddressCeiling    *       &FA000000       ; base of kernel workspace
+
+; quick switch to define whether we 'ConvertWordAligned' for all alignments or just as needed
+                GBLL    AlwaysTestCVA
+AlwaysTestCVA   SETL    {FALSE}
+
+; Alignment to force all data to.
+; Must be multiple of 2 to comply with AHCI spec. We used to use 4, because it
+; seemed like the i.MX6 AHCI controller was slow with halfword aligned data,
+; but re-testing now suggests there's no real difference at all (or at least
+; not enough to offset the cost of copying to/from a bounce buffer when forcing
+; to 4 byte alignment)
+PRDDataAlignment *      2
+ ]
+
+; Macro to simplify returning SCSI errors from the handler routines
+        MACRO
+        XSCSIError $err
+        MOV     R0, #ErrorNumber_$err-SCSI_ErrorBase
+        SETV
+        MEND
+
+; 3 macros to provide safe entry to service mode from anywhere..
+; ToSVCEIRQOff enters and turns off IRQs
+; ToSVCE       enters without changing IRQ mode
+; reg 1 < reg 2.. .. 2 work registers, preserved and not passed into code
+
+        MACRO
+        ToSVCEIRQOff    $reg1,$reg2
+        STMFD   r13!,{r$reg1,r$reg2,lr} ; remember work regs & current mode
+                                        ; on current mode stack
+        MRS     r$reg1, CPSR            ; remember mode & flags
+        ORR     r$reg2, r$reg1, #&83    ; IRQ26->SVC26, IRQ32->SVC32 ,IRQ off
+        MSR     CPSR_c, r$reg2
+
+        MOV     r$reg2,lr               ; remember svce lr
+        STMFD   r13!,{r$reg1,r$reg2}    ; on svce stack
+                                        ; and continue.. reg1 is i/p mode status
+                                        ;                reg2 is ip mode lr
+        MEND
+
+; go to service mode without effecting IRQ mode
+; reg 1 < reg 2.. and not passed into code following this
+        MACRO
+        ToSVCE  $reg1,$reg2
+        STMFD   r13!,{r$reg1,r$reg2,lr} ; remember work regs & current mode
+                                        ; on current mode stack
+        MRS     r$reg1, CPSR            ; remember mode & flags
+        ORR     r$reg2, r$reg1, #&3    ; IRQ26->SVC26, IRQ32->SVC32
+        MSR     CPSR_c, r$reg2
+
+        MOV     r$reg2,lr               ; remember svce lr
+        STMFD   r13!,{r$reg1,r$reg2}    ; on svce stack
+                                        ; and continue.. reg1 is i/p mode status
+                                        ;                reg2 is ip mode lr
+        MEND
+
+; reg1,reg2 are same regs as provided to ToSVCE.. they will be restored on exit
+        MACRO
+        FromSVCE $reg1,$reg2
+        LDMFD   r13!,{r$reg1,lr}        ; recover i/p mode + flags,  svce lr
+        MSR     CPSR_c, r$reg1
+        LDMFD   r13!,{r$reg1,r$reg2,lr} ; restore r0,r1,lr in old mode
+        MEND
+
+; reg1,reg2 are same regs as provided to ToSVCE.. they will be restored on exit
+; returns to {lr}
+        MACRO
+        FromSVCERet $reg1,$reg2
+        LDMFD   r13!,{r$reg1,lr}        ; recover i/p mode + flags,  svce lr
+        MSR     CPSR_c, r$reg1
+        LDMFD   r13!,{r$reg1,r$reg2,pc} ; restore r0,r1,lr in old mode
+        MEND
+
+; Memory barrier (for writes only)
+; Calls an ARMop located in the kernel, and so deals with the PL310 write buffer
+        MACRO
+        DMB_Write
+        Push    "r0"                    ; ARMops can corrupt r0
+        MOV     lr, pc
+        LDR     pc, ARMop_DMB_Write_p
+        Pull    "r0"
+        MEND
+
+; Diagnostics macros
+
+        MACRO
+        DebugReg $reg, $str
+    [ Debug
+     Push "$reg"
+     [ "$str" <> ""
+        BL      DebugHALPrint
+        =       "$str", 0
+        ALIGN
+     ]
+     bl  DebugHALPrintReg
+    ]
+        MEND
+
+        MACRO
+        DebugRegCond $reg, $str , $cond
+    [ Debug
+     b$cond  %ft1223
+     b %ft1224
+1223
+     Push "$reg"
+     [ "$str" <> ""
+        BL      DebugHALPrint
+        =       "$str", 0
+        ALIGN
+     ]
+     bl  DebugHALPrintReg
+1224
+    ]
+        MEND
+
+        MACRO
+        DebugRegNCR $reg, $str
+    [ Debug
+     Push "$reg"
+     [ "$str" <> ""
+        BL      DebugHALPrint
+        =       "$str", 0
+        ALIGN
+     ]
+     bl  DebugHALPrintRegNCR
+    ]
+        MEND
+
+        MACRO
+        DebugByteReg $reg, $str
+    [ Debug
+     Push "$reg"
+     [ "$str" <> ""
+        BL      DebugHALPrint
+        =       "$str", 0
+        ALIGN
+     ]
+     bl  DebugHALPrintB
+    ]
+        MEND
+
+        MACRO
+        DebugByteRegNCR $reg, $str
+    [ Debug
+        DebugByteReg $reg, $str
+    ]
+        MEND
+
+        MACRO
+        DebugTX $str
+    [ Debug
+        BL      DebugHALPrint
+        =       "$str", 13,10,00
+        ALIGN
+    ]
+        MEND
+
+        MACRO
+        DebugTXS $str
+    [ Debug
+        BL      DebugHALPrint
+        =       "$str",00
+        ALIGN
+    ]
+        MEND
+
+        MACRO
+        DebugRamReset $tmp
+    [ Debug
+        adrl    $tmp, DebugRamBase+4
+        str     $tmp, DebugRamBase+4
+        mov     $tmp, #0              ; flag dont show
+        str     $tmp, DebugRamBase
+    ]
+        MEND
+        MACRO
+$label  DebugRamSave   $tmp, $reglist
+    [ Debug
+        LCLS   temps
+        LCLL   onereg
+temps   SETS   "$reglist"
+onereg  SETL   {TRUE}
+        WHILE  onereg :LAND: :LEN: temps > 0
+        [ temps :LEFT: 1 = "," :LOR: temps :LEFT: 1 = "-"
+onereg  SETL   {FALSE}
+        ]
+temps   SETS   temps :RIGHT: (:LEN: temps - 1)
+        WEND
+        ldr     $tmp, (DebugRamBase+4)
+        [ onereg
+$label  str     $reglist, [$tmp], #4
+        |
+$label  stmia   $tmp!, {$reglist}
+        ]
+        str     $tmp, (DebugRamBase+4)
+    ]
+        MEND
+
+        MACRO
+        DebugRamOn  $tmp ,$cond
+    [ Debug
+        mov$cond        $tmp, #1
+        str$cond        $tmp, DebugRamBase
+    ]
+        MEND
+
+        MACRO
+        DebugRamDump $base, $top, $tmp
+    [ Debug
+        adrl    $base, DebugRamBase
+        ldr     $tmp, [$base], #4
+        teq     $tmp, #0
+        beq     %ft8973           ; dump not enabled
+        ldr     $top, [$base]
+        cmp     $top, $base
+        ble     %ft8973
+        DebugTX ""
+        DebugTXS "Dump: "
+8972    ldr     $tmp, [$base], #4
+        DebugRegNCR $tmp, ""
+        cmp     $top, $base
+        bgt     %bt8972
+        DebugTX "done "
+8973
+    ]
+        MEND
+
+
+        END

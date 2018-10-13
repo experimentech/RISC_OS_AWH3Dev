@@ -1,0 +1,61 @@
+Watchdog Timer access
+22/11/2014 JWB
+
+There is now a HAL call the exposes a hardware watchdog timer.
+The interface to it is as follows:
+
+HAL_Watchdog is HAL entrypoint no 121
+
+; On entry, a1 = reason code
+; a1 = 0 report capabilities etc
+; a1 = 1 Claim/initialise things
+; a1 = 2 write watchdog tickle address
+; a1 = 3 acknowledge timeout warning irq.
+
+a1 = 0: WDinfo
+; WDInfo returns a1-> a structure as follows
+; flag field to indicate capabilities
+; timeout unit increments in milleseconds
+; max timeout in units above
+; max irq warning time prior to watchdog reset, or 0 if no warning irq
+; warning irq number
+; tickle value count(TVC)
+; list of tickle values to use .. TVC words long
+
+Flags:
+WDFlag_HardReset        *       (1<<0)
+WDFlag_HasTimeout       *       (1<<1)
+WDFlag_HasWarnIRQ       *       (1<<2)
+WDFlag_WontTurnOff      *       (1<<3)
+
+Structure
+        int     WDFlags;
+        int     WDResolution; // unit size in ms for timeouts
+        int     WDMaxTimeout; // in WDResolution steps
+        int     WDMaxTOWarn;  // WDResolution steps for early warning IRQ
+        int     IRQNum;       // IRQ number if relevant
+        int     NTickle;      // number of tickle values that follow
+        int     Tickle1;      // Tickle values are written in sequence
+...                           // (over time..) to keep from timeout
+        int     TickleN;
+
+a1 = 1;
+a4 = &deaddead
+; WDSetup is called either with a2 = 0 to turn off the watchdog,
+; or with a2 = timeout value to turn the watchdog on
+; if a2 <> 0 then if a3 <> 0 also set up the warning irq
+; according to a3 value.
+; This assumes the client has already claimed the IRQ
+; no action unless a4 = &deaddead
+
+a1 = 2; write tickle value
+a2 = value to write.
+; This is the main service routine, and is used to keep the watchdog alive.
+; successive calls, in sequence, with all the tickle values are required
+; to reset the watchdog timeout value. Only once the full sequence is received
+; will the watchdog timer be reset, so if you are changing the watchdog timeout
+; value you will need to put out a full watchdog tickle sequence before the
+; timeout value gets changed.
+
+a2 = 3;
+; Acknowledge the timeout warning irq bit

@@ -1,0 +1,82 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_SDMA_HDR__
+        GBLL    __HAL_SDMA_HDR__
+
+        GET     hdr.iMx6qIRQs
+
+        GET     hdr:DMADevice
+
+; SDMA registers - relative to SDMA_BASE_ADDR
+
+SDMAARM_MC0PTR                * &00
+SDMAARM_INTR                  * &04
+SDMAARM_STOP_STAT             * &08
+SDMAARM_HSTART                * &0C
+SDMAARM_EVTOVR                * &10
+SDMAARM_DSPOVR                * &14
+SDMAARM_HOSTOVR               * &18
+SDMAARM_EVTPEND               * &1C
+SDMAARM_RESET                 * &24
+SDMAARM_EVTERR                * &28
+SDMAARM_INTRMASK              * &2C
+SDMAARM_PSW                   * &30
+SDMAARM_EVTERRDBG             * &34
+SDMAARM_CONFIG                * &38
+SDMAARM_LOCK                  * &3C
+SDMAARM_ILLINSTRADDR          * &58
+SDMAARM_CHN0ADDR              * &5C
+SDMAARM_EVT_MIRROR            * &60
+SDMAARM_EVT_MIRROR2           * &64
+SDMAARM_XTRIG_CONF1           * &70
+SDMAARM_XTRIG_CONF2           * &74
+SDMAARM_SDMA_CHNPRI0          * &100 ; 32 registers with 4 byte stride
+SDMAARM_CHNENBL0              * &200 ; 48 registers with 4 byte stride
+
+; Channel 0 ROM script commands
+C0_SET_DM * 1<<24
+C0_GET_DM * 2<<24
+C0_SET_PM * 4<<24
+C0_GET_PM * 6<<24
+C0_SETCTX * 7<<24
+C0_GETCTX * 3<<24
+
+; Buffer descriptor flags
+SDMA_BD_DONE * 1<<16
+SDMA_BD_WRAP * 1<<17
+SDMA_BD_CONT * 1<<18
+SDMA_BD_INT  * 1<<19
+SDMA_BD_ERR  * 1<<20
+SDMA_BD_LAST * 1<<21
+
+; Channel control block structure
+                      ^ 0
+SDMA_CCB_currentBDptr # 4
+SDMA_CCB_baseBDptr    # 4
+SDMA_CCB_chanDesc     # 4
+SDMA_CCB_status       # 4
+SDMA_CCB_SIZE         # 0
+
+; ROM script addresses
+SDMA_ROM_app_2_mcu * 683
+SDMA_ROM_mcu_2_app * 747
+
+        ] ; __HAL_SDMA_HDR__
+
+        END

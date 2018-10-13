@@ -1,0 +1,57 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+; 
+;
+; Control bitmasks used to indicate results of test to RISCOS
+;
+
+R_SOFT          *       0               ; not a power-on reset
+R_HARD          *       1               ; Self-test run due to POR
+R_EXTERN        *       2               ; external tests performed
+R_TESTED        *       4               ; Self-test run due to test link
+R_MEMORY        *       8               ; Memory has been tested
+R_ARM3          *       &10             ; read ARM id
+R_MEMSKIP       *       &20             ; long memory test disabled
+R_IOEB          *       &40             ; PC-style IO controller (A5000)
+R_IOMD          *       &40             ; PC-style IO controller (RiscPC, ARM7500)
+R_VRAM          *       &80             ; VRAM present
+
+R_STATUS        *       &1ff            ; bits that aren't a fatal fault
+
+R_CHKFAILBIT    *       &100            ; CMOS contents failed checksum
+R_ROMFAILBIT    *       &200            ; ROM failed checksum
+R_CAMFAILBIT    *       &400            ; CAM failed
+R_PROFAILBIT    *       &800            ; MEMC protection failed
+R_IOCFAILBIT    *       &1000           ; IOC register test failed
+R_INTFAILBIT    *       &2000           ; Cannot clear interrupts
+R_VIDFAILBIT    *       &4000           ; VIDC flyback failure
+R_SNDFAILBIT    *       &8000           ; Sound DMA failure
+R_CMSFAILBIT    *       &10000          ; CMOS unreadable
+R_LINFAILBIT    *       &20000          ; Page zero RAM failure
+R_MEMFAILBIT    *       &40000          ; Main RAM test failure
+R_CACFAILBIT    *       &80000          ; ARM 3 Cache test failure
+
+;
+; Define Long, Equal and short flash delays
+;
+ts_Long_Flash           *       &03             ; Number of 1/4 Sec delays for a long flash
+ts_Short_Flash          *       &01             ; Number of 1/4 Sec delays for a short flash
+ts_Equal_Flash          *       &02             ; Number of 1/4 Sec delays for a equal flash
+ts_Fail_Flash_Delay     *       &14             ; Number of Flash Cycles for a Fail, with adaptor
+ts_Pass_Flash_Delay     *       &0A             ; Number of Flash Cycles for a Pass, with adaptor
+
+        END

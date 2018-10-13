@@ -1,0 +1,386 @@
+;
+; CDDL HEADER START
+;
+; The contents of this file are subject to the terms of the
+; Common Development and Distribution License (the "Licence").
+; You may not use this file except in compliance with the Licence.
+;
+; You can obtain a copy of the licence at
+; cddl/RiscOS/Sources/HWSupport/SD/SDIODriver/LICENCE.
+; See the Licence for the specific language governing permissions
+; and limitations under the Licence.
+;
+; When distributing Covered Code, include this CDDL HEADER in each
+; file and include the Licence file. If applicable, add the
+; following below this CDDL HEADER, with the fields enclosed by
+; brackets "[]" replaced with your own identifying information:
+; Portions Copyright [yyyy] [name of copyright owner]
+;
+; CDDL HEADER END
+;
+; Copyright 2012 Ben Avison.  All rights reserved.
+; Use is subject to license terms.
+;
+
+        SUBT    Exported SDIODriver constants
+
+OldOpt  SETA    {OPT}
+        OPT     OptNoList+OptNoP1List
+
+; SWIs
+
+SWIClass        SETS    SDIODriverSWI_Name
+
+        ^       SDIODriverSWI_Base
+
+        AddSWI  Initialise              ; &59000
+        AddSWI  Control                 ; &59001
+        AddSWI  Enumerate               ; &59002
+        AddSWI  ControllerFeatures      ; &59003
+        AddSWI  ReadRegister            ; &59004
+        AddSWI  Op                      ; &59005
+        AddSWI  ClaimDeviceVector       ; &59006
+        AddSWI  ReleaseDeviceVector     ; &59007
+
+; SDIO_Initialise reason codes
+                                ^       0
+SDIOInitialise_ResetBus         #       1
+SDIOInitialise_RescanSlot       #       1
+
+; SDIO_Initialise 0 flags
+                                ^       0
+SDIOResetBus_BusShift           *       0
+SDIOResetBus_BusMask            *       &FF :SHL: SDIOResetBus_BusShift
+
+; SDIO_Initialise 1 flags
+                                ^       0
+SDIORescanSlot_SlotShift        *       0
+SDIORescanSlot_SlotMask         *       &FF :SHL: SDIORescanSlot_SlotShift
+SDIORescanSlot_BusShift         *       8
+SDIORescanSlot_BusMask          *       &FF :SHL: SDIORescanSlot_BusShift
+
+; SDIO_Control reason codes
+                                ^       0
+SDIOControl_TryLock             #       1
+SDIOControl_Lock                #       1
+SDIOControl_SleepLock           #       1
+SDIOControl_Unlock              #       1
+SDIOControl_AbortAll            #       1
+SDIOControl_AbortOp             #       1
+SDIOControl_PollCardDetect      #       1
+
+; SDIO_Control flags
+
+SDIOControl_SlotShift           *       0
+SDIOControl_SlotMask            *       &FF :SHL: SDIOControl_SlotShift
+SDIOControl_BusShift            *       8
+SDIOControl_BusMask             *       &FF :SHL: SDIOControl_BusShift
+
+; SDIO_Enumerate reason codes
+                                ^       0
+SDIOEnumerate_Slots             #       1
+SDIOEnumerate_Units             #       1
+
+; SDIO_Enumerate flags - deliberately consistent with Service_SDIOUnitAttached
+
+SDIOEnumerate_SlotShift         *       0
+SDIOEnumerate_SlotMask          *       &FF :SHL: SDIOEnumerate_SlotShift
+SDIOEnumerate_BusShift          *       8
+SDIOEnumerate_BusMask           *       &FF :SHL: SDIOEnumerate_BusShift
+SDIOEnumerate_Integrated        *       1 :SHL: 16
+SDIOEnumerate_NoCardDetect      *       1 :SHL: 17
+SDIOEnumerate_IntegratedMem     *       1 :SHL: 18
+SDIOEnumerate_RCAShift          *       16
+SDIOEnumerate_RCAMask           *       -1 :SHL: SDIOEnumerate_RCAShift
+SDIOEnumerate_UnitShift         *       0
+SDIOEnumerate_UnitMask          *       &FF :SHL: SDIOEnumerate_UnitShift
+SDIOEnumerate_FICShift          *       8
+SDIOEnumerate_FICMask           *       &FF :SHL: SDIOEnumerate_FICShift
+SDIOEnumerate_WriteProtect      *       1 :SHL: 16
+SDIOEnumerate_MMC               *       1 :SHL: 17
+
+; SDIO_ControllerFeatures indexes
+                                ^       0
+SDIOController_MaxBlockLen      #       1
+
+; SDIO_ControllerFeatures flags
+
+SDIOController_SlotShift        *       0
+SDIOController_SlotMask         *       &FF :SHL: SDIOController_SlotShift
+SDIOController_BusShift         *       8
+SDIOController_BusMask          *       &FF :SHL: SDIOController_BusShift
+
+; SDIO_ReadRegister indexes
+                                ^       0
+SDIORegister_MemoryOCR          #       1
+SDIORegister_IOOCR              #       1
+SDIORegister_CID                #       1
+SDIORegister_CSD                #       1
+SDIORegister_SCR                #       1
+
+; SDIO_ReadRegister flags
+
+SDIORegister_SlotShift          *       0
+SDIORegister_SlotMask           *       &FF :SHL: SDIORegister_SlotShift
+SDIORegister_BusShift           *       8
+SDIORegister_BusMask            *       &FF :SHL: SDIORegister_BusShift
+SDIORegister_RCAShift           *       16
+SDIORegister_RCAMask            *       -1 :SHL: SDIORegister_RCAShift
+
+; SDIO_Op flags
+
+SDIOOp_SlotShift                *       0
+SDIOOp_SlotMask                 *       &FF :SHL: SDIOOp_SlotShift
+SDIOOp_BusShift                 *       8
+SDIOOp_BusMask                  *       &FF :SHL: SDIOOp_BusShift
+SDIOOp_ChkBusy                  *       1 :SHL: 16
+SDIOOp_ChkCRC                   *       1 :SHL: 17
+SDIOOp_ChkIndex                 *       1 :SHL: 18
+SDIOOp_ChkStatusR1              *       1 :SHL: 19
+SDIOOp_ChkStatusR5              *       1 :SHL: 20
+SDIOOp_TransShift               *       24
+SDIOOp_TransNone                *       0 :SHL: SDIOOp_TransShift
+SDIOOp_TransRead                *       1 :SHL: SDIOOp_TransShift
+SDIOOp_TransWrite               *       2 :SHL: SDIOOp_TransShift
+SDIOOp_TransMask                *       3 :SHL: SDIOOp_TransShift
+SDIOOp_Scatter                  *       1 :SHL: 26
+SDIOOp_DisableEscape            *       1 :SHL: 27
+SDIOOp_Background               *       1 :SHL: 29
+
+SDIOOp_R0                       *       0
+SDIOOp_R1                       *       SDIOOp_R7 :OR: SDIOOp_ChkStatusR1
+SDIOOp_R1b                      *       SDIOOp_R1 :OR: SDIOOp_ChkBusy
+SDIOOp_R2                       *       SDIOOp_ChkCRC
+SDIOOp_R3                       *       0
+SDIOOp_R4mmc                    *       SDIOOp_R7
+SDIOOp_R4sdio                   *       0
+SDIOOp_R5mmc                    *       SDIOOp_R7
+SDIOOp_R5sdio                   *       SDIOOp_R7 :OR: SDIOOp_ChkStatusR5
+SDIOOp_R6                       *       SDIOOp_R7
+SDIOOp_R7                       *       SDIOOp_ChkCRC :OR: SDIOOp_ChkIndex
+
+SDIOOp_ResLen_R0                *       0
+SDIOOp_ResLen_R1                *       4
+SDIOOp_ResLen_R1b               *       4
+SDIOOp_ResLen_R2                *       15
+SDIOOp_ResLen_R3                *       4
+SDIOOp_ResLen_R4mmc             *       4
+SDIOOp_ResLen_R4sdio            *       4
+SDIOOp_ResLen_R5mmc             *       4
+SDIOOp_ResLen_R5sdio            *       4
+SDIOOp_ResLen_R6                *       4
+SDIOOp_ResLen_R7                *       4
+
+SDIOOp_CmdFlg_CmdShift          *       0
+SDIOOp_CmdFlg_CmdMask           *       &FF :SHL: SDIOOp_CmdFlg_CmdShift
+SDIOOp_CmdFlg_AppCmd            *       1 :SHL: 8
+SDIOOp_CmdFlg_AutoCMD12         *       1 :SHL: 9
+SDIOOp_CmdFlg_BlockSplitShift   *       12
+SDIOOp_CmdFlg_BlockSplitMask    *       &F :SHL: SDIOOp_CmdFlg_BlockSplitShift
+SDIOOp_CmdFlg_RCAShift          *       16
+SDIOOp_CmdFlg_RCAMask           *       -1 :SHL: SDIOOp_CmdFlg_RCAShift
+
+; SDIO_ClaimDeviceVector (and ReleaseDeviceVector) flags
+
+SDIOCDV_UnitShift               *       0
+SDIOCDV_UnitMask                *       &FF :SHL: SDIOCDV_UnitShift
+SDIOCDV_SlotShift               *       8
+SDIOCDV_SlotMask                *       &FF :SHL: SDIOCDV_SlotShift
+SDIOCDV_BusShift                *       16
+SDIOCDV_BusMask                 *       &FF :SHL: SDIOCDV_BusShift
+
+; Service calls
+
+ [ :DEF: SDIODriverService ; defined in Hdr:Services
+        ASSERT  SDIODriverService = &81040
+ ]
+Service_SDIOSlotAttached        *       &81040
+Service_SDIOSlotDetached        *       &81041
+Service_SDIOUnitAttached        *       &81042
+Service_SDIOUnitDetached        *       &81043
+Service_SDIOSlotAcquired        *       &81044
+Service_SDIOSlotReleased        *       &81045
+Service_SDIODescribeFIC         *       &81046
+
+; Service_SDIOSlotAttached and Service_SDIOSlotDetached flags
+
+SDIOSlotAttached_SlotShift      *       0
+SDIOSlotAttached_SlotMask       *       &FF :SHL: SDIOSlotAttached_SlotShift
+SDIOSlotAttached_BusShift       *       8
+SDIOSlotAttached_BusMask        *       &FF :SHL: SDIOSlotAttached_BusShift
+SDIOSlotAttached_Integrated     *       1 :SHL: 16
+SDIOSlotAttached_NoCardDetect   *       1 :SHL: 17
+SDIOSlotAttached_IntegratedMem  *       1 :SHL: 18
+
+; Service_SDIOUnitAttached and Service_SDIOUnitDetached flags
+
+SDIOUnitAttached_SlotShift      *       0
+SDIOUnitAttached_SlotMask       *       &FF :SHL: SDIOUnitAttached_SlotShift
+SDIOUnitAttached_BusShift       *       8
+SDIOUnitAttached_BusMask        *       &FF :SHL: SDIOUnitAttached_BusShift
+SDIOUnitAttached_RCAShift       *       16
+SDIOUnitAttached_RCAMask        *       -1 :SHL: SDIOUnitAttached_RCAShift
+SDIOUnitAttached_UnitShift      *       0
+SDIOUnitAttached_UnitMask       *       &FF :SHL: SDIOUnitAttached_UnitShift
+SDIOUnitAttached_FICShift       *       8
+SDIOUnitAttached_FICMask        *       &FF :SHL: SDIOUnitAttached_FICShift
+SDIOUnitAttached_WriteProtect   *       1 :SHL: 16
+SDIOUnitAttached_MMC            *       1 :SHL: 17
+
+; Service_SDIOSlotAcquired and Service_SDIOSlotReleased flags
+
+SDIOSlotAcquired_SlotShift      *       0
+SDIOSlotAcquired_SlotMask       *       &FF :SHL: SDIOSlotAcquired_SlotShift
+SDIOSlotAcquired_BusShift       *       8
+SDIOSlotAcquired_BusMask        *       &FF :SHL: SDIOSlotAcquired_BusShift
+
+; Errors
+
+        ^        ErrorBase_SDIO ; &81EE00
+        
+        ; Software errors
+        AddError SDIO_BadSWI,    "BadSWI:SWI value out of range for module %0"
+        AddError SDIO_BadReason, "E01:Unknown %0 reason code"
+        AddError SDIO_BadBus,    "E02:Invalid bus"
+        AddError SDIO_BadSlot,   "E03:Invalid slot"
+        AddError SDIO_BadRCA,    "E04:Invalid card"
+        AddError SDIO_BadUnit,   "E05:Invalid unit"
+        AddError SDIO_SlotInUse, "E06:Slot in use"
+        AddError SDIO_BadCRLen,  "E07:Bad command/response block length"
+        AddError SDIO_PartBlk,   "E08:Transfer must be a whole number of blocks"
+        AddError SDIO_TooLong,   "E09:Transfer too long"
+        AddError SDIO_QueueFull, "E10:Command queue full"
+        AddError SDIO_QueueTO,   "E11:Timeout waiting for command queue"
+        AddError SDIO_OpTO,      "E12:Command timeout"
+        AddError SDIO_CMDTO,     "E13:Timeout waiting for CMD line"
+        AddError SDIO_DATTO,     "E14:Timeout waiting for DAT line"
+        AddError SDIO_BadOp,     "E15:Invalid operation ID"
+        AddError SDIO_Abort,     "E16:Command aborted"
+        AddError SDIO_BadCIS,    "E17:Invalid CIS pointer %0"
+        AddError SDIO_NoTuple,   "E18:Tuple not found"
+        
+        ; 0xAF and 0xBx - controller errors
+        ^        ErrorBase_SDIO + &AF
+        AddError SDIO_Conflict,  "CtlrExx:Controller error - CMD line conflict"
+        AddError SDIO_CTO,       "CtlrE00:Controller error - Response timeout"
+        AddError SDIO_CCRC,      "CtlrE01:Controller error - Response CRC error"
+        AddError SDIO_CEB,       "CtlrE02:Controller error - Response end bit error"
+        AddError SDIO_CIE,       "CtlrE03:Controller error - Response index error"
+        AddError SDIO_DTO,       "CtlrE04:Controller error - Data timeout"
+        AddError SDIO_DCRC,      "CtlrE05:Controller error - Data CRC error"
+        AddError SDIO_DEB,       "CtlrE06:Controller error - Data end bit error"
+        AddError SDIO_CLE,       "CtlrE07:Controller error - Current limit error"
+        AddError SDIO_ACE,       "CtlrE08:Controller error - Auto CMD error"
+        AddError SDIO_ADE,       "CtlrE09:Controller error - ADMA error"
+        AddError SDIO_TE,        "CtlrE10:Controller error - Tuning error"
+        AddError SDIO_C12,       "CtlrE12:Controller error 12"
+        
+        ; 0xCx and 0xDx - memory device (R1) errors
+        ^        ErrorBase_SDIO + &C7
+        AddError SDIO_DevE07, "DevE07:Device error - Switch error"
+        ^        ErrorBase_SDIO + &CD
+        AddError SDIO_DevE13, "DevE13:Device error - Erase reset"
+        ^        ErrorBase_SDIO + &CF
+        AddError SDIO_DevE15, "DevE15:Device error - Write protect erase skip"
+        AddError SDIO_DevE16, "DevE16:Device error - CID/CSD overwrite"
+        ^        ErrorBase_SDIO + &D3
+        AddError SDIO_DevE19, "DevE19:Device error - Generic error"
+        AddError SDIO_DevE20, "DevE20:Device error - CC error"
+        AddError SDIO_DevE21, "DevE21:Device error - Device ECC failed"
+        AddError SDIO_DevE22, "DevE22:Device error - Illegal command"
+        AddError SDIO_DevE23, "DevE23:Device error - Command CRC error"
+        AddError SDIO_DevE24, "DevE24:Device error - Lock/unlock failed"
+        ^        ErrorBase_SDIO + &DA
+        AddError SDIO_DevE26, "DevE26:Device error - Write protect violation"
+        AddError SDIO_DevE27, "DevE27:Device error - Invalid erase parameters"
+        AddError SDIO_DevE28, "DevE28:Device error - Erase sequence error"
+        AddError SDIO_DevE29, "DevE29:Device error - Block length error"
+        AddError SDIO_DevE30, "DevE30:Device error - Address misalign"
+        AddError SDIO_DevE31, "DevE31:Device error - Address out of range"
+        
+        ; 0xEx - IO device (R5) errors
+        AddError SDIO_IODevE00, "IODevE00:Device error - Out of range"
+        AddError SDIO_IODevE01, "IODevE01:Device error - Invalid function number"
+        ^        ErrorBase_SDIO + &E3
+        AddError SDIO_IODevE03, "IODevE03:Device error - Generic error"
+        ^        ErrorBase_SDIO + &E6
+        AddError SDIO_IODevE06, "IODevE06:Device error - Illegal command"
+        AddError SDIO_IODevE07, "IODevE07:Device error - Command CRC error"
+
+; MMC/SD/SDIO commands                          ; type    resp    MMC SD  SDIO
+                                ^       0       ; 
+CMD0_GO_IDLE_STATE              #       0       ; bc      -       *   *   *
+CMD0_GO_PRE_IDLE_STATE          #       0       ; bc      -       *
+CMD0_BOOT_INITIATION            #       1       ; -       -       *
+CMD1_SEND_OP_COND               #       1       ; bcr     R3      *
+CMD2_ALL_SEND_CID               #       1       ; bcr     R2      *   *
+CMD3_SET_RELATIVE_ADDR          #       0       ; ac      R1      *
+CMD3_SEND_RELATIVE_ADDR         #       1       ; bcr     R6          *   *
+CMD4_SET_DSR                    #       1       ; bc      -       *   *
+CMD5_SLEEP_AWAKE                #       0       ; ac      R1b     *
+CMD5_IO_SEND_OP_COND            #       1       ; ?       R4              *
+CMD6_SWITCH                     #       0       ; ac      R1b     *
+CMD6_SWITCH_FUNC                #       1       ; adtc    R1              *
+CMD7_SELECT_DESELECT_CARD       #       1       ; ac      R1/R1b  *   *   *
+CMD8_SEND_EXT_CSD               #       0       ; adtc    R1      *
+CMD8_SEND_IF_COND               #       1       ; bcr     R7          *   *
+CMD9_SEND_CSD                   #       1       ; ac      R2      *   *
+CMD10_SEND_CID                  #       1       ; ac      R2      *   *
+CMD11_VOLTAGE_SWITCH            #       1       ; ac      R1          *   *
+CMD12_STOP_TRANSMISSION         #       1       ; ac      R1/R1b  *   *
+CMD13_SEND_STATUS               #       1       ; ac      R1      *   *
+CMD14_BUSTEST_R                 #       1       ; adtc    R1      *
+CMD15_GO_INACTIVE_STATE         #       1       ; ac      -       *   *   *
+CMD16_SET_BLOCKLEN              #       1       ; ac      R1      *   *
+CMD17_READ_SINGLE_BLOCK         #       1       ; adtc    R1      *   *
+CMD18_READ_MULTIPLE_BLOCK       #       1       ; adtc    R1      *   *
+CMD19_BUSTEST_W                 #       0       ; adtc    R1      *
+CMD19_SEND_TUNING_BLOCK         #       1       ; adtc    R1          *   *
+CMD20_SPEED_CLASS_CONTROL       #       1       ; ac      R1b         *   ?
+CMD21_SEND_TUNING_BLOCK         #       1       ; adtc    R1      *
+                                ^       23      ; 
+CMD23_SET_BLOCK_COUNT           #       1       ; ac      R1      *   *
+CMD24_WRITE_BLOCK               #       1       ; adtc    R1      *   *
+CMD25_WRITE_MULTIPLE_BLOCK      #       1       ; adtc    R1      *   *
+CMD26_PROGRAM_CID               #       1       ; adtc    R1      *
+CMD27_PROGRAM_CSD               #       1       ; adtc    R1      *   *
+CMD28_SET_WRITE_PROT            #       1       ; ac      R1b     *   *
+CMD29_CLR_WRITE_PROT            #       1       ; ac      R1b     *   *
+CMD30_SEND_WRITE_PROT           #       1       ; adtc    R1      *   *
+CMD31_SEND_WRITE_PROT_TYPE      #       1       ; adtc    R1      *
+CMD32_ERASE_WR_BLK_START        #       1       ; ac      R1          *
+CMD33_ERASE_WR_BLK_END          #       1       ; ac      R1          *
+                                ^       35      ; 
+CMD35_ERASE_GROUP_START         #       1       ; ac      R1      *
+CMD36_ERASE_GROUP_END           #       1       ; ac      R1      *
+                                ^       38      ; 
+CMD38_ERASE                     #       1       ; ac      R1b     *   *
+CMD39_FAST_IO                   #       1       ; ac      R4      *
+CMD40_GO_IRQ_STATE              #       1       ; bcr     R5      *
+                                ^       42      ; 
+CMD42_LOCK_UNLOCK               #       1       ; adtc    R1      *   *
+                                ^       49      ; 
+CMD49_SET_TIME                  #       1       ; adtc    R1      *
+                                ^       52
+CMD52_IO_RW_DIRECT              #       1       ; ?       ?               *
+CMD53_IO_RW_EXTENDED            #       1       ; ?       ?               *
+                                ^       55      ; 
+CMD55_APP_CMD                   #       1       ; ac      R1      *   *
+CMD56_GEN_CMD                   #       1       ; adtc    R1      *   *
+
+; SD APP commands
+                                ^       &106
+ACMD6_SET_BUS_WIDTH             #       1       ; ac      R1          *
+                                ^       &10D
+ACMD13_SD_STATUS                #       1       ; adtc    R1          *
+                                ^       &116
+ACMD22_SEND_NUM_WR_BLOCKS       #       1       ; adtc    R1          *
+ACMD23_SET_WR_BLK_ERASE_COUNT   #       1       ; ac      R1          *
+                                ^       &129
+ACMD41_SD_SEND_OP_COND          #       1       ; bcr     R3          *
+ACMD42_SET_CLR_CARD_DETECT      #       1       ; ac      R1          *
+                                ^       &133
+ACMD51_SEND_SCR                 #       1       ; adtc    R1          *
+
+        OPT     OldOpt
+        END

@@ -1,0 +1,11 @@
+to change hal size:
+env.rool.imx6   .. set hal size, 64, 96,128k
+buildsys.components.rool.imx6 .. adjust kernel start address
+recompile kernel
+recompile hal
+
+kernel will need to run ending up at a megabyte (&100000) boundary
+
+
+#makefile linked address
+

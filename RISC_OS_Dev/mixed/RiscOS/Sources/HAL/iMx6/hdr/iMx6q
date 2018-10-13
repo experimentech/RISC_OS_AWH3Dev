@@ -1,0 +1,264 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_iMx6_HDR__
+        GBLL    __HAL_iMx6_HDR__
+
+        GET     Hdr.iMx6qMemMap
+        GET     hdr.iMx6qReg
+        GET     hdr.iMx6qIOMux
+        GET     hdr.iMx6qIRQs
+        GET     Hdr:iMx6qMemMap
+
+                GBLL    HALDebug
+HALDebug        SETL    {FALSE};{TRUE};
+
+        ; Debugging in the serial port (UART 2)
+                GBLL    Debug
+Debug           SETL    {FALSE};{TRUE};
+        ; this depends on the Debug definition above
+        GET     hdr.iMx6qboard
+
+        ; Boot timings using the 32KHz timer
+                GBLL    DebugTiming
+DebugTiming     SETL    Debug :LAND: {FALSE}
+
+        ; Should the I cache be off when the MMU is
+                GBLL    CacheOff
+CacheOff        SETL    {FALSE}
+
+        ; Interrupt debugging - warn over serial port when IRQSource/FIQSource is called twice
+        ; in a row without IRQClear/FIQClear being called inbetween
+                GBLL    DebugInterrupts
+DebugInterrupts SETL    Debug :LAND: {TRUE}
+
+        ; Extra interrupt debugging - when a missed IRQClear is detected, enables code that
+        ; prints a trace of IRQClear and IRQSource calls.
+        ; Note: Doesn't track FIQs at the moment!
+                GBLL    ExtraDebugInterrupts
+ExtraDebugInterrupts    SETL DebugInterrupts :LAND: {TRUE}
+
+        ; Whether we clear RAM or let the OS do it
+        ; SDMA is fairly slow (about 110MB/s bandwidth), it's better to let the
+        ; OS clear RAM using the CPU once the caches are enabled (about 600MB/s)
+                GBLL    ClearRAM
+ClearRAM        SETL    {FALSE}
+
+; IVT offset from start of SD media
+IVTMediaAddress *       0x400
+; size we round this loader up to  (need to ensure it is on 4k boundary
+IVTLoaderSize   *       0x1000
+
+; Support PCIe space?
+                GBLL    PCIeSpace
+PCIeSpace       SETL    {FALSE}
+
+
+IO_Base         *       &02000000
+IO_Size         *       &01000000
+
+
+RAM_Base        *       &10000000           ; try off bottom
+Boot_RAM_Base   *       &10000000
+
+; IOMUX pad settings
+IOMuxPadUartIn  * (  (HYS_ENABLED <<16)    \
+                   + (PUS_100KOHM_PU <<14) \
+                   + (PUE_PULL <<13)       \
+                   + (PKE_ENABLED <<12)    \
+                   + (ODE_DISABLED <<11)   \
+                   + (SPD_100MHZ <<6)      \
+                   + (DSE_DISABLED <<3)    \
+                   + (SRE_FAST)            \
+                  )
+
+IOMuxPadUartOut * (  (HYS_ENABLED <<16)    \
+                   + (PUS_100KOHM_PU <<14) \
+                   + (PUE_PULL <<13)       \
+                   + (PKE_ENABLED <<12)    \
+                   + (ODE_DISABLED <<11)   \
+                   + (SPD_100MHZ <<6)      \
+                   + (DSE_40OHM <<3)       \
+                   + (SRE_FAST)            \
+                  )
+
+IOMuxPadI2C   * (  (HYS_ENABLED <<16)       \
+                   + (PUS_22KOHM_PU <<14)   \
+                   + (PUE_PULL <<13)        \
+                   + (PKE_ENABLED <<12)     \
+                   + (ODE_ENABLED <<11)     \
+                   + (SPD_50MHZ <<6)        \
+                   + (DSE_40OHM <<3)        \
+                   + (SRE_FAST)             \
+                  )
+
+IOMuxPadDDC   * (  (HYS_ENABLED <<16)       \
+                   + (PUS_22KOHM_PU <<14)  \
+                   + (PUE_PULL <<13)        \
+                   + (PKE_DISABLED <<12)     \
+                   + (ODE_ENABLED <<11)     \
+                   + (SPD_50MHZ <<6)        \
+                   + (DSE_40OHM <<3)        \
+                   + (SRE_SLOW)             \
+                  )
+
+IOMuxPadUSBHC   * (  (HYS_ENABLED <<16)     \
+                   + (PUS_47KOHM_PU <<14)   \
+                   + (PUE_PULL <<13)        \
+                   + (PKE_DISABLED <<12)    \
+                   + (ODE_DISABLED <<11)    \
+                   + (SPD_50MHZ <<6)        \
+                   + (DSE_80OHM <<3)        \
+                   + (SRE_FAST)             \
+                  )
+
+IOMuxPadUSDHC   * (  (HYS_ENABLED <<16)     \
+                   + (PUS_100KOHM_PU <<14)  \
+                   + (PUE_PULL <<13)        \
+                   + (PKE_ENABLED <<12)     \
+                   + (ODE_DISABLED <<11)    \
+                   + (SPD_100MHZ <<6)       \
+                   + (DSE_40OHM <<3)        \
+                   + (SRE_SLOW)             \
+                  )
+
+IOMuxPadEnet    * (  (HYS_ENABLED <<16)       \
++ (PUS_100KOHM_PU <<14)     \
++ (PUE_PULL <<13)          \
++ (PKE_DISABLED <<12)       \
+                   + (ODE_DISABLED <<11)      \
+                   + (SPD_100MHZ <<6)         \
+                   + (DSE_40OHM <<3)          \
+                   + (SRE_SLOW)               \
+                  )
+
+IOMuxPadRGMII    * (  (HYS_ENABLED <<16)       \
+                   + (PUS_100KOHM_PU <<14)     \
+                   + (PUE_PULL <<13)          \
+                   + (PKE_ENABLED <<12)       \
+                   + (DSE_40OHM <<3)          \
+                  )
+
+IOMuxPadSPI     * (  (HYS_ENABLED <<16)       \
+                   + (PUS_100KOHM_PU <<14)     \
+                   + (PUE_PULL <<13)          \
+                   + (PKE_ENABLED <<12)       \
+                   + (DSE_40OHM <<3)          \
+                  )
+
+
+
+
+
+
+
+
+        MACRO
+$label  DebugChar $temp1,$temp2,$char
+    [ Debug
+$label  LDR     $temp1,[sb, #:INDEX:DebugUART]
+        MOV     $temp2,#$char
+        STRB    $temp2,[$temp1, #UART_UTXD_OFFSET]
+    ]
+        MEND
+
+        MACRO
+$label  DebugTX $str
+    [ Debug
+$label  BL      DebugHALPrint
+        =       "$str", 13, 10, 0
+        ALIGN
+    ]
+        MEND
+
+        MACRO
+$label  DebugTXS $str
+    [ Debug
+$label  BL      DebugHALPrint
+        =       "$str ", 0
+        ALIGN
+    ]
+        MEND
+
+        MACRO
+$label  DebugCR
+    [ Debug
+$label  BL      DebugHALPrint
+        =       13,10, 0
+        ALIGN
+    ]
+        MEND
+
+        MACRO
+$label   DebugReg $reg, $str
+    [ Debug
+$label   Push   "$reg"
+     [ "$str" <> ""
+       DebugTXS $str
+     ]
+        BL     DebugHALPrintReg
+        DebugCR
+    ]
+        MEND
+
+        MACRO
+$label   DebugRegNCR $reg, $str
+    [ Debug
+$label   Push   "$reg"
+     [ "$str" <> ""
+       DebugTXS $str
+     ]
+        BL     DebugHALPrintReg
+    ]
+        MEND
+
+        MACRO
+$label  DebugRegByte $reg, $str
+    [ Debug
+$label  Push   "$reg"
+     [ "$str" <> ""
+        BL     DebugHALPrint
+        =      "$str",0
+        ALIGN
+     ]
+        BL     DebugHALPrintByte
+    ]
+        MEND
+
+        MACRO
+$label  DebugTime $temp,$str
+    [ DebugTiming
+$label  LDR     $temp,L4_32KTIMER_Log
+        LDR     $temp,[$temp,#16] ; REG_32KSYNCNT_CR
+        DebugReg $temp, "$str"
+    ]
+        MEND
+
+        MACRO
+$label  DebugTimeNoMMU $temp,$str
+    [ DebugTiming
+$label  LDR     $temp,=L4_32KTIMER
+        LDR     $temp,[$temp,#16]
+        DebugReg $temp, "$str"
+    ]
+        MEND
+
+
+        ] ; __HAL_iMx6_HDR__
+
+        END

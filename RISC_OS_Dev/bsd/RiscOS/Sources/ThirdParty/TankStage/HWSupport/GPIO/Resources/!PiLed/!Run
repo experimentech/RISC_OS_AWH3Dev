@@ -1,0 +1,4 @@
+|wimpslot -min 32K -max 32K
+|run <obey$dir>.!RunImage
+RMEnsure GPIO 0.58 Error GPIO Module is not loaded
+TaskWindow <obey$dir>.!RunImage -wimpslot 32K

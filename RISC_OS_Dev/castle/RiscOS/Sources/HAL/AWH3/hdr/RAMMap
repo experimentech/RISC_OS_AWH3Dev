@@ -1,0 +1,38 @@
+;This file is a quick and dirty stop-gap. Use it how you wish.
+;RAM map set up to put the OS image under VRAM.
+;only including SDRAM for now.
+;Very temporary map to have something to feed to RO_AddRAM
+;-FIXME- Do what needs to be done to obsolete this file!!!
+
+BLOCK_0_START      *    &40000000
+BLOCK_0_END        *    &7FE00000
+;BLOCK_0_END       *    &7F800000
+BLOCK_0_FLAGS      *    2_001100000000
+;no DMA (b7) set for experiment.
+
+; image size 5120K     which is &500000
+;BLOCK_1_START     *    &42600000
+;BLOCK_1_END       *    &7FE00000
+;BLOCK_1_FLAGS     *    2_001100000000
+;there is a very good chance this address is wrong. Pulled from U-boot msgs
+VRAM_START         *    &7FE00000 ;&7Fe79000     ;&7FE00000
+VRAM_SIZE          *    &00200000;&178e00
+VRAM_END           *    &80000000 ;&7FFF1E00 ;&7FF00000
+VRAM_FLAGS        *    2_001100000011
+
+;an extra mb of wiggle room for stashing stuff.
+;All hardcoded for now. No detection.
+RO_RAM_START       *    &7F800000
+RO_RAM_END         *    RO_RAM_START + RO_SIZE ;&7FD00000
+RO_SIZE            *    &500000
+PreMMU_Workspace   *    &7FD00000 ; &40000000 ;Maybe I'm treading on something.
+PreMMU_Stack       *    &7FDFFFFC
+;I believe the U-Boot stack lives in that small hole between VRAM_END
+;and &80000000 where the top of RAM in 1GB machines live.
+;line length 2880 for vram.
+
+
+
+
+          END
+

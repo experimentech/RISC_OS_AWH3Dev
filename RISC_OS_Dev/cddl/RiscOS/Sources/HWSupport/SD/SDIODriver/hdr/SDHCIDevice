@@ -1,0 +1,90 @@
+;
+; CDDL HEADER START
+;
+; The contents of this file are subject to the terms of the
+; Common Development and Distribution License (the "Licence").
+; You may not use this file except in compliance with the Licence.
+;
+; You can obtain a copy of the licence at
+; cddl/RiscOS/Sources/HWSupport/SD/SDIODriver/LICENCE.
+; See the Licence for the specific language governing permissions
+; and limitations under the Licence.
+;
+; When distributing Covered Code, include this CDDL HEADER in each
+; file and include the Licence file. If applicable, add the
+; following below this CDDL HEADER, with the fields enclosed by
+; brackets "[]" replaced with your own identifying information:
+; Portions Copyright [yyyy] [name of copyright owner]
+;
+; CDDL HEADER END
+;
+; Copyright 2012 Ben Avison.  All rights reserved.
+; Use is subject to license terms.
+;
+
+        SUBT    SDHCI HAL device constants
+
+OldOpt  SETA    {OPT}
+        OPT     OptNoList+OptNoP1List
+
+; Layout of device
+                                        ^       HALDeviceSize
+HALDevice_SDHCIFlags                    #       4
+HALDevice_SDHCISlots                    #       4
+HALDevice_SDHCISlotInfo                 #       4
+HALDevice_SDHCIWriteRegister            #       4
+HALDevice_SDHCIGetCapabilities          #       4
+HALDevice_SDHCIGetVddCapabilities       #       4
+HALDevice_SDHCISetVdd                   #       4
+HALDevice_SDHCISetBusMode               #       4
+HALDevice_SDHCIPostPowerOn              #       4
+HALDevice_SDHCISetBusWidth              #       4
+HALDevice_SDHCIGetMaxCurrent            #       4
+HALDevice_SDHCISetSDCLK                 #       4
+HALDevice_SDHCIGetTMCLK                 #       4
+HALDevice_SDHCISetActivity              #       4
+HALDevice_SDHCIGetCardDetect            #       4
+HALDevice_SDHCIGetWriteProtect          #       4
+HALDevice_SDHCITriggerCommand           #       4
+HALDevice_SDHCISize                     *       :INDEX: @
+
+; Version identifiers
+                                        ^       0
+HALDeviceSDHCI_MajorVersion_Original    #       &10000  ; 0
+                                        ^       0
+HALDeviceSDHCI_MinorVersion_Original    #       1       ; 0
+HALDeviceSDHCI_MinorVersion_HasTrigger  #       1       ; 1
+
+; Flag bits for the SDHCI controller HAL device
+
+HALDeviceSDHCI_Flag_32bit       *       1 :SHL: 0
+HALDeviceSDHCI_Flag_R2bug       *       1 :SHL: 1
+HALDeviceSDHCI_Flag_ErrIRQbug   *       1 :SHL: 2
+
+; Layout of SDHCI slot info block
+                                        ^       0
+HALDeviceSDHCI_SlotInfo_Flags           #       4
+HALDeviceSDHCI_SlotInfo_StdRegs         #       4
+HALDeviceSDHCI_SlotInfo_Size            *       :INDEX: @
+
+; Flag bits for the slot info block
+
+HALDeviceSDHCI_SlotFlag_Integrated      *       1 :SHL: 0
+HALDeviceSDHCI_SlotFlag_BusShift        *       1
+HALDeviceSDHCI_SlotFlag_Bus1Bit         *       0 :SHL: HALDeviceSDHCI_SlotFlag_BusShift
+HALDeviceSDHCI_SlotFlag_Bus4Bit         *       1 :SHL: HALDeviceSDHCI_SlotFlag_BusShift
+HALDeviceSDHCI_SlotFlag_Bus8Bit         *       2 :SHL: HALDeviceSDHCI_SlotFlag_BusShift
+HALDeviceSDHCI_SlotFlag_BusMask         *       3 :SHL: HALDeviceSDHCI_SlotFlag_BusShift
+HALDeviceSDHCI_SlotFlag_ClocksShift     *       3
+HALDeviceSDHCI_SlotFlag_ClocksMask      *       &7 :SHL: HALDeviceSDHCI_SlotFlag_ClocksShift
+HALDeviceSDHCI_SlotFlag_NoCardDetect    *       1 :SHL: 6
+HALDeviceSDHCI_SlotFlag_IntegratedMem   *       1 :SHL: 7
+
+; Values for the SetActivity entry
+                                ^       0
+HALDeviceSDHCI_ActivityOff      #       1
+HALDeviceSDHCI_ActivityRead     #       1
+HALDeviceSDHCI_ActivityWrite    #       1
+
+        OPT     OldOpt
+        END

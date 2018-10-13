@@ -1,0 +1,283 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+;hdr2h safe
+
+          ; Debugging in the serial port (UART 0)
+          GBLL    Debug
+Debug     SETL    {TRUE}
+
+          ; Boot timings using the 32KHz timer
+            GBLL    DebugTiming
+DebugTiming SETL  Debug :LAND: {FALSE}
+
+                GBLL    DebugInterrupts
+DebugInterrupts SETL    Debug :LAND: {FALSE}
+
+                        GBLL    ExtraDebugInterrupts
+ExtraDebugInterrupts    SETL DebugInterrupts :LAND: {FALSE}
+
+          ; Should the I cache be off when the MMU is
+          GBLL    CacheOff
+CacheOff  SETL    {FALSE}
+
+          ; QEMU support - disables some code that does stuff QEMU doesn't support
+          GBLL    QEMU
+QEMU      SETL    {FALSE}
+
+          ; Interrupt debugging - warn over serial port when IRQSource/FIQSource is called twice in a row without IRQClear/FIQClear being
+
+          ; Extra interrupt debugging - when a missed IRQClear is detected, enables code that prints a trace of IRQClear and IRQSource calls. Note: Doesn't
+
+
+
+
+
+; Physical memory map. All unmentioned ranges are reserved.
+;Just look at the damn defines below.
+
+;H3 memory map. Close but not identical to H5.
+
+;SRAM
+
+SRAM_A1       	 *        &00000000    ; Caches?
+SRAM_A1_Size     *        &00010000    ;
+SRAM_A2       	 *        &00044000    ;
+SRAM_A2_Size     *        &00008000    ;
+SRAM_C        	 *        &00010000 ;why is this after SRAM_A2 in the docs?
+SRAM_C_Size      *            &B000 ;44k
+
+;Something to do with the display. DE2.0
+IO_Base          *        &01000000
+;IO_Size         *        &00F00400
+;;to the top of RTC;
+IO_Size          *        &00F03C00 ;to the top of R_PWM
+DE            	 *        &01000000
+DE_Size          *        &00400000 ;4M
+DeInt	         *        &01400000
+DeInt_Size       *        &00020000
+
+
+SysCtrl          *        &01C00000
+SysCtrl_Size     *        &00001000 ;4k
+DMA              *        &01C02000
+DMA_Size         *        &00001000
+NFDC             *        &01C03000
+NFDC_Size        *        &00001000
+TS               *        &01C06000
+TS_Size          *        &00001000
+Key_Mem          *        &01C0B000
+KeyMem_Size      *        &00001000
+
+
+LCD_0            *        &01C0C000
+LCD_0_Size       *        &00001000
+LCD_1            *        &01C0D000
+LCD_1_Size       *        &00001000
+VE               *        &01C0E000
+VE_Size          *        &00001000
+SDMMC_0          *        &01C0F000
+SDMMC_0_Size     *        &00001000
+SDMMC_1          *        &01C10000
+SDMMC_1_Size     *        &00001000
+SDMMC_2          *        &01C11000
+SDMMC_2_Size     *        &00001000
+SID              *        &01C14000
+SID_Size         *        &00000400 ;1k
+Crypto           *        &01C15000
+Crypto_Size      *        &00001000
+MSG_BOX          *        &01C17000
+MSG_BOX_Size     *        &00001000
+SPINLOCK         *        &01C18000
+SPINLOCK_Size    *        &00001000
+USB_OTG_Dev      *        &01C19000
+USB_OTG_Dev_Size *        &00001000
+USB_HCI0         *        &01C1A000 ;USB OTG
+USB_HCI0_Size    *        &00001000
+USB_HCI1         *        &01C1B000
+USB_HCI1_Size    *        &00001000
+USB_HCI2         *        &01C1C000
+USB_HCI2_Size    *        &00001000
+USB_HCI3         *        &01C1D000
+USB_HCI3_Size    *        &00001000
+SMC              *        &01C1E000
+SMC_Size         *        &00001000
+CCU              *        &01C20000
+CCU_Size         *        &00000400 ;1k
+;CPU port controller registers???
+PIO              *        &01C20800
+PIO_Size         *        &00000400
+TIMER            *        &01C20C00
+TIMER_Size       *        &00000400
+OWA              *        &01C21000
+OWA_Size         *        &00000400
+PWM              *        &01C21400
+PWM_Size         *        &00000400
+;6 bit ADC
+KEYADC           *        &01C21800
+KEYADC_Size      *        &00000400
+I2SPCM_0         *        &01C22000
+I2SPCM_0_Size    *        &00000400
+I2SPCM_1         *        &01C22400
+I2SPCM_1_Size    *        &00000400
+I2SPCM_2         *        &01C22800
+I2SPCM_2_Size    *        &00000400
+AC               *        &01C22C00
+AC_Size          *        &00000800 ;2k
+SMTA             *        &01C23400
+SMTA_Size        *        &00000400
+;Thermal sensor.
+THS              *        &01C25000
+THS_Size         *        &00000400
+;finally up to the UARTs
+;perhaps I should have the UART bases as offsets?
+UART_Offset      *             &400
+UART_Base        *        &01C28000 ;to help avoid confusion.
+UART_0           *        &01C28000
+UART_0_Size      *        &00000400
+UART_1           *        &01C28400
+UART_1_Size      *        &00000400
+UART_2           *        &01C28800
+UART_2_Size      *        &00000400
+UART_3           *        &01C28C00
+UART_3_Size      *        &00000400
+UART_Size        *            &1000
+;TWI
+TWI_0            *        &01C2AC00
+TWI_0_Size       *        &00000400
+TWI_1            *        &01C2B000
+TWI_1_Size       *        &00000400
+TWI_2            *        &01C2B400
+TWI_2_Size       *        &00000400
+
+SCR              *        &01C2C400
+SCR_Size         *        &00000400
+EMAC             *        &01C30000
+EMAC_Size        *        &00010000 ;64k
+GPU              *        &01C40000
+GPU_Size         *        &00010000
+HSTMR            *        &01C60000
+HSTMR_Size       *        &00001000 ;4k
+DRAMCOM          *        &01C62000
+DRAMCOM_Size     *        &00001000
+DRAMCTL0         *        &01C63000
+DRAMCTL0_Size    *        &00001000
+DRAMPHY0         *        &01C69000
+DRAMPHY0_Size    *        &00001000
+SPI0             *        &01C68000
+SPI0_Size        *        &00001000
+SPI1             *        &01C69000
+SPI1_Size        *        &00001000
+
+;SCU. SCU v2 architecture. GIC400
+SCU              *        &01C80000
+SCU_BASE_ADDR    *        SCU       ;
+GIC_DIST         *        SCU+GIC_DIST_Offset ;Distributor
+GIC_DIST_Offset  *        &1000
+GIC_CPUIF_Offset *        &2000
+GIC_CPUIF        *        SCU+GIC_CPUIF_Offset ;CPU interface
+
+;----------OMAP4 stuff for compat.---------------------
+;FIXME This is a tangled mess.
+;MPU_INTC phys MPU_INTC_Log
+MPU_INTC                *       MPU_SCU
+
+MPU_SCU                 *       SCU ; Snoop Control Unit
+MPU_GIC_PI              *       GIC_CPUIF ; GIC Processor Interface
+MPU_GIC_ID              *       GIC_DIST ; GIC Interrupt Distributor
+
+;hey hang on. These can be simplified more
+MPU_INTC_DIST           *       GIC_DIST - SCU
+
+MPU_INTC_CPU            *       GIC_CPUIF - SCU ;cpu iface offset from SCU
+;
+;------------------------------------------------------
+
+CSI                 *        &01CB0000
+CSI_Size            *        &00050000 ;320k
+TVE                 *        &01E00000
+TVE_Size            *        &00010000 ;64k
+HDMI                *        &01EE0000 ;h3
+;HDMI                        &03D00000 ;aarch64
+HDMI_Size           *        &00020000 ;128k
+RTC                 *        &01F00000
+RTC_Size            *        &00000400 ; 1k
+
+;I don't like the _Base nonmenclature.
+R_TIMER             *        &01F00800
+R_TIMER_Size        *        &00000400
+R_INTC              *        &01F00C00
+R_INTC_Size         *        &00000400
+R_WDOG              *        &01F01000
+R_WDOG_Size         *        &00000400
+R_PRCM              *        &01F01400
+R_PRCM_Size         *        &00000400
+R_TWD               *        &01F01800
+R_TWD_Size          *        &00000400
+R_CPUCFG            *        &01F01C00 ;CPUCFG. Not for OpenRISC. Hmm.
+R_CPUCFG_Size       *        &00000400
+R_CIR_RX            *        &01F02000
+R_CIR_RX_Size       *        &00000400
+R_TWI               *        &01F02400
+R_TWI_Size          *        &00000400
+R_UART              *        &01F02800
+R_UART_Size         *        &00000400
+;R_PIO is Port L.
+R_PIO               *        &01F02C00
+R_PIO_Size          *        &00000400
+R_PWM               *        &01F03800
+R_PWM_Size          *        &00000400
+
+;Debug stuff
+
+CS_Debug            *        &3F500000
+CS_Debug_Size       *        &00020000 ;128k
+TSGEN_RO            *        &3F506000
+TSGEN_RO_Size       *        &00001000
+TSGEN_CTRL          *        &3F507000
+TSGEN_CTRL_Size     *        &00001000
+
+;RAM
+
+SDRAM               *        &40000000
+SDRAM_Size          *        &80000000          ;2GB.
+
+
+;BROM
+N_BROM              *        &FFFF0000
+N_BROM_Size         *        &00008000 ;32k
+S_BROM              *        &FFFF0000
+S_BROM_Size         *        &00010000 ;64k
+
+
+
+;Things that probably shouldn't be here:
+
+;Not using this currently. Borrowing U-Boot stack.
+STACK_BASE           *        &40000000
+;STACK_BASE           *        &00000000
+STACK_SIZE           *        &1000
+
+;more stray stuff
+;UART_Debug_Addr      *        UART_0
+;UART_Log             *        0
+;UART_Default         *        0
+;UART_Num             *        4
+
+
+        END

@@ -1,0 +1,272 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __AHCI_STRUCT_HDR__
+        GBLL    __AHCI_STRUCT_HDR__
+
+;
+; AHCI control structures etc
+;
+; AHCI AHCI RX FIS structure , 256 byte aligned!!
+                ^ 0
+AHCI_RX_FIS     # 0
+dsfis           # &1c   ; &00..&1B, DMA Setup FIS (7 word)
+rsv0            # 4     ; &1C..&1F, Reserved
+psfis           # &14   ; &20..&33, PID Setup FIS  (5 word)
+rsv1            # &c    ; &34..&3F, Reserved
+rfis            # &14   ; &40..&53, D2H Register FIS (5 word)
+rsv2            # 4     ; &54..&57, Reserved
+sdbfis          # 8     ; &58..&5F, Set Device Bits FIS (2 word)
+ufis            # &40   ; &60..&9F, Unknown FIS
+rsv3            # &60   ; &A0..&FF, Reserved
+AHCI_RX_FIS_Size # 0
+        ASSERT AHCI_RX_FIS_Size = 256
+;
+;
+;
+; AHCI CMD fisType defines
+fisT_RFIS_H2D   *       &27     ; Register FIS, Host to Device
+fisT_RFIS_H2D_len *     5       ; length
+fisT_RFIS_D2H   *       &34     ; Register FIS, Device to Host
+fisT_DAFIS      *       &39     ; DMA Activate FIS, Device to Host
+fisT_DSFIS      *       &41     ; DMA Setup FIS, bidir
+fisT_DFIS       *       &46     ; Data FIS, bidir
+fisT_BAFIS      *       &58     ; BIST Activate, bidir
+fisT_PSFIS      *       &5f     ; PIO setup FIS, Dev to host
+fisT_SDBFIS     *       &a1     ; Set Device Bits FIS, Dev to host
+;
+; ahci stuff
+AHCI_READ       *       0
+AHCI_WRITE      *       1
+
+AHCICmdTabCount *       32      ; chip supplies 32 command slots
+
+; A AHCI command is built in one of the 32 AHCI Command Tables
+; which points to a AHCI_CMD_TABLE which
+; contains a ahci_CFIS (256 aligned) and
+; if needed an atapi command followed by 1 or more ahciPRDs
+;
+; AHCI CmdList header, 32 bytes
+                        ^       0
+AHCI_CMD_HEADER         #       0
+cmdH_info               #       4       ; descr info
+cmdH_info_cfl           *       0       ; Bit4:0, Command FIS Length
+cmdH_info_atapi         *       5       ; Bit5, ATAPI
+cmdH_info_write         *       6       ; Bit6, Write - direction of operation
+cmdH_info_prefetch      *       7       ; Bit7, Prefetchable
+cmdH_info_reset         *       8       ; Bit8, Reset
+cmdH_info_bist          *       9       ; Bit9, BIST
+cmdH_info_clear         *       10      ; Bit10, Clear Busy upon R_OK
+cmdH_info_rsv           *       11      ; Bit11, Reserved
+cmdH_info_pmp           *       12      ; Bit15:12, Port Multiplier Port
+cmdH_info_prdtl         *       16      ; Bit31:15, Physical Region Descriptor Table Len
+cmdH_prdbc              #       4       ; Physical Region Descriptor Byte Count
+cmdH_ctba               #       4       ; Command Table Descriptor Base Address, 256 align
+cmdH_ctba_u             #       4       ; Command Table Descriptor Base Address Upper 32bit
+cmdH_rsv1               #       16      ; Reserved
+AHCI_CMD_HEADER_SIZE    #       0
+        ASSERT  AHCI_CMD_HEADER_SIZE = 32
+; AHCI Physical Region Descriptor, 16 bytes
+                        ^       0
+ahciPRD                 #       0
+ahciPRD_dba             #       4       ; Data Address, bit0 must be zero
+ahciPRD_dbau            #       4       ; Data Address Upper 32-bits
+ahciPRD_rsv             #       4       ; Reserved
+ahciPRD_info            #       4       ; byte count and int on complete
+ahciPRD_dbc_ioc         *       0       ; 21..0 Data Byte Count, Bit 0 must be 1
+ahciPRD_IOC             *       31      ; irq on complete if 1
+ahciPRD_SIZE            #       0
+        ASSERT  ahciPRD_SIZE = 16
+; ahci command FIS
+                        ^       0
+ahciCFIS        #       0
+fisType         #       1       ;
+pmPort_Cbit     #       1       ;
+command         #       1       ;
+features        #       1       ;
+lbaLow          #       1       ;
+lbaMid          #       1       ;
+lbaHigh         #       1       ;
+device          #       1       ;
+lbaLowExp       #       1       ;
+lbaMidExp       #       1       ;
+lbaHighExp      #       1       ;
+featuresExp     #       1       ;
+sectorNum       #       1       ;
+sectorNumExp    #       1       ;
+rsv1cf          #       1       ;
+control         #       1       ;
+rsv2cf          #       48      ;
+ahciCFIS_SIZE   #       0
+        ASSERT  ahciCFIS_SIZE = 64
+
+
+; AHCI Command Table (256 aligned)
+; 256 bytes would permit 8 * prdt, which with riscos 4k page size
+; would permit max transfer per comand of 32k
+; allocating 512 bytes will give us 24 prdt which permits 96k per transaction.
+MaxPRDTCount            *       24
+                        ^       0
+ahciCMDTab              #       0
+ahciCMDT_CMD            #       ahciCFIS_SIZE   ; AHCI_CFIS structure 256 aligned
+ahciCMDT_acmd           #       16              ; ATAPI cmd, max 16 bytes
+ahciCMDT_resv           #       48              ; reserved
+ahciCMDT_prdt           #       MaxPRDTCount*ahciPRD_SIZE
+                                                ; theres 24, but could in theory
+                                                ; be 65535
+ahciCMDT_SIZE           #       0
+                        ASSERT  ahciCMDT_SIZE = 512
+MaxPRDTl2shift          *       9               ; log 2 bpp of size this
+
+PRDT_MAX_LEN            *       4:SHL:20        ; Max 4MB per PRDT entry
+
+; ATAPI commands
+ATAPI_COMMAND_NOP                               * &00
+ATAPI_COMMAND_DEVICE_RESET                      * &08
+ATAPI_COMMAND_READ_SECTOR                       * &20
+ATAPI_COMMAND_READ_SECTOR48                     * &24
+ATAPI_COMMAND_READ_DMA48                        * &25
+ATAPI_COMMAND_WRITE_SECTOR                      * &30
+ATAPI_COMMAND_WRITE_SECTOR48                    * &34
+ATAPI_COMMAND_WRITE_DMA48                       * &35
+ATAPI_COMMAND_DIAGNOSIS                         * &90
+ATAPI_COMMAND_PACKET                            * &A0
+ATAPI_COMMAND_PACKET_IDENTIFY                   * &A1
+ATAPI_COMMAND_READ_DMA_QUEUED                   * &C7
+ATAPI_COMMAND_READ_DMA                          * &C8
+ATAPI_COMMAND_WRITE_DMA                         * &CA
+ATAPI_COMMAND_WRITE_DMA_QUEUED                  * &CC
+ATAPI_COMMAND_CFA_WRITE_MULTI_W_OUT_ERASE       * &CD
+ATAPI_COMMAND_CFA_WRITE_SECTOR_W_OUT_ERASE      * &CD
+ATAPI_COMMAND_STBY_IMMEDIATE                    * &E0
+ATAPI_COMMAND_IDLE_IMMEDIATE                    * &E1
+ATAPI_COMMAND_IDLE_NONDATA                      * &E3
+ATAPI_COMMAND_READ_BUFFER                       * &E4
+ATAPI_COMMAND_CHK_PWR_MODE                      * &E5
+ATAPI_COMMAND_SLEEP                             * &E6
+ATAPI_COMMAND_WRITE_BUFFER                      * &E8
+ATAPI_COMMAND_IDENTIFY_DEVICE                   * &EC
+ATAPI_COMMAND_SET_FEATURES                      * &EF
+ATAPI_COMMAND_SEC_ERS_PREP                      * &F3
+ATAPI_COMMAND_FORMAT                            * &F7
+
+; AHCI identify command data structure
+; defined based on ATAPI7 specification(T13/1532D)
+; all parameters are 16 bit parameters, or arrays of 16 bit (_p)
+                        ^       0
+SID_Base                        #       0
+SID_general_conf                #       2       ; 00    : general configuration
+SID_num_cylinders               #       2       ; 01    : number of cylinders (default CHS trans)
+SID_specific_conf               #       2       ; 02    : specific configuration
+SID_num_heads                   #       2       ; 03    : number of heads (default CHS trans)
+SID_num_ub_per_track            #       2       ; 04    : number of unformatted bytes per track
+SID_num_ub_per_sector           #       2       ; 05    : number of unformatted bytes per sector
+SID_num_sectors                 #       2       ; 06    : number of sectors per track (default CHS trans)
+SID_rsv5p                       #       4       ; 07-08 : number of sectors per card
+SID_rsv6                        #       2       ; 09    : reserved
+SID_serial_p                    #       20      ; 10-19 : serial number (string)
+SID_rsv7                        #       2       ; 20    : buffer type (dual ported)
+SID_rsv8                        #       2       ; 21    : buffer size in 512 increments
+SID_rsv9                        #       2       ; 22    : number of ECC bytes passed on R/W Long cmds
+SID_fw_rev_p                    #       8       ; 23-26 : firmware revision (string)
+SID_model_num_p                 #       40      ; 27-46 : model number (string)
+SID_rw_mult_support             #       2       ; 47    : max number of sectors on R/W multiple cmds
+SID_rsv10                       #       2       ; 48    : reserved
+SID_capabilities_p              #       4       ; 49-50 : LBA, DMA, IORDY support indicator
+SID_rsv11                       #       2       ; 51    : PIO data transfer cycle timing mode
+SID_rsv12                       #       2       ; 52    : single word DMA data transfer cycle timing mode
+SID_cur_field_validity          #       2       ; 53    : words 54-58 validity (0 == not valid)
+SID_rsv13                       #       2       ; 54    : number of current cylinders
+SID_rsv14                       #       2       ; 55    : number of current heads
+SID_rsv15                       #       2       ; 56    : number of current sectors per track
+SID_rsv16_p                     #       4       ; 57-58 : current capacity in sectors
+SID_mult_sectors                #       2       ; 59    : multiple sector setting
+SID_lba_total_sectors_p         #       4       ; 60-61 : total sectors in LBA mode
+SID_rsv17                       #       2       ; 62    : single word DMA support
+SID_mw_dma                      #       2       ; 63    : multi word DMA support
+SID_apio_modes                  #       2       ; 64    : advanced PIO transfer mode supported
+SID_min_dma_timing              #       2       ; 65    : minimum multiword DMA transfer cycle
+SID_rec_dma_timing              #       2       ; 66    : recommended multiword DMA cycle
+SID_min_pio_timing              #       2       ; 67    : min PIO transfer time without flow control
+SID_min_pio_iordy_timing        #       2       ; 68    : min PIO transfer time with IORDY flow control
+SID_rsv18_p                     #       12      ; 69-74 : reserved
+SID_queue_depth                 #       2       ; 75    : queue depth
+SID_rsv19_p                     #       8       ; 76-79 : reserved for AHCI
+SID_major_ver                   #       2       ; 80    : major version number
+SID_minor_ver                   #       2       ; 81    : minor version number
+SID_cmd_set_supp_p0             #       2       ; 82    : command set supported
+SID_cmd_set_supp_p1             #       2       ; 83    : command set supported
+SID_cmd_set_supp_p2             #       2       ; 84    : command set supported
+SID_cmd_set_enabled_p           #       6       ; 85-87 : command set/feature enabled
+SID_ultra_dma_mode              #       2       ; 88    : ultra dma modes
+SID_sec_ers_unit_time           #       2       ; 89    : time required for security erase unit completion
+SID_enhance_sec_ers_time        #       2       ; 90    : time required for enhanced security erase completion
+SID_current_pm_val              #       2       ; 91    : current advanced power management value
+SID_master_pwd_rev              #       2       ; 92    : master password revision code
+SID_hw_conf_tst_result          #       2       ; 93    : hardware configuration test result
+SID_acoustic_mng_val            #       2       ; 94    : automatic acoustic management value
+SID_stream_min_req_sz           #       2       ; 95    : stream minimum request size
+SID_stream_trans_time_dma       #       2       ; 96    : streaming transfer time - dma
+SID_stream_access_latency       #       2       ; 97    : streaming access latency - dma and pio
+SID_stream_perf_gran_p          #       4       ; 98-99 : streaming performance granularity
+SID_max_48b_lba_addr_p          #       8       ; 100-103:maximum user lba for 48b address feature set
+SID_stream_trans_time_pio       #       2       ; 104   : streaming transfer time - pio
+SID_rsv20                       #       2       ; 105   : reserved
+SID_sector_size                 #       2       ; 106   : physical sector size/logical sector size
+SID_inter_seek_delay_us         #       2       ; 107   : inter-seek delay for ISO-7799 acoustic testing in ms
+SID_world_wide_name_p           #       8       ; 108-111:world wide name
+SID_rsv21_p                     #       8       ; 112-115:reserved for world wide name extension to 128bits
+SID_rsv22                       #       2       ; 116   : reserved for technical report
+SID_sector_sz_in_word_p         #       4       ; 117-118:words per logical sector
+SID_rsv23_p                     #       16      ; 119-126:reserved
+SID_rem_stat_notify_supp        #       2       ; 127   : removable media status notification feature set support
+SID_security_status             #       2       ; 128   : security status
+SID_vendor_specific_p           #       62      ; 129-159:vendor specific
+SID_cfa_pwr_mode_1              #       2       ; 160   : CFA power mode 1
+SID_rsv24_p                     #       30      ; 161-175:reserved for assignment by the CF association
+SID_sn_p                        #       60      ; 176-205:current media serial number
+SID_rsv25_p                     #       98      ; 206-254: reserved
+SID_integrity                   #       2       ; 255   : 15-8 -> checksum; 7-0 -> signature;
+SID_SIZE                         #      0
+        ASSERT (SID_SIZE) = 512
+
+;SID_cmd_set_supp bits
+; word 82
+BIT_SID_CmdSup0_NOP     *       (1<<14)         ; NOP Supported
+BIT_SID_CmdSup0_READBUF *       (1<<13)         ; ReadBuffer Supported
+BIT_SID_CmdSup0_WRBUF   *       (1<<12)         ; WriteBuffer
+BIT_SID_CmdSup0_HPA     *       (1<<10)         ; HPA feature set
+BIT_SID_CmdSup0_SVCIRQ  *       (1<<08)         ; SERVICE Irq supported
+BIT_SID_CmdSup0_RELIRQ  *       (1<<07)         ; Release Irq supported
+BIT_SID_CmdSup0_PWRMAN  *       (1<<03)         ; PowerManageFreatureSet
+BIT_SID_CmdSup0_SECFEAT *       (1<<01)         ; Security Featureset
+BIT_SID_CmdSup0_SMART   *       (1<<00)         ; SMART Featureset
+; word 83                                       ;
+BIT_SID_CmdSup1_FLCACEXT *      (1<<13)         ; Flush Cache Extended
+BIT_SID_CmdSup1_FLCAC   *       (1<<12)         ; Flush Cache
+BIT_SID_CmdSup1_DCO     *       (1<<11)         ; DCO Featureset supported
+BIT_SID_CmdSup1_48BIT   *       (1<<10)         ; 48BIT features supported
+BIT_SID_CmdSup1_AAM     *       (1<<09)         ; AAM Featureset
+BIT_SID_CmdSup1_SETMAX  *       (1<<08)         ;
+; word 84                                       ;
+BIT_SID_CmdSup2_WWNAME  *       (1<<08)         ; WorldWideName supported
+BIT_SID_CmdSup2_SMARTST *       (1<<01)         ; SMART Selftest supported
+BIT_SID_CmdSup2_SMARTEL *       (1<<00)         ; SMART error logging supported
+
+        ] ; __HAL_AHCI_STRUCT_HDR__
+        END

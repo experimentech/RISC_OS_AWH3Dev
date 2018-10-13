@@ -1,0 +1,63 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+; 
+
+; Public interface (ie interface to SoundControl) of DMA audio mixer devices
+
+        GET     hdr:HALDevice
+
+OldOpt  SETA    {OPT}
+        OPT     OptNoList+OptNoP1List
+
+ [ :LNOT: :DEF: Included_Hdr_MixerDevice
+                         GBLL Included_Hdr_MixerDevice
+Included_Hdr_MixerDevice SETL {TRUE}
+
+; Device for each DMA controller
+
+                                ^       0
+                                #       HALDeviceSize
+HALDevice_MixerCtrlr            #       4
+HALDevice_MixerChannels         #       4
+HALDevice_MixerGetFeatures      #       4
+HALDevice_MixerSetMix           #       4
+HALDevice_MixerGetMix           #       4
+HALDevice_Mixer_Size            *       :INDEX: @
+HALDevice_MixerGetMixLimits     #       4 ; API 0.1 and above
+HALDevice_Mixer_Size_0_1        *       :INDEX: @
+
+MixerFeaturesFlag_Fixed         *       1 :SHL: 0
+MixerFeaturesFlag_Mono          *       1 :SHL: 1
+MixerFeaturesFlag_DefaultMute   *       1 :SHL: 2
+MixerFeaturesShift_Category     *       16
+MixerFeaturesMask_Category      *       &FFFF :SHL: MixerFeaturesShift_Category
+
+MixerMixFlag_Mute               *       1 :SHL: 0
+
+MixerCategory_Speaker           *       -1
+MixerCategory_Headphones        *       -2
+MixerCategory_LineOut           *       -3
+MixerCategory_AuxOut            *       -4
+MixerCategory_System            *       0
+MixerCategory_Mic               *       1
+MixerCategory_LineIn            *       2
+MixerCategory_AuxIn             *       3
+
+ ]
+
+        OPT     OldOpt
+        END

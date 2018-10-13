@@ -1,0 +1,63 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+; 
+        SUBT    RTSupport module API
+
+OldOpt	SETA	{OPT}
+	OPT	OptNoList+OptNoP1List
+
+SWIClass        SETS    RTSWI_Name
+
+        ^       RTSWI_Base
+
+        AddSWI  Register
+        AddSWI  Deregister
+        AddSWI  Yield
+        AddSWI  TimedYield
+        AddSWI  ChangePriority
+        AddSWI  ReadInfo
+
+; Routine exit flags
+
+RTExit_Rescan           *       1:SHL:0
+RTExit_PollwordGiven    *       1:SHL:1
+RTExit_TimeLimitGiven   *       1:SHL:2
+RTExit_EntryGiven       *       1:SHL:3
+
+; RT_ReadInfo reason code
+                        ^       0
+RTReadInfo_Handle       #       1
+RTReadInfo_Priority     #       1
+RTReadInfo_SVCStk       #       1
+
+; Error numbers
+
+ ^ ErrorBase_RT
+ AddError RTSupport_PollwordInUse, "Pollword in use"
+ AddError RTSupport_CantYield,     "Cannot yield in this context"
+ AddError RTSupport_DontBeSilly,   "RTSupport cannot be reinstantiated"
+ AddError RTSupport_BadOS,         "Unsupported OS or hardware"
+ AddError RTSupport_AllocFailed,   "Out of memory in RTSupport"
+ AddError RTSupport_UKSWI,         "Unknown SWI for module RTSupport"
+ AddError RTSupport_BadPriority,   "Invalid priority"
+ AddError RTSupport_Exhausted,     "Too many RTSupport routines"
+ AddError RTSupport_BadHandle,     "Illegal routine handle"
+ AddError RTSupport_UKReason,      "Unknown reason code in RTSupport"
+ AddError RTSupport_UKFlags,       "Unknown SWI flags in RTSupport"
+
+	OPT	OldOpt
+	END

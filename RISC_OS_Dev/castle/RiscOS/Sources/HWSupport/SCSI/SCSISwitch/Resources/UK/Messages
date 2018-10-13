@@ -1,0 +1,60 @@
+#{DictTokens}
+Dev:Device
+Typ:Type
+Cap:Capacity
+Ven:Vendor
+Prd:Product
+Rev:Revision
+Hst:Host
+T00:Direct-access
+T01:Sequential-access
+T02:Printer
+T03:Processor
+T04:WORM
+T05:Read-only
+T06:Scanner
+T07:Optical memory
+T08:Changer
+T09:Communications
+T??/Unk:Unknown
+E00:No room for SCSI driver workspace
+E01:Unknown SCSI SWI number
+E02:Unknown reason code for SCSI SWI
+E03:SCSI bus failed to reset
+E04:Invalid SCSI host ID
+E05:Invalid SCSI device ID
+E06:No hardware at this device ID
+E07:Device already established
+E08:Device not established
+E09:Device not idle
+E0a:Timeout
+E0b:Timeout
+E0c:Command queue not empty
+E0d:Command queue full
+E0e:SCSI driver reservation error
+E0f:Invalid parameters
+E10:Parameter error
+E11:Not callable from IRQ routine
+E12:Operation aborted
+E13:Unexpected disconnection
+E14:SCSI requires MEMC1a - see your dealer
+E80:Target status - Check condition
+E81:Target status - Busy
+E82:Target status - Unknown
+Ec0:Target error - No sense
+Ec1:Target error - Recovered error
+Ec2:Target error - Not ready
+Ec3:Target error - Medium error
+Ec4:Target error - Hardware error
+Ec5:Target error - Illegal request
+Ec6:Target error - Unit attention
+Ec7:Target error - Data protect
+Ec8:Target error - Blank check
+Ec9:Target error - Vendor unique
+Eca:Target error - Copy aborted
+Ecb:Target error - Aborted command
+Ecc:Target error - Equal
+Ecd:Target error - Volume overflow
+Ece:Target error - Miscompare
+Ecf:Target error - Reserved sense key
+Ed0:Target error - Unknown

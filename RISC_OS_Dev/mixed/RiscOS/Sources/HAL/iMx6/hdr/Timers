@@ -1,0 +1,77 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_TIMERS_HDR__
+        GBLL    __HAL_TIMERS_HDR__
+
+        GET     hdr.iMx6q
+
+
+
+
+; Timer registers (offset from relevant base)
+;Timer0 GPT
+;GPT_CR                 *       &00     ; Control reg
+;GPT_PR                 *       &04     ; Prescaler
+;GPT_SR                 *       &08     ; Status
+;GPT_IR                 *       &0c     ; interrupt reg
+;GPT_OCR1               *       &10     ; output compare1
+;GPT_OCR2               *       &14     ; output compare2
+;GPT_OCR3               *       &18     ; output compare3
+;GPT_ICR1               *       &1c     ; Input capture 1
+;GPT_ICR2               *       &20     ; Input capture 2
+;GPT_CNTR               *       &24     ; counter
+
+ [ A9Timers
+; Timer3 Private timer & watchdog  .. per CPU
+PT_LR                   *       &00     ; Private Timer load reg
+PT_CNTR                 *       &04     ; Private Timer Count reg
+PT_CR                   *       &08     ; Private Timer control reg
+PT_IRQS                 *       &0c     ; Private Timer IRQ Status reg
+WD_LR                   *       &20     ; Watchdog load reg
+WD_CNTR                 *       &24     ; Watchdog Count reg
+WD_CR                   *       &28     ; Watchdog control reg
+WD_IRQS                 *       &2c     ; Watchdog IRQ Status reg
+WD_RSTST                *       &30     ; watchdog reset status
+WD_DIS                  *       &34     ; watchdog disable
+
+; Timer4 Global Timer .. each cpu has a compare reg
+GLB_CNTR_L              *       &00     ; low 32bits of coounter
+GLB_CNTR_H              *       &04     ; Hi 32bits of coounter
+GLB_CR                  *       &08     ; Control reg
+GLB_IRQS                *       &0c     ; IRQ status reg
+GLB_CMP_L               *       &10     ; compare reg low
+GLB_CMP_H               *       &14     ; compare reg Hi
+GLB_AINC                *       &18     ; compar reg auto inc value
+ ]
+
+; Timers 1 and 2, EPIT
+EPIT_CR                 *       &00     ; Control reg
+EPIT_SR                 *       &04     ; Status reg
+EPIT_LR                 *       &08     ; Load reg
+EPIT_CMPR               *       &0c     ; compare reg
+EPIT_CNTR               *       &10     ; Counter reg
+
+; GPT (Timer0) control bits
+Timer0En                *       1 << 0  ; enable bit
+Timer0RstMode           *       1<<9    ; restart after compare, or freerun
+Timer0IEN               *       1<<0    ; IRQ enable
+
+        ] ; __HAL_TIMERS_HDR__
+
+        END

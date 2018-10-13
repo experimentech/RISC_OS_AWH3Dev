@@ -1,0 +1,58 @@
+#{DictTokens}
+# Unix errors
+E01:Operation not permitted
+E05:Input/output error
+E06:Invalid unit number
+E12:Out of memory
+E22:Invalid argument
+E25:Inappropriate operation
+E40:Oversized message
+E50:Link is down
+E55:Out of buffers
+E135:Higher priority filter already claimed
+# Private errors
+E200:No EtherCPSW compatible interfaces found
+E201:Virtual interfaces cannot be configured
+E202:Interface has no hardware address
+E203:Multiple instantiation forbidden
+E204:Failed to detect CPSW controller
+E205:Interface not active on this driver
+# Messages
+M00:Length--------------
+M01:Interface driver
+M02:Interface unit
+M03:Interface location
+M04:Interface EUI48
+M05:Interface controller
+M06:Running time
+#M07:
+#M08:
+M09:%dd, %dh %dm %ds
+M10:up
+M11:down
+M12:Motherboard
+M13:Virtual
+#M14:
+#M15:
+M16:passed
+M17:failed
+M18:EtherCPSW interface statistics
+#M19:
+M20:Packets sent
+M21:Packets received
+M22:Bytes sent
+M23:Bytes received
+M24:Send errors
+M25:Receive errors
+M26:Undelivered packets
+M27:IEEE 802.3 clients
+M28:Monitor clients
+M29:Sink clients
+M30:Standard clients
+M31:Type %04X (AddrLvl %02X, ErrLvl %02X) handler=(%p/%p)
+M32:selftest
+M33:Interface media
+M34:%0baseT half duplex
+M35:%0baseT full duplex
+M36:Unplugged
+M37:unit number

@@ -1,0 +1,74 @@
+# Unix errors 1-127
+E6:Device not configured
+E25:Inappropriate ioctl for device
+E5:Input/output error
+E22:Invalid argument
+E12:Cannot allocate memory
+E1:Operation not permitted
+E40:Message too long
+E55:No buffer space available
+# Internet module specific errors 128-199
+E128:No EtherH hardware found
+E?/E??/E???:EtherH internal error &%0
+# Messages
+M0:Unknown interface on EtherLan unit!
+M1:Unknown or no MAU adaptor connected to EtherLan 200!
+M2:Expansion slot %0
+M3:Network slot
+M4:Diagnostic tests started
+M5:Diagnostic tests complete
+M6:EtherH interface statistics
+M7:<---LONGEST-STAT--->
+M8:Interface location
+M9:Interface EUI48
+M10:Interface controller
+M11:Virtual (Multicast filtering)
+M12:Faulty, try resetting to clear the problem
+M13:EtherLan%0 (Multicast filtering)
+M14:Interface unit
+M15:Interface driver
+M16:Interface media
+M17:Attribution
+M18:Packets sent
+M19:Packets received
+M20:Interface buffer
+M21:No MAU connected
+M22:10baseT MAU connected
+M23:10base2 MAU connected
+M24:Micro 10baseT MAU connected
+M25:Micro 10base2 MAU connected
+M26:Unknown MAU adaptor connected (id=%0)
+M27:10baseT twisted pair interface
+M28:10base2 coaxial interface
+M29:Unable to detect active interface (id=%0)
+M30:Send errors
+M31:Receive errors
+M32:Collisions
+M33:Rejects
+M34:Mbuf exhaustions
+M35:DMA frames
+M36:No DMA frames
+M37:Overwrites
+M38:Good link
+M39:Bad link
+M40:, correct polarity
+M41:, incorrect polarity
+M42:Twisted pair state
+M43:Filter clients:
+M44:Type %0 handler
+M45:     Software multicast filter disabled
+M46:     Software multicast filter %0 usage=%1
+M47:     Totals discards=%0 allowed=%1
+M48:Multicast registers
+M49:Controller mode
+M50:Normal
+M51:Multicast
+M52:Promiscuous
+M53:Unknown
+M54:, accept frames with errors
+M55:, reject frames with errors
+M56:Driver warning -
+M57:Not yet fully initialised
+M58:No Mbuf manager
+M59:Driver log -
+M60:Driver error -

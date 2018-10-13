@@ -1,0 +1,56 @@
+;
+; CDDL HEADER START
+;
+; The contents of this file are subject to the terms of the
+; Common Development and Distribution License (the "Licence").
+; You may not use this file except in compliance with the Licence.
+;
+; You can obtain a copy of the licence at
+; cddl/RiscOS/Sources/FileSys/SDFS/SDFS/LICENCE.
+; See the Licence for the specific language governing permissions
+; and limitations under the Licence.
+;
+; When distributing Covered Code, include this CDDL HEADER in each
+; file and include the Licence file. If applicable, add the
+; following below this CDDL HEADER, with the fields enclosed by
+; brackets "[]" replaced with your own identifying information:
+; Portions Copyright [yyyy] [name of copyright owner]
+;
+; CDDL HEADER END
+;
+; Copyright 2012 Ben Avison.  All rights reserved.
+; Use is subject to license terms.
+;
+
+#include "Global/Services.h"
+#include "Interface/SDIO.h"
+#include "VersionNum"
+
+initialisation-code:	module_initialise
+
+finalisation-code:	module_finalise
+
+service-call-handler:	module_service Service_SDIOSlotAttached Service_SDIOSlotDetached Service_SDIOUnitAttached Service_SDIOUnitDetached Service_SDIOSlotReleased
+
+title-string:		SDFS
+
+help-string:		SDFS Module_MajorVersion_CMHG Module_MinorVersion_CMHG
+
+command-keyword-table:	module_command
+			SDFS(min-args:0, max-args:0, international:, invalid-syntax:"SSDFSDF", help-text:"HSDFSDF"),
+			SDFSdrive(min-args:1, max-args:1, configure:, international:, help-text:"HSDFDRI")
+
+swi-chunk-base-number:	0x59040
+
+swi-handler-code:	module_swi
+
+swi-decoding-table:	SDFS, DiscOp, 01, Drives, FreeSpace, 04, DescribeDisc, 06, 07, 08, MiscOp, SectorDiscOp, FreeSpace64, DiscOp64, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, ReadCardInfo
+
+international-help-file:"Resources:$.Resources.SDFS.Messages"
+
+date-string:		Module_Date_CMHG
+
+generic-veneers:	module_discop_veneer/module_discop_handler,
+			module_miscop_veneer/module_miscop_handler
+
+vector-handlers:	module_tickerv_veneer/module_tickerv_handler

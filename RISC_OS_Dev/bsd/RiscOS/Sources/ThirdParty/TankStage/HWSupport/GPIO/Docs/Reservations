@@ -1,0 +1,5 @@
+SWI Chunk	0x00058F80 - 0x00058FBF
+Error block	0x0081DD20 - 0x0081DD2F
+Module name	GPIO
+Star		GPIOMap
+		GPIOMachine

@@ -1,0 +1,8 @@
+#{DictTokens}
+Card:card
+ExtEscape:Escape
+BadDrive:Disc drive not known
+DriveEmpty:The disc drive is empty
+BadFileCore:SDFS requires FileCore 3.31 or later
+NotMem:Not a memory card
+CardLocked:Card is locked

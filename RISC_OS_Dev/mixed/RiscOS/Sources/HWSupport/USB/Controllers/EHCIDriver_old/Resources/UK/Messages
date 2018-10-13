@@ -1,0 +1,7 @@
+#{DictTokens}
+#00:Global
+E01:No EHCI devices found
+E02:Couldn't claim veneer
+E03:USBDriver too old
+
+UkRoot:Built-in

@@ -1,0 +1,61 @@
+Data pumping from CPSW
+=======================
+Previous network driver analysis shows most time is spent copying data around. All other operations, like management, IRQ despatch, are insignificant, so seek to minimise copying.
+
+The DMA controller in the CPSW peripheral works through buffer descriptors set up in STATERAM (8kB) using 4x4B transmit and receive descriptors. Therefore at most 512 descriptors are in play.
+
+The descriptors contain a linked list pointer, the (byte aligned) data pointer, an optional offset for the start-of-packet descriptor (zero otherwise), 11 bit length (0x7FF maximum), some flags, and the overall packet length (also 11 bit).
+
+Transmit
+--------
+The default NetBSD approach is to record the mbuf pointer in an array, and build the descriptors to consume the mbufs directly, having marked those areas as due for DMA with bus_dmamap_load_mbuf(), then when the txintr() is called these are m_freem()'d annd bus_dmamap_unload()'d.
+
+Receive
+-------
+The default NetBSD approach is to prefill the receive descriptors with mbufs with cpsw_new_rxbuf() in readiness for a packet arriving. Each is one page MCLBYTES long, presumably to help with cache bits. When a packet is received the rxintr() hands off the mbuf to the IP stack and repopulates the empty slot.
+
+The receive buffers could linger for days or weeks if the network is quiet.
+
+With RISC OS
+------------
+Possible approaches within RISC OS to handle this
+* DMA list controller
+  + DMAManager handles cache coherency issues
+  + Ethernet driver can own the DMA controller by adding/removing it at
+    runtime with OS_Hardware, so bits of the driver don't end up stranded
+    in the HAL
+  - Effectively a list controller, and since mbufs aren't guaranteed to be
+    page aligned, would incur a bounce buffer
+* Using 'unsafe' mbufs
+  + Allows DMA friendly buffer to exist in one area, with the mbufs managed
+    by MbufManager, marking as cacheable once transfer completes
+  + Zero copy operations
+  - Not currently supported by the Internet module
+* Using a static buffer via PCI_RAMAlloc
+  + Simple to implement
+  - Involves reads/writes from uncached memory
+
+DMA list controller
+-------------------
+During pages unsafe the transfer would need to be halted (and ethernet packets dropped) since the pages might be the ones in progress in a CPSW descriptor.
+
+The biggest single mbuf is for a 1500 ethernet frame, but there's no guarantee this is page aligned, so when DMAManager is processing it whatever happens to be in the rest of that page would become uncached. For receive packets this could be for a long time.
+
+This is architecturally nice, but performance wise there's no net benefit as there's still a copy operation from uncached memory to the safe mbuf chain.
+
+Unsafe mbufs
+------------
+MBufManager will error attempts to allocate mbufs > max_size as a single mbuf, so a chain is needed for anything larger.
+Doing an ensure_safe just copies the contents into a new chain.
+
+The Internet module always calls the Filter SWI with FILTER_NO_UNSAFE turned on, and so uses m_freem() in the function pointer it registers (this is rxf_handler()).
+
+This option has the possibility of a zero copy transfer, but since the Internet module doesn't generate unsafe mbufs, nor accept them for receiving, it's a dead end currently.
+
+Static PCI_RAMAlloc
+-------------------
+Having concluded the MbufManager doesn't allocate page sized/page aligned single mbufs, and Internet can't accept unsafe mbufs, there's always going to be a copy operation somewhere.
+
+This option requires the least number of changes to the ported NetBSD driver, at the expense of having to reserve quite a bit of RAM. Rounding up to a power of two and using all 512 slots would require a 1MB reservation.
+
+As the PCI_RAMAlloc region can be nicely aligned, for received packets the single copy operation will use MbufManager's fast routines to walk over the data only once, so having it cached wouldn't help. For transmitted packets the read will be from the cached mbuf chain and one pass writing into the uncached copy, stalling the CPU along the way, presumably not that different overall to writing it with the cache on then having to wait for the flush (since we want to send the packet straight away).

@@ -1,0 +1,98 @@
+#{Default}
+# CCxx errors mustn't be tokenised
+CC00:Normal Completion
+CC01:In Progress
+CC02:Pending requests
+CC03:Not started
+CC04:Invalid value
+CC05:No memory
+CC06:Cancelled
+CC07:Bad address
+CC08:In use
+CC09:No address
+CC10:Set address failed
+CC11:No power
+CC12:Too deep
+CC13:IO Error
+CC14:Not configured
+CC15:Timeout
+CC16:Short transfer
+CC17:Stalled
+CC18:Interrupted
+
+#{DictTokens}
+NoDevice:No such USB device
+NoInterface:Couldn't find interface
+NoEndpoint:Cannot find a valid endpoint
+EndpointUsed:Endpoint in use
+BadPipe:Couldn't open pipe
+BadXfer:Couldn't allocate transfer
+NoStream:No such stream
+BadRequest:Bad request
+NotRootP:Can't reset root hub
+BadDevice:USB device failed to enumerate
+IncVers:Incompatible USBDriver version
+XferFailed:USB transfer failed: %0
+QuirkCmd:Unrecognised quirk operation
+NoSuchQuirk:Quirk not found
+QuirkMem:Too many existing quirks
+DefVID:Vendor ID %0
+DefPID:Product ID %0
+DevHdr:No._Bus_Dev_Class_Description
+QrkHdr:Vendor_Product_Device_Flags
+BusHdr:Bus_Control_Isochronous_Bulk_Interrupt
+BusTxf:Transfers (%0 buses)
+
+DILen:----LONGEST----
+DIRel:USB release
+DICls:Device class
+DISub:Device subclass
+DIPrt:Device protocol
+DIMxP:Max packet size
+DIVid:Vendor ID
+DIPid:Product ID
+DIDid:Device ID
+DICfg:# of configs
+DIMfg:Manufacturer
+DIPrd:Product
+DISer:Serial number
+DISpd:Speed
+
+CILen:----LONGEST----
+CICur:Current config
+CIQty:# of interfaces
+CICfg:Config value
+CINom:Name
+CIPwr:Maximum power
+CIAtt:Attributes
+
+IFace:Interface
+IEndp:Endpoint
+IHidd:Human interface device
+
+ECtrl:Control
+EIsoY:Isochronous asynchronous
+EIsoA:Isochronous adaptive
+EIsoS:Isochronous synchronous
+EBulk:Bulk
+EIntr:Interrupt
+
+Att80:Bus powered
+Att40:Self powered
+Att20:Remote wakeup
+
+UByt:bytes
+UFrm:frames
+UHTy:HID descriptor type
+UCls:class
+ULen:length
+UCcd:country
+UDsc:Descriptor
+
+Spd1:Low
+Spd2:Full
+Spd3:High
+Spd4:Super
+Spd?:Unknown
+
+Mouse:USB mouse

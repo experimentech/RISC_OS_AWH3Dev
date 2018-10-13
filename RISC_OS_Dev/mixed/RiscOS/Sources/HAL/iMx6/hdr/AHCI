@@ -1,0 +1,961 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_AHCI_HDR__
+        GBLL    __HAL_AHCI_HDR__
+
+        GET     hdr.iMx6q
+        GET     Hdr.iMx6qMemMap
+
+; AHCI memory usage
+; the device as we use it
+                ^       0, a1
+; public bit
+AHCIDevice     #       HALDevice_AHCI_Size
+; our private bit
+AHCI_sb        #       4                  ; sb to use on hal calls
+
+AHCIDeviceEnd  #       0
+
+AHCIDeviceSize *       (AHCIDeviceEnd-AHCIDevice)
+
+; SATA module
+; Register addresses, offset from SATA_BASE_ADDR (0x02200000 physical address)
+HW_SATA_CAP_OFFSET     *        (0x000)
+
+BIT_SATA_CAP_NP        *        0       ; (4..0)Number of Ports.
+BIT_SATA_CAP_NP_MASK   *        &1f     ; bitmask
+BIT_SATA_CAP_SXS       *        5       ; Supports External SATA.
+BIT_SATA_CAP_EMS       *        6       ; Enclosure Management Support.
+BIT_SATA_CAP_CCCS      *        7       ; Command Completion Coalescing Support.
+BIT_SATA_CAP_NCS       *        8       ; (12..8)Number of Command Slots.
+BIT_SATA_CAP_PSC       *        13      ; Partial State Capable.
+BIT_SATA_CAP_SSC       *        14      ; Slumber State Capable.
+BIT_SATA_CAP_PMD       *        15      ; PIO Multiple DRQ Block.
+BIT_SATA_CAP_RESERVED0 *        16      ; Reserved.
+BIT_SATA_CAP_SMP       *        17      ; Supports Port Multiplier.
+BIT_SATA_CAP_SAM       *        18      ; Supports AHCI Mode Only.
+BIT_SATA_CAP_RESERVED1 *        19      ; Reserved.
+BIT_SATA_CAP_ISS       *        20      ; (23..20)Interface Speed Support.
+BIT_SATA_CAP_SCLO      *        24      ; Supports Command List Override.
+BIT_SATA_CAP_SAL       *        25      ; Supports Activity LED.
+BIT_SATA_CAP_SALP      *        26      ; Supports Aggressive Link Power Management.
+BIT_SATA_CAP_SSS       *        27      ; Supports Staggered Spin-up.
+BIT_SATA_CAP_SMPS      *        28      ; Supports Mechanical Presence Switch.
+BIT_SATA_CAP_SSNTF     *        29      ; Supports SNotification Register.
+BIT_SATA_CAP_SNCQ      *        30      ; Supports Native Command Queuing.
+BIT_SATA_CAP_S64A      *        31      ; Supports 64-bit Addressing
+
+HW_SATA_GHC_OFFSET      *       (0x004)
+BIT_SATA_GHC_HR         *       0       ; HBA Reset
+BIT_SATA_GHC_IE         *       1       ; IRQ Enable
+BIT_SATA_GHC_AE         *       31      ; AHCI Enable
+
+HW_SATA_IS_OFFSET       *       (0x008)
+BIT_SATA_IS_IPS         *       0       ; (1..0)IRQ Pending Status
+
+
+HW_SATA_PI_OFFSET       *       (0x00c)
+BIT_SATA_PI_PI          *       0       ; 1 bit, ports implemented = 1
+
+
+HW_SATA_VS_OFFSET       *       (0x010)
+BIT_SATA_VS_MNR         *       0       ; (15..0) AHCI Minor version
+BIT_SATA_VS_MJR         *       16      ; (31..16) AHCI Major version
+
+HW_SATA_CCC_CTL_OFFSET  *       (0x014)
+BIT_SATA_CCC_CTL_EN     *       0       ; Enable.
+BIT_SATA_CCC_CTL_INT    *       3       ; (7..3) Interrupt.
+BIT_SATA_CCC_CTL_CC     *       8       ; (15..8) Command Completions.
+BIT_SATA_CCC_CTL_TV     *       16      ; (31..16) Time-out Value.
+
+HW_SATA_CCC_PORTS_OFFSET *      (0x018)
+BIT_SATA_CCC_PORTS_PRT  *       0       ; (31..0) which ports are coalesced
+
+HW_SATA_CAP2_OFFSET     *       (0x024)
+BIT_SATA_CAP2_APST      *       2       ; Automatic Partial to Slumber Transitions
+
+HW_SATA_BISTAFR_OFFSET  *       (0x0a0)
+BIT_SATA_BISTAFR_PD     *       0       ; (7..0) Pattern definition
+BIT_SATA_BISTAFR_NCP    *       8       ; (15..8) LSB of BIST AcFIS 2nd DWORD
+
+HW_SATA_BISTCR_OFFSET   *       (0x0a4)
+BIT_SATA_BISTCR_PATTERN *       0       ; (3..0) This field defines one of the following SATA compliant patterns for far-end retimed/ far-end analog/ near-end analog initiator modes, or non-compliant patterns for transmit-only responder mode when initiated by the software writing to the SATA_BISTCR[TXO] bit.
+BIT_SATA_BISTCR_PV      *       4       ;  Pattern Version
+BIT_SATA_BISTCR_FLIP    *       5       ;  Flip Disparity
+BIT_SATA_BISTCR_ERREN   *       6       ;  Error Enable.
+BIT_SATA_BISTCR_LLC     *       8       ; (10..8) Link Layer Control
+BIT_SATA_BISTCR_SDFE    *       12      ;  Signal Detect Feature Enable
+BIT_SATA_BISTCR_QPHYINIT *      14      ;  When set, this bit enables quick PHY initialization feature.
+BIT_SATA_BISTCR_NEALB   *       16      ;  Near-End Analog Loopback
+BIT_SATA_BISTCR_CNTCLR  *       17      ;  Counter Clear
+BIT_SATA_BISTCR_TXO     *       18      ;  Transmit Only.
+BIT_SATA_BISTCR_FERLB   *       20      ;  Far-end Retimed Loopback.
+
+HW_SATA_BISTFCTR_OFFSET *       (0x0a8) ; 32bit readonly BIST count
+
+HW_SATA_BISTSR_OFFSET   *       (0x0ac)
+BIT_SATA_BISTSR_FRAMERR *       0       ; (15..0) Frame error
+BIT_SATA_BISTSR_BRSTERR *       16      ; (23..16) Burst error
+
+HW_SATA_OOBR_OFFSET     *       (0x0bc)
+BIT_SATA_OOBR_CIMAX     *       0       ; (7..0) COMINIT max
+BIT_SATA_OOBR_CIMIN     *       8       ; (15..8) COMINIT min
+BIT_SATA_OOBR_CWMAX     *       16      ; (23..16) COMWAKE max
+BIT_SATA_OOBR_CWMIN     *       24      ; (30..24) COMWAKE min
+BIT_SATA_OOBR_WE        *       31      ; Write enable
+COMWAKE_MIN_VAL         *       (0x02<<BIT_SATA_OOBR_CWMIN)
+COMWAKE_MAX_VAL         *       (0x06<<BIT_SATA_OOBR_CWMAX)
+COMINIT_MIN_VAL         *       (0x0b<<BIT_SATA_OOBR_CIMIN)
+COMINIT_MAX_VAL         *       (0x14<<BIT_SATA_OOBR_CIMAX)
+COM_Default             *       (COMWAKE_MIN_VAL+COMWAKE_MAX_VAL+COMINIT_MIN_VAL+COMINIT_MAX_VAL)
+
+
+HW_SATA_GPCR_OFFSET     *       (0x0d0) ; GP_CONTROL
+
+HW_SATA_GPSR_OFFSET     *       (0x0d4) ; GP_STATUS
+
+HW_SATA_TIMER1MS_OFFSET *       (0x0e0) ; 100000=100MHz (Default) 133000 133MHz
+BIT_SATA_TIMET1MS_TIMV  *       0       ; (19..0) 1ms timer value
+
+HW_SATA_TESTR_OFFSET    *       (0x0f4)
+BIT_SATA_TESTR_TEST_IF  *       0       ; test interface
+BIT_SATA_TESTR_PSEL     *       18      ; (18..16) port select
+
+HW_SATA_VERSIONR_OFFSET *       (0x0f8) ; hardcoded ascii version
+
+; Sata port registers, &80 addresses per port
+SATA_CLB_SIZE           *       (&80)
+HW_SATA_P0CLB_OFFSET    *       (0x100)
+BIT_SATA_P0CLB_CLB      *       10      ; (31..10) Command list base address
+
+HW_SATA_P0FB_OFFSET     *       (0x108)
+BIT_SATA_P0FB_FB        *       8       ; (31..8) P0 FIS base address
+
+HW_SATA_P0IS_OFFSET     *       (0x110)
+BIT_SATA_P0IS_DHRS      *       0       ;  Device to Host Register FIS Interrupt
+BIT_SATA_P0IS_PSS       *       1       ;  PIO Setup FIS Interrupt.
+BIT_SATA_P0IS_DSS       *       2       ;  DMA Setup FIS Interrupt
+BIT_SATA_P0IS_SDBS      *       3       ;  Set Device Bits Interrupt.
+BIT_SATA_P0IS_UFS       *       4       ;  Unknown FIS Interrupt.
+BIT_SATA_P0IS_DPS       *       5       ;  Descriptor Processed
+BIT_SATA_P0IS_PCS       *       6       ;  Port Connect Change Status
+BIT_SATA_P0IS_PRCS      *       22      ;  PHY Ready Change Status
+BIT_SATA_P0IS_IPMS      *       23      ;  Incorrect Port Multiplier Status.
+BIT_SATA_P0IS_OFS       *       24      ;  Overflow Status
+BIT_SATA_P0IS_INFS      *       26      ;  Interface Non-fatal Error Status
+BIT_SATA_P0IS_IFS       *       27      ;  Interface Fatal Error Status
+BIT_SATA_P0IS_HBDS      *       28      ;  Host Bus Data Error Status.
+BIT_SATA_P0IS_HBFS      *       29      ;  Host Bus Fatal Error Status.
+BIT_SATA_P0IS_TFES      *       30      ;  Task File Error Status.
+
+HW_SATA_P0IE_OFFSET     *       (0x114)
+BIT_SATA_P0IE_DHRE      *       0       ; Device to Host Register FIS Interrupt
+BIT_SATA_P0IE_PSE       *       1       ; PIO Setup FIS Interrupt Enable
+BIT_SATA_P0IE_DSE       *       2       ; DMA Setup FIS Interrupt Enable
+BIT_SATA_P0IE_SDBE      *       3       ; Set Device Bits FIS Interrupt Enable
+BIT_SATA_P0IE_UFE       *       4       ; Unknown FIS Interrupt Enable
+BIT_SATA_P0IE_DPE       *       5       ; Descriptor Processed Interrupt Enable
+BIT_SATA_P0IE_PCE       *       6       ; Port Change Interrupt Enable
+BIT_SATA_P0IE_PRCE      *       22      ;  PHY Ready Change Enable
+BIT_SATA_P0IE_IPME      *       23      ;  Incorrect Port Multiplier Enable
+BIT_SATA_P0IE_OFE       *       24      ;  Overflow Enable
+BIT_SATA_P0IE_INFE      *       26      ;  Interface Non-Fatal Error Enable
+BIT_SATA_P0IE_IFE       *       27      ;  Dependencies: when the following conditions are true, the intrq output signal is asserted:
+BIT_SATA_P0IE_HBDE      *       28      ;  Host Bus Data Error Enable
+BIT_SATA_P0IE_HBFE      *       29      ;  Host Bus Fatal Error Enable
+BIT_SATA_P0IE_TFEE      *       30      ;  Task File Error Enable
+BIT_SATA_P0IE_CPDE      *       31      ;  Cold Port Detect Enable
+
+HW_SATA_P0CMD_OFFSET    *       (0x118)
+BIT_SATA_P0CMD_ST       *       0       ; Start
+BIT_SATA_P0CMD_SUD      *       1       ; Spin-Up Device
+BIT_SATA_P0CMD_POD      *       2       ; Power On Device
+BIT_SATA_P0CMD_CLO      *       3       ; Command List Override
+BIT_SATA_P0CMD_FRE      *       4       ; FIS Receive Enable
+BIT_SATA_P0CMD_CCS      *       8       ; (12..8)Current Command Slot
+BIT_SATA_P0CMD_MPSS     *       13      ; Mechanical Presence Switch State
+BIT_SATA_P0CMD_FR       *       14      ; FIS Receive Running
+BIT_SATA_P0CMD_CR       *       15      ; Command List Running
+BIT_SATA_P0CMD_CPS      *       16      ; Cold Presence State
+BIT_SATA_P0CMD_PMA      *       17      ; Port Multiplier Attached
+BIT_SATA_P0CMD_HPCP     *       18      ; Hot Plug Capable Port
+BIT_SATA_P0CMD_ESP      *       21      ; External SATA Port
+BIT_SATA_P0CMD_APSTE    *       23      ; Device is ATAPI
+BIT_SATA_P0CMD_ATAPI    *       24      ; ATAPI Device is ATAPI
+BIT_SATA_P0CMD_DLAE     *       25      ; Drive LED on ATAPI Enable
+BIT_SATA_P0CMD_ALPE     *       26      ; Aggressive Link Power Management Enable
+BIT_SATA_P0CMD_ASP      *       27      ; Aggressive Slumber/ Partial
+BIT_SATA_P0CMD_ICC      *       28      ; (31..28)Interface Communication Control
+
+HW_SATA_P0TFD_OFFSET    *       (0x120)
+BIT_SATA_P0TFD_STA      *       0       ; (7..0) status
+; common status bits .. others are command specific
+P0TFD_STA_err           *       0       ; err bit
+P0TFD_STA_DRQ           *       3       ; DRQ bit
+P0TFD_STA_busy          *       7       ; busy bit
+P0TFD_STA_MASK          *       &89     ; mask for these bits
+BIT_SATA_P0TFD_ERR      *       8       ; (15..8) error
+
+HW_SATA_P0SIG_OFFSET    *       (0x124) ; port 0 signiature register
+                                        ; cyl and sec info
+
+HW_SATA_P0SSTS_OFFSET   *       (0x128)
+BIT_SATA_SSTS_DET       *       0       ; (3..0) dev det & phy state
+SSTS_DET_none           *       0       ; no device or phy coms
+SSTS_DET_det            *       1       ; device detected, no phy coms
+SSTS_DET_PhyRdy         *       3       ; dev detected, phy ready
+SSTS_DET_offline        *       4       ; phy offline
+BIT_SATA_SSTS_SPD       *       4       ; (7..4) current i/f speed
+SSTS_SPD_none           *       0       ; not established
+SSTS_SPD_1G5            *       1       ; 1.5G/s detected
+SSTS_SPD_3G0            *       2       ; 3Gb/s detected
+BIT_SATA_SSTS_IPM       *       8       ; (11..8) i/f power management
+SSTS_IPM_none           *       0       ; no dev or no comms
+SSTS_IPM_ifact          *       1       ; interface in active state
+SSTS_IPM_partpwr        *       2       ; i/f in partial power manage state
+SSTS_IPM_slumber        *       6       ; i/f in slumber power manage state
+
+HW_SATA_P0SCTL_OFFSET   *       (0x12c)
+BIT_SATA_P0SCTL_DET     *       0       ; (3..0) dev det initialisation
+SATA_P0SCTL_DET_none    *       0       ; no action
+SATA_P0SCTL_DET_cominit *       1       ; initialise
+SATA_P0SCTL_DET_disable *       4       ; disable
+SATA_P0SCTL_clear       *       15      ; clear mask
+BIT_SATA_P0SCTL_SPD     *       4       ; (7..4) i/f speed allowed
+SATA_P0SCTL_SP_both     *       0       ; both speeds
+SATA_P0SCTL_SP_1g5      *       1       ; 1.5Gb/s only
+SATA_P0SCTL_SP_3g0      *       2       ; 3.0 Gb/s only
+SATA_P0SCTL_SP_clear    *       15      ; clear mask
+BIT_SATA_P0SCTL_IPM     *       8       ; (11..8) i/f power management
+SATA_P0SCTL_IPM_none    *       0       ; no restriction
+SATA_P0SCTL_IPM_nopartial *     1       ; no partial state
+SATA_P0SCTL_IPM_noslumber *     2       ; no slumber state
+SATA_P0SCTL_IPM_neither *       3       ; neither partial or slumber
+SATA_P0SCTL_IPM_clear   *       15      ; clear mask
+P0SCTL_Default          *       (SATA_P0SCTL_DET_cominit<<BIT_SATA_P0SCTL_DET)\
+                        +       (SATA_P0SCTL_SP_both<<BIT_SATA_P0SCTL_SPD)\
+                        +       (SATA_P0SCTL_IPM_neither<<BIT_SATA_P0SCTL_IPM)
+
+HW_SATA_P0SERR_OFFSET   *       (0x130)
+BIT_SATA_P0SERR_ERR_I   *       0       ; This bit is set when any of the following SATA_P 0 SERR register bits is set during non- Data FIS transfer:
+BIT_SATA_P0SERR_ERR_M   *       1       ; Recovered Communication Error
+BIT_SATA_P0SERR_ERR_T   *       8       ; Non-Recovered Transient Data Integrity Error
+BIT_SATA_P0SERR_ERR_C   *       9       ; Non-Recovered Persistent Communication Error
+BIT_SATA_P0SERR_ERR_P   *       10      ;  Protocol Error
+BIT_SATA_P0SERR_ERR_E   *       11      ;  Internal Error
+BIT_SATA_P0SERR_DIAG_N  *       16      ;  PHY Ready Change
+BIT_SATA_P0SERR_DIAG_I  *       17      ;  PHY Internal Error
+BIT_SATA_P0SERR_DIAG_W  *       18      ;  Comm Wake
+BIT_SATA_P0SERR_DIAG_B  *       19      ;  10B to 8B Decode Error
+BIT_SATA_P0SERR_DIAG_D  *       20      ;  Disparity Error
+BIT_SATA_P0SERR_DIAG_C  *       21      ;  CRC Error
+BIT_SATA_P0SERR_DIAG_H  *       22      ;  Handshake Error
+BIT_SATA_P0SERR_DIAG_S  *       23      ;  Link Sequence Error
+BIT_SATA_P0SERR_DIAG_T  *       24      ;  Transport State Transition Error
+BIT_SATA_P0SERR_DIAG_F  *       25      ;  Unknown FIS Type
+BIT_SATA_P0SERR_DIAG_X  *       26      ;  Exchanged
+
+HW_SATA_P0SACT_OFFSET   *       (0x134) ; device status
+
+HW_SATA_P0CI_OFFSET     *       (0x138) ; command register
+
+HW_SATA_P0SNTF_OFFSET   *       (0x13c)
+BIT_SATA_P0SNTF_PMN     *       0       ; (15..0) PM notify
+
+HW_SATA_P0DMACR_OFFSET  *       (0x170) ; P0 dma control
+BIT_SATA_P0DMACR_TXTS   *       0       ; (3..0) TX transaction size
+BIT_SATA_P0DMACR_RXTS   *       4       ; (7..4) RX transaction size
+; transaction size values
+TS_SIZE_1               *       0       ; rx/tx transaction size 1 DWORD
+TS_SIZE_2               *       1       ; 2 DWORD
+TS_SIZE_4               *       2       ; 4 DWORD
+TS_SIZE_8               *       3       ; 8 DWORD
+TS_SIZE_16              *       4       ; 16 DWORD
+TS_SIZE_32              *       5       ; 32 DWORD
+TS_SIZE_64              *       6       ; 64 DWORD
+TS_SIZE_128             *       7       ; 128 DWORD
+TS_SIZE_256             *       8       ; 256 DWORD
+TS_SIZE_512             *       9       ; 512 DWORD
+TS_SIZE_1024            *       10      ; 1024 DWORD
+
+
+HW_SATA_P0PHYCR_OFFSET  *       (0x178) ; p0 phy control register
+BIT_SATA_P0PHYCR_CR_DATA_IN  * 0        ; (15..0)CR Address and Write Data Input Bus.
+BIT_SATA_P0PHYCR_CR_CAP_ADDR * 16       ; CR Capture Address.
+BIT_SATA_P0PHYCR_CR_CAP_DATA * 17       ; CR Capture Data.
+BIT_SATA_P0PHYCR_CR_WRITE    * 18       ; CR Write.
+BIT_SATA_P0PHYCR_CR_READ     * 19       ; CR Read.
+BIT_SATA_P0PHYCR_TEST_PDDQ   * 20       ; Test IDDQ
+
+HW_SATA_P0PHYSR_OFFSET  *       (0x17c)
+BIT_SATA_P0PHYSR_CR_DATA_OUT * 0        ; (15..0) CR Data Output Bus.
+BIT_SATA_P0PHYSR_CR_ACK *       18      ; CR Acknowledgement.
+
+;SATA Phy0 module
+; 16 bit address values ;; all values and registers are 16bit
+HW_SATA_PHY_LANE0_TX_STAT        * (0x2001) ; transmit input status
+BIT_SATA_PHY0_TXS_TX_CKO_EN   * 0       ; tx_cko clock enable
+BIT_SATA_PHY0_TXS_TX_EN       * 1       ; (3..1) Transmit enable control
+BIT_SATA_PHY0_TXS_TX_CLK_ALIGN * 4      ; Command to align clocks
+BIT_SATA_PHY0_TXS_RESERVED0   * 5       ; Always reads as 0
+BIT_SATA_PHY0_TXS_TX_BOOST    * 6       ; (9..6) Boost amount control
+BIT_SATA_PHY0_TXS_TX_ATTEN    * 10      ; (12..10) Attenuation amount control
+BIT_SATA_PHY0_TXS_TX_EDGERATE * 13      ; (14..13) Edge rate control
+BIT_SATA_PHY0_TXS_RESERVED1   * 15      ; Always reads as 1
+
+HW_SATA_PHY_LANE0_RX_STAT        * (0x2002) ; rx input status
+BIT_SATA_PHY0_RXS_HALF_RATE    * 0      ; Digital half-rate data control
+BIT_SATA_PHY0_RXS_RX_PLL_PWRON * 1      ; PLL power state control
+BIT_SATA_PHY0_RXS_RX_EN        * 2      ; Receiver enable control
+BIT_SATA_PHY0_RXS_RX_ALIGN_EN  * 3      ; Receiver alignment enable
+BIT_SATA_PHY0_RXS_RX_TERM_EN   * 4      ; Receiver termination enable
+BIT_SATA_PHY0_RXS_RX_EQ_VAL    * 5      ; (7..5) Equalization amount control
+BIT_SATA_PHY0_RXS_RX_DPLL_MODE * 8      ; (10..8) DPLL mode control
+BIT_SATA_PHY0_RXS_DPLL_RESET   * 11     ; DPLL reset control
+BIT_SATA_PHY0_RXS_LOS_CTL      * 12     ; (13..12) LOS filtering mode control
+BIT_SATA_PHY0_RXS_RESERVED0    * 14     ; (15..14) Always reads as 1
+
+HW_SATA_PHY_LANE0_OUT_STAT       * (0x2003) ; output status
+BIT_SATA_PHY0_LANEOUT_RX_VALID     * 0  ; Receiver valid output
+BIT_SATA_PHY0_LANEOUT_RX_PLL_STATE * 1  ; Current state of Rx PLL
+BIT_SATA_PHY0_LANEOUT_LOS          * 2  ; Loss of signal output
+BIT_SATA_PHY0_LANEOUT_TX_DONE      * 3  ; Transmit operation is complete output
+BIT_SATA_PHY0_LANEOUT_TX_RXPRES    * 4  ; Transmit receiver detection result
+BIT_SATA_PHY0_LANEOUT_RESERVED0    * 5  ; (15..5) Always reads as 1
+
+HW_SATA_PHY_LANE0_TX_OVRD        * (0x2004) ; tx input override
+BIT_SATA_PHY0_TXOVRD_TX_CKO_EN    * 0   ; tx_cko clock enable
+BIT_SATA_PHY0_TXOVRD_TX_EN        * 1   ; (3..1) Transmit enable control
+BIT_SATA_PHY0_TXOVRD_TX_CLK_ALIGN * 4   ; Command to align clocks
+BIT_SATA_PHY0_TXOVRD_TX_DIS_ALIGN * 5   ; Disables clock alignment FSM
+BIT_SATA_PHY0_TXOVRD_TX_BOOST     * 6   ; (9..6) Boost amount control
+BIT_SATA_PHY0_TXOVRD_TX_ATTEN     * 10  ; (12..10) Attenuation amount control
+BIT_SATA_PHY0_TXOVRD_TX_EDGERATE  * 13  ; (14..13) Edge rate control
+BIT_SATA_PHY0_TXOVRD_OVRD         * 15  ; Enables override of all bits in this
+                                        ; register
+HW_SATA_PHY_LANE0_RX_OVRD        * (0x2005) ; rx input override
+BIT_SATA_PHY0_RXOVRD_HALF_RATE    * 0   ; Digital half-rate data control
+BIT_SATA_PHY0_RXOVRD_RX_PLL_PWRON * 1   ; PLL power state control
+BIT_SATA_PHY0_RXOVRD_RX_EN        * 2   ; Receiver enable control
+BIT_SATA_PHY0_RXOVRD_RX_ALIGN_EN  * 3   ; Receiver alignment enable
+BIT_SATA_PHY0_RXOVRD_RX_TERM_EN   * 4   ; Receiver termination enable
+BIT_SATA_PHY0_RXOVRD_RX_EQ_VAL    * 5   ; (7..5) Equalization amount control
+BIT_SATA_PHY0_RXOVRD_RX_DPLL_MODE * 8   ; (10..8) DPLL mode control
+BIT_SATA_PHY0_RXOVRD_DPLL_RESET   * 11  ; DPLL reset control
+BIT_SATA_PHY0_RXOVRD_LOS_CTL      * 12  ; (13..12) LOS filtering mode control
+BIT_SATA_PHY0_RXOVRD_OVRD         * 14  ; Enables override of all bits in this
+                                        ; register
+BIT_SATA_PHY0_RXOVRD_RESERVED0    * 15  ; Reserved
+
+HW_SATA_PHY_LANE0_OUT_OVRD       * (0x2006) ; output override register
+BIT_SATA_PHY0_OPOVRD_RX_VALID     * 0   ; Receiver valid output
+BIT_SATA_PHY0_OPOVRD_RX_PLL_STATE * 1   ; Current state of Rx PLL
+BIT_SATA_PHY0_OPOVRD_LOS          * 2   ; Loss of signal output
+BIT_SATA_PHY0_OPOVRD_TX_DONE      * 3   ; Transmit operation is complete output
+BIT_SATA_PHY0_OPOVRD_TX_RXPRES    * 4   ; Transmit receiver detection result
+BIT_SATA_PHY0_OPOVRD_OVRD         * 5   ; Enables override of all bits in this register
+BIT_SATA_PHY0_OPOVRD_RESERVED0    * 6   ; (15..6) Reserved
+
+HW_SATA_PHY_LANE0_DBG_CTL        * (0x2007) ; debug control register
+BIT_SATA_PHY0_DBG_ZERO_TX_DATA  * 0     ; Overrides all transmit data to zeros
+BIT_SATA_PHY0_DBG_ZERO_RX_DATA  * 1     ; Overrides all receive data to zeros
+BIT_SATA_PHY0_DBG_INVERT_TX     * 2     ; Inverts transmit data (post-LBERT)
+BIT_SATA_PHY0_DBG_INVERT_RX     * 3     ; Inverts receive data (pre-LBERT)
+BIT_SATA_PHY0_DBG_DISABLE_RX_CK * 4     ; Disables rx_ck output
+BIT_SATA_PHY0_DBG_DTB_SEL0      * 5     ; (9..5) All other bits: Disabled
+BIT_SATA_PHY0_DBG_DTB_SEL1      * 10    ; (14..10) All other bits: Disabled
+BIT_SATA_PHY0_DBG_RESERVED0     * 15    ; Reserved
+
+HW_SATA_PHY_LANE0_PG_CTL         * (0x2010) ; pattern gen control
+BIT_SATA_PHY0_PG_MODE        *  0       ; (2..0) Selects a pattern to generate:
+BIT_SATA_PHY0_PG_TRIGGER_ERR *  3       ; Inserts a single error into the LSB
+BIT_SATA_PHY0_PG_PAT0        *  4       ; (13..4) Pattern for modes 3-5
+BIT_SATA_PHY0_PG_RESERVED0   *  14      ; (15..14) Reserved
+
+HW_SATA_PHY_LANE0_PM_CTL         * (0x2018) ; pattern matcher control
+BIT_SATA_PHY0_PM_CTL_MODE      * 0      ; (2..0) All other bits: Reserved
+BIT_SATA_PHY0_PM_CTL_SYNC      * 3      ; To enable checking, "Synchronize
+                                        ; pattern matcher LFSR with incoming
+                                        ; data" must be turned on, then
+                                        ; turned off.
+BIT_SATA_PHY0_PM_CTL_RESERVED0 * 4      ; (15..4) Reserved
+
+HW_SATA_PHY_LANE0_PM_ERR         * (0x2019) ; pattern matcher error
+BIT_SATA_PHY0_PM_ERR_COUNT      * 0     ; (14..0) Current error count
+BIT_SATA_PHY0_PM_ERR_OV14       * 15    ; If this field is active, the count is
+                                        ; multiplied by 128
+
+HW_SATA_PHY_LANE0_DPLL_PHASE     * (0x201a) ; DPLL phase register
+BIT_SATA_PHY0_DPLLP_DTHR        *  0    ; Bits below the useful resolution
+BIT_SATA_PHY0_DPLLP_VAL         *  1    ; (10..1) Phase is .UI/512 x VAL
+                                        ; ps from zero reference
+BIT_SATA_PHY0_DPLLP_RESERVED0   *  11   ; (15..11) Reserved
+
+HW_SATA_PHY_LANE0_DPLL_FREQ      * (0x201b) ; DPLL Freq register
+BIT_SATA_PHY0_DPLLF_DTHR        * 0     ; Bits below the useful resolution
+BIT_SATA_PHY0_DPLLF_VAL         * 1     ; (13..1) Frequency is 1.526 x VAL
+                                        ;  ppm from the reference
+BIT_SATA_PHY0_DPLLF_RESERVED0   * 14    ; (15..14) Reserved
+
+HW_SATA_PHY_LANE0_SCOPE_CTL      * (0x201c) ; scope control register
+BIT_SATS_PHY0_SCOPECR_MODE      * 0     ; (1..0) Mode of counters:
+BIT_SATS_PHY0_SCOPECR_DELAY     * 2     ; (10..2) Number of symbols to skip
+                                        ;  between samples
+BIT_SATS_PHY0_SCOPECR_BASE      * 11    ; (14..11) The bit to be sampled
+                                        ; when mode = 2'b01
+BIT_SATS_PHY0_SCOPECR_RESERVED0 * 15    ;  Reserved
+
+HW_SATA_PHY_LANE0_RX_CTL         * (0x201d) ; rx control register
+BIT_SATA_PHY0_RXCTL_PHDET_EN       * 0  ; (1..0)Enables phase detector
+BIT_SATA_PHY0_RXCTL_PHDET_EDGE     * 2  ; (3..2)Edges to use for phase detection
+BIT_SATA_PHY0_RXCTL_PHDET_POL      * 4  ; Reverses polarity of phase error
+BIT_SATA_PHY0_RXCTL_OVRD_DPLL_GAIN * 5  ; Overrides phase update gain (PHUG)
+                                        ;and frequency update gain (FRUG) values
+BIT_SATA_PHY0_RXCTL_PHUG_VALUE     * 6  ; (7..6)Overrides value for phase update
+                                        ; gain (PHUG)
+BIT_SATA_PHY0_RXCTL_FRUG_VALUE     * 8  ; (9..8)Overrides value for frequency up
+                                        ; date gain (FRUG)
+BIT_SATA_PHY0_RXCTL_MODE_BP        * 10 ; (12..10)Sets BP 2:0 to longer
+                                        ; timescale (for FTS patterns)
+BIT_SATA_PHY0_RXCTL_OVRD_SWITCH    * 13 ; Overrides the value of the data/phase
+                                        ; MUX
+BIT_SATA_PHY0_RXCTL_SWITCH_VAL     * 14 ; Value to override the data/phase MUX
+BIT_SATA_PHY0_RXCTL_RESERVED0      * 15 ; Reserved
+
+HW_SATA_PHY_LANE0_RX_DBG         * (0x201e) ; rx debug register
+BIT_SATA_PHY0_RX_DBG_DTB_SEL0   * 0     ; (3..0) Selects wire to go on DTB bit 0
+BIT_SATA_PHY0_RX_DBG_DTB_SEL1   * 4     ; (7..4) Selects wire to go on DTB bit 1
+BIT_SATA_PHY0_RX_DBG_RESERVED0  * 8     ; (15..8) Reserved
+
+HW_SATA_PHY_LANE0_RX_ANA_CONTROL * (0x2030) ; rx analog control
+BIT_SATA_PHY0_ANCTL_ATB_EN      * 0     ; ATB enable bit
+BIT_SATA_PHY0_ANCTL_MARGIN_EN   * 1     ; 1 RWCr Margin enable bit
+BIT_SATA_PHY0_ANCTL_RCK625_EN   * 2     ; rck625 enable bit
+BIT_SATA_PHY0_ANCTL_RXLBE_EN    * 3     ; Wafer level (external) loopback
+                                        ; enable bit
+BIT_SATA_PHY0_ANCTL_RXLBI_EN    * 4     ; Digital serial (internal) loopback
+                                        ; enable bit
+BIT_SATA_PHY0_ANCTL_RESERVED0   * 5     ; (15..5) Reserved
+
+HW_SATA_PHY_LANE0_RX_ANA_ATB     * (0x2031) ; rx ATB reg
+BIT_SATA_PHY0_RXATB_FORCEP_RX_P     * 0 ; Connects atb_f_p to rx_p
+BIT_SATA_PHY0_RXATB_FORCEP_RX_M     * 1 ; Connects atb_f_p to rx_m
+BIT_SATA_PHY0_RXATB_SENSEP_RX_P     * 2 ; Connects atb_s_p to rx_p
+BIT_SATA_PHY0_RXATB_SENSEM_RX_M     * 3 ; Connects atb_s_m to rx_m
+BIT_SATA_PHY0_RXATB_SENSEM_VCM      * 4 ; Connects atb_s_m to Rx vcm Use in
+                                        ; margining.
+BIT_SATA_PHY0_RXATB_SENSEM_VREF_LOS * 5 ; Connects atb_s_m to vref_los
+                                        ; (vref_rx / 14)
+BIT_SATA_PHY0_RXATB_RESERVED0       * 6 ; (15..6) Reserved
+
+HW_SATA_PHY_LANE0_PLL_PRG2       * (0x2032) ; rx pll prog2
+BIT_SATA_PHY0_RXPLL2_ENABLE_TEST_PD * 0 ; Controls phase interpolator test mode:
+BIT_SATA_PHY0_RXPLL2_RESET_LCL      * 1 ; Resets PLL:
+BIT_SATA_PHY0_RXPLL2_FRC_RESET      * 2 ; Enables override of default value
+                                        ; of pll_pwron.
+BIT_SATA_PHY0_RXPLL2_PWRON_LCL      * 3 ; Controls power to PLL:
+BIT_SATA_PHY0_RXPLL2_FRC_PWRON      * 4 ; Enables override of default value
+                                        ; of pll_pwron.
+BIT_SATA_PHY0_RXPLL2_HCPL_LCL       * 5 ; Forces coupling in VCO:
+BIT_SATA_PHY0_RXPLL2_FRC_HCPL       * 6 ; Enables override of hcpl default value
+BIT_SATA_PHY0_RXPLL2_ATB_SENSE_SEL  * 7 ; Controls proportional charge pump
+                                        ; current:
+BIT_SATA_PHY0_RXPLL2_RESERVED0      * 8 ; (15..8) Reserved
+
+HW_SATA_PHY_LANE0_PLL_PRG1       * (0x2033) ; rx pll prog 1
+BIT_SATA_PHY0_RXPLL1_RESERVED0  * 0     ; (1..0) Reserved
+BIT_SATA_PHY0_RXPLL1_INT_CNTRL  * 2     ; (4..2) Controls integral charge pump
+                                        ; current Integral current = (n + 1) /
+                                        ; 8 x full_scale. Default value =
+                                        ; 3'b010: 0.375 x full_scale
+BIT_SATA_PHY0_RXPLL1_PROP_CNTRL * 5     ; (7..5) Controls proportional charge
+                                        ; pump current
+BIT_SATA_PHY0_RXPLL1_SEL_RXCK   * 8     ; Uses recovered clock as reference
+                                        ; to the PLL:
+BIT_SATA_PHY0_RXPLL1_RESERVED1  * 9     ; (15..9) Reserved
+
+HW_SATA_PHY_LANE0_PLL_PRG3       * (0x2034) ; rx pll measure
+BIT_SATA_PHY0_RPLLM_RESERVED0    * 0    ; Reserved
+BIT_SATA_PHY0_RPLLM_MEAS_CROWBAR * 1    ; Measures crowbar bias voltage on
+                                        ; atb_sense_p; gd on atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_1V      * 2    ; Measures 1-V supply voltage on
+                                        ; atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_VP_CP   * 3    ; Measures vp_cp voltage on
+                                        ; atb_sense_p; gd on atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_VCO     * 4    ; Measures VCO supply voltage on
+                                        ; atb_sense_p; gd on atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_STARTUP * 5    ; Measures startup voltage on
+                                        ; atb_sense_p; gd on atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_VP16    * 6    ; Measures vp16 on
+                                        ; atb_sense_p; gd on atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_VREF    * 7    ; Measures vref on
+                                        ; atb_sense_p; gd on atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_VCNTRL  * 8    ; Measures vcntrl on atb_sense_m.
+BIT_SATA_PHY0_RPLLM_MEAS_BIAS    * 9    ; Measures copy of bias current i
+                                        ; n oscillator on atb_force_m.
+BIT_SATA_PHY0_RPLLM_RESERVED1    * 10   ; (15..10) Reserved
+
+HW_SATA_PHY_LANE0_TX_ANA_ATBSEL1 * (0x2035) ; tx ATB ctrl
+BIT_SATA_PHY0_TXATB_VGR_S_P     * 0     ; Regulator gate voltage on ATB_S_P
+BIT_SATA_PHY0_TXATB_VREF_S_P    * 1     ; tx_vref voltage on ATB_S_P
+BIT_SATA_PHY0_TXATB_VREG_S_M    * 2     ; Regulator output voltage on ATB_S_M
+BIT_SATA_PHY0_TXATB_TXP_F_P     * 3     ; txp connected to ATB_F_P
+BIT_SATA_PHY0_TXATB_TXP_S_P     * 4     ; txp connected to ATB_S_P
+BIT_SATA_PHY0_TXATB_TXM_F_P     * 5     ; txm connected to ATB_S_P
+BIT_SATA_PHY0_TXATB_TXM_S_M     * 6     ; txm on ATB_S_M
+BIT_SATA_PHY0_TXATB_VBPF_S_P    * 7     ; vbpf in edge rate control circuit
+                                        ; on ATB_S_P
+BIT_SATA_PHY0_TXATB_RESERVED0   * 8     ; (15..8) Reserved
+
+HW_SATA_PHY_LANE0_TX_ANA_ATBSEL2 * (0x2036) ; tx ATB2 ctl
+BIT_SATA_PHY0_TXATB2_EN_TXILPBK  * 0    ; Enables Tx internal loopback
+BIT_SATA_PHY0_TXATB2_ENLPBK      * 1    ; Enables Tx external loopback
+BIT_SATA_PHY0_TXATB2_VBNF_S_M    * 2    ; vbnf in edge rate control circuit
+                                        ; on ATB_S_M
+BIT_SATA_PHY0_TXATB2_VBPS_S_P    * 3    ; vbps in edge rate control circuit
+                                        ; on ATB_S_M
+BIT_SATA_PHY0_TXATB2_VBNS_S_M    * 4    ; vbps in edge rate control circuit on ATB_S_M To validate this field, set the atb_en field.
+BIT_SATA_PHY0_TXATB2_VCM_S_P     * 5    ; Vcm replica on ATB_S_P
+BIT_SATA_PHY0_TXATB2_VREFRXD_S_M * 6    ; Reference voltage for RX_DETECT
+                                        ; on ATB_S_M
+BIT_SATA_PHY0_TXATB2_ATB_EN      * 7    ; RWCr 7 RWCr Connects internal and
+                                        ; external ATB buses
+BIT_SATA_PHY0_TXATB2_RESERVED0   * 8    ; (15..8) Reserved
+
+HW_SATA_PHY_LANE0_TX_ANA_CONTROL * (0x2037) ; tx analog control
+BIT_SATA_PHY0_TXANA_RESERVED0    * 0    ; Reserved
+BIT_SATA_PHY0_TXANA_BCN_LCL      * 1    ; Local beacon on/off control value
+BIT_SATA_PHY0_TXANA_FRC_BEACON   * 2    ; Forces beacon to local value (bcn_lcl)
+BIT_SATA_PHY0_TXANA_DATAOVRD_LCL * 3    ; RWCr Local dataovrd control value
+BIT_SATA_PHY0_TXANA_FRC_DO       * 4    ; Forces dataovrd locally
+BIT_SATA_PHY0_TXANA_EN_LCL       * 5    ; (6..5) Locally forces tx_en[1:0]:
+BIT_SATA_PHY0_TXANA_FRC_PWRST    * 7    ; Locally forces power state
+BIT_SATA_PHY0_TXANA_RESERVED1    * 8    ; (15..8) Reserved
+
+; SATA Phy Clock stuff
+
+HW_SATA_PHY_CLOCK_CRCMP_LT_LIMIT_ADDR *  (0x01) ; Creg Comp Upper Limit Register
+BIT_SATA_PHYCLK_CRCMPLTLIMIT    * 0     ; (15..0) Less-than-limit compare point
+
+HW_SATA_PHY_CLOCK_CRCMP_GT_LIMIT_ADDR *  (0x02) ; Creg Comp Lower Limit Register
+BIT_SATA_PHYCLK_CRCMPGTLIMIT    * 0     ; (15..0) Greater-than-limit comp point
+
+HW_SATA_PHY_CLOCK_CRCMP_MASK_ADDR     *  (0x03) ;Creg Compare Mask Register
+BIT_SATA_PHYCLK_CRCMPMASK       * 0     ; (15..0) Mask for comparisons
+
+HW_SATA_PHY_CLOCK_CRCMP_CTL_ADDR      *  (0x04) ;Creg Compare Control Register
+BIT_SATA_PHYCLK_CRCMP_HOLD_SCRATCH0 * 0 ; Scratch0 not updated on register reads
+BIT_SATA_PHYCLK_CRCMP_HOLD_SCRATCH1 * 1 ; Scratch1 not updated on register reads
+BIT_SATA_PHYCLK_CRCMP_RESERVED0     * 2 ; (15..2) reserved
+
+HW_SATA_PHY_CLOCK_CRCMP_STAT_ADDR     *  (0x05) ;Creg Compare Status Register
+BIT_SATA_PHYCLK_CRCMPST_S0_LOW        * 0; Masked Scratch0 is lower than
+                                        ; CRCMP_LT_LIMIT
+BIT_SATA_PHYCLK_CRCMPST_S0_HIGH       * 1; Masked Scratch0 is higher than
+                                        ; CRCMP_HT_LIMIT.
+BIT_SATA_PHYCLK_CRCMPST_S1_S0_LOW     * 2; Masked (Scratch1 - Scratch0) is lower
+                                        ; than CRCMP_LT_LIMIT.
+BIT_SATA_PHYCLK_CRCMPST_S1_S0_HIGH    * 3; Masked (Scratch1-Scratch0) is higher
+                                        ; than CRCMP_HT_LIMIT.
+BIT_SATA_PHYCLK_CRCMPST_S0_OUTSIDE   * 4; Logical OR of S0_LOW and S0_HIGH
+                                        ; Useful for determining if the value is
+                                        ; near signed zero.
+BIT_SATA_PHYCLK_CRCMPST_S1_S0_OUTSIDE * 5; Logical OR of S1_S0_LOW and
+                                        ;  S1_S0_HIGH
+                                        ; Useful for determining if the
+                                        ; difference is near signed zero.
+BIT_SATA_PHYCLK_CRCMPST_RESERVED0   * 6 ; (15..6) Reserved
+
+HW_SATA_PHY_CLOCK_SCOPE_SAMPLES_ADDR  *  (0x06) ;Scope Sample Count Register
+BIT_SATA_PHYCLK_SCOPE_SAMPLES   * 0     ; (15..0) num samples to count
+
+HW_SATA_PHY_CLOCK_SCOPE_COUNT_ADDR    *  (0x07) ;Scope Count Result Register
+BIT_SATA_PHYCLK_SCOPE_COUNT     * 0     ; (15..0) result count
+
+HW_SATA_PHY_CLOCK_DAC_CTL_ADDR        *  (0x08) ;DAC Control Register
+BIT_SATA_PHYCLK_DACCTL_DAC_VAL       * 0 ;(9..0)Digital value to be used for DAC
+BIT_SATA_PHYCLK_DACCTL_OVRD_RTUNE_TX * 10; Wr DAC_VAL[5:0] to the Tx rtune bus
+BIT_SATA_PHYCLK_DACCTL_OVRD_RTUNE_RX * 11; Wr DAC_VAL[5:0] to the Rx rtune bus
+BIT_SATA_PHYCLK_DACCTL_DAC_MODE      * 12; (14..12) DAC output mode:
+BIT_SATA_PHYCLK_DACCTL_RESERVED0     * 15; Reserved
+
+HW_SATA_PHY_CLOCK_RTUNE_CTL_ADDR      *  (0x09) ;Resistor Tuning Ctrl Register
+BIT_SATA_PHYCLK_RTUNE_MODE       * 0    ; (1..0) Resistor tune SAR mode:
+BIT_SATA_PHYCLK_RTUNE_FRC_PWRON  * 2    ; Overrides internal power-on
+BIT_SATA_PHYCLK_RTUNE_PWRON_LCL  * 3    ; Value of power-on to force
+BIT_SATA_PHYCLK_RTUNE_SEL_ATBP   * 4    ; Selects atb_s_p for A/D measurement
+BIT_SATA_PHYCLK_RTUNE_RSC_X4     * 5    ; Sets x4 in rescal circuitry
+BIT_SATA_PHYCLK_RTUNE_DAC_CHOP   * 6    ; Polarity of chop control for DAC
+BIT_SATA_PHYCLK_RTUNE_CMP_INVERT * 7    ; Inverts output of comparator (to
+                                        ; reverse successive approximation
+                                        ; register (SAR) feedback loop)
+BIT_SATA_PHYCLK_RTUNE_DIS       * 8     ; Disables automatic resistor
+BIT_SATA_PHYCLK_RTUNE_TRIG      * 9     ; Triggers manual resistor calibration
+BIT_SATA_PHYCLK_ADC_TRIG        * 10    ; Triggers ADC conversion
+BIT_SATA_PHYCLK_RESERVED0       * 11    ; (15..11) Reserved
+
+HW_SATA_PHY_CLOCK_ADC_OUT_ADDR        *  (0x0a) ;ADC Output Register
+BIT_SATA_PHYCLK_ADCO_VALUE      * 0     ; (9..0)A/D conversion result
+BIT_SATA_PHYCLK_ADCO_FRESH      * 10    ; Flags new A/D conversion is present.
+BIT_SATA_PHYCLK_ADCO_RESERVED0  * 11    ; (15..11) Reserved
+
+HW_SATA_PHY_CLOCK_SS_PHASE_ADDR       *  (0x0b) ;Spread Spectrum Phase Register
+BIT_SATA_PHYCLK_SSP_DTHR        * 0     ; (1..0)Bits below the useful resolution
+BIT_SATA_PHYCLK_SSP_VAL         * 2     ; (11..2)Phase value from zero reference
+BIT_SATA_PHYCLK_SSP_ZERO_FREQ   * 12    ; Zero frequency register
+BIT_SATA_PHYCLK_SSP_RESERVED0   * 13    ; (15..13 Reserved
+
+HW_SATA_PHY_CLOCK_CHIP_ID_HI_ADDR     *  (0x0c) ;JTAG Chip ID (High Bits) Register
+BIT_SATA_PHYCLK_CHIP_IDHI       * 0     ; (15..0) JTAG Chip ID Hi
+
+HW_SATA_PHY_CLOCK_CHIP_ID_LOW_ADDR    *  (0x0d) ;JTAG Chip ID (Low Bits) Register
+BIT_SATA_PHYCLK__CHIP_IDLo      * 0     ; (15..0) JTAG Chip ID Lo
+
+HW_SATA_PHY_CLOCK_FREQ_STAT_ADDR      *  (0x0e) ;Frequency Status Register
+BIT_SATA_PHYCLK_FSTAT_PROP_CTL  * 0     ; (2..0) Proportional charge pump ctrl
+BIT_SATA_PHYCLK_FSTAT_INT_CTL   * 3     ; (5..3) Integral charge pump control
+BIT_SATA_PHYCLK_FSTAT_NCY5      * 6     ; (7..6) Divide-by-5 control
+BIT_SATA_PHYCLK_FSTAT_NCY       * 8     ; (12..8) Divide-by-4 cycle control
+BIT_SATA_PHYCLK_FSTAT_PRESCALE  * 13    ; (14..13) Prescaler control
+BIT_SATA_PHYCLK_FSTAT_RESERVED0 * 15    ; Always reads as 1
+
+HW_SATA_PHY_CLOCK_CTL_STAT_ADDR       *  (0x0f) ;Control Status Register
+BIT_SATA_PHYCLK_CTLSTAT_USE_REFCLK_ALT * 0  ; Alternate refclk is used
+BIT_SATA_PHYCLK_CTLSTAT_MPLL_CLK_OFF   * 1  ; Reference clock is off
+BIT_SATA_PHYCLK_CTLSTAT_MPLL_PWRON     * 2  ; MPLL power-on control
+BIT_SATA_PHYCLK_CTLSTAT_MPLL_SS_EN     * 3  ; Spread spectrum enable
+BIT_SATA_PHYCLK_CTLSTAT_CKO_ALIVE_CON  * 4  ; (5..4)cko_alive MUX control
+BIT_SATA_PHYCLK_CTLSTAT_CKO_WORD_CON   * 6  ; (8..6)cko_word MUX control
+BIT_SATA_PHYCLK_CTLSTAT_RESERVED0      * 9  ; Reserved
+BIT_SATA_PHYCLK_CTLSTAT_RTUNE_DO_TUNE  * 1  ; Manual resistor tune control
+BIT_SATA_PHYCLK_CTLSTAT_WIDE_XFACE     * 1  ; Wide interface control
+BIT_SATA_PHYCLK_CTLSTAT_VPH_IS_3P3     * 1  ; High voltage supply is 3.3 V
+BIT_SATA_PHYCLK_CTLSTAT_VP_IS_1P2      * 1  ; Low voltage supply is 1.2 V
+BIT_SATA_PHYCLK_CTLSTAT_FAST_TECH      * 1  ; Technology is fast
+BIT_SATA_PHYCLK_CTLSTAT_RESERVED1      * 1  ; Reserved
+
+HW_SATA_PHY_CLOCK_LVL_STAT_ADDR       *  (0x10) ;Level Status Register
+BIT_SATA_PHYCLK_LVLS_ACJT_LVL   * 0     ; (4..0) ACJTAG comparator level
+BIT_SATA_PHYCLK_LVLS_LOS_LVL    * 5     ; (9..5) Loss of Signal Detector level
+BIT_SATA_PHYCLK_LVLS_TX_LVL     * 10    ; (14..10) Transmit level
+BIT_SATA_PHYCLK_LVLS_RESERVED0  * 15    ; Reserved
+
+HW_SATA_PHY_CLOCK_CREG_STAT_ADDR      *  (0x11) ;Creg Status Register
+BIT_SATA_PHYCLK_CREGSTAT_CR_READ     * 0  ; Read request
+BIT_SATA_PHYCLK_CREGSTAT_CR_WRITE    * 1  ; Write request
+BIT_SATA_PHYCLK_CREGSTAT_CR_CAP_DATA * 2  ; Captures data request
+BIT_SATA_PHYCLK_CREGSTAT_CR_CAP_ADDR * 3  ; Captures address request
+BIT_SATA_PHYCLK_CREGSTAT_RESERVED0   * 4  ; Reserved
+BIT_SATA_PHYCLK_CREGSTAT_CR_ACK      * 5  ; Creg request acknowledgement
+BIT_SATA_PHYCLK_CREGSTAT_POWER_GOOD  * 6  ; Power good output
+BIT_SATA_PHYCLK_CREGSTAT_OP_DONE     * 7  ; Operation is complete output
+BIT_SATA_PHYCLK_CREGSTAT_RESERVED1   * 8  ; (15..8) Reserved
+
+HW_SATA_PHY_CLOCK_FREQ_OVRD_ADDR      *  (0x12) ;Frequency Override Register
+BIT_SATA_PHYCLK_FOVR_PROP_CTL   * 0     ; (2..0)Proportional charge pump control
+BIT_SATA_PHYCLK_FOVR_INT_CTL    * 3     ; (5..3)Integral charge pump control
+BIT_SATA_PHYCLK_FOVR_NCY5       * 6     ; (7..6)Divide-by-5 control
+BIT_SATA_PHYCLK_FOVR_NCY        * 8     ; (12..8) Divide-by-4 cycle control
+BIT_SATA_PHYCLK_FOVR_PRESCALE   * 13    ; (14..13) Prescaler control:
+BIT_SATA_PHYCLK_FOVR_OVRD       * 15    ; Enables override of all bits
+                                        ; in this register
+
+HW_SATA_PHY_CLOCK_CTL_OVRD_ADDR       *  (0x13) ;Control Override Register
+BIT_SATA_PHYCLK_CTLOVRD_USE_REFCLK_ALT * 0  ; Uses alternate refclk
+BIT_SATA_PHYCLK_CTLOVRD_MPLL_CLK_OFF   * 1  ; Reference clock is off
+BIT_SATA_PHYCLK_CTLOVRD_MPLL_PWRON     * 2  ; MPLL power-on control
+BIT_SATA_PHYCLK_CTLOVRD_MPLL_SS_EN     * 3  ; Spread spectrum enable
+BIT_SATA_PHYCLK_CTLOVRD_CKO_ALIVE_CON  * 4  ; (5..4) cko_alive mux control
+BIT_SATA_PHYCLK_CTLOVRD_CKO_WORD_CON   * 6  ; (8..6) cko_word mux control
+BIT_SATA_PHYCLK_CTLOVRD_OVRD_CLK       * 9  ; Overrides clock controls
+                                            ; (bits [8:0])
+BIT_SATA_PHYCLK_CTLOVRD_RTUNE_DO_TUNE  * 10 ; Manual resistor tune control
+BIT_SATA_PHYCLK_CTLOVRD_WIDE_XFACE     * 11 ; Wide interface control
+BIT_SATA_PHYCLK_CTLOVRD_VPH_IS_3P3     * 12 ; High-voltage supply is 3.3 V
+BIT_SATA_PHYCLK_CTLOVRD_VP_IS_1P2      * 13 ; Low-voltage supply is 1.2 V
+BIT_SATA_PHYCLK_CTLOVRD_FAST_TECH      * 14 ; Technology is fast
+BIT_SATA_PHYCLK_CTLOVRD_OVRD_STATIC    * 15 ; Overrides static controls
+                                            ; (bits [14:10])
+
+HW_SATA_PHY_CLOCK_LVL_OVRD_ADDR       *  (0x14) ;Level Override Register
+BIT_SATA_PHYCLK_LVLOVRD_ACJT_LVL     * 0    ; (4..0) ACJTAG comparator level
+BIT_SATA_PHYCLK_LVLOVRD_LOS_LVL      * 5    ; (9,,5) Loss of Signal Detector
+BIT_SATA_PHYCLK_LVLOVRD_LEVEL_TX_LVL * 10   ; (14..10) Transmit level
+BIT_SATA_PHYCLK_LVLOVRD_OVRD         * 15   ; Overrides all level controls
+
+HW_SATA_PHY_CLOCK_CREG_OVRD_ADDR      *  (0x15) ;Creg Override Register
+BIT_SATA_PHYCLK_CREGOVRD_CR_READ     * 0  ; Reads request
+BIT_SATA_PHYCLK_CREGOVRD_CR_WRITE    * 1  ; Writes request
+BIT_SATA_PHYCLK_CREGOVRD_CR_CAP_DATA * 2  ; Captures data request
+BIT_SATA_PHYCLK_CREGOVRD_CR_CAP_ADDR * 3  ; Captures address request
+BIT_SATA_PHYCLK_CREGOVRD_OVRD_IN     * 4  ; Overrides inputs (bits [3:0])
+BIT_SATA_PHYCLK_CREGOVRD_CR_ACK      * 5  ; Creg request acknowledgement
+BIT_SATA_PHYCLK_CREGOVRD_POWER_GOOD  * 6  ; Power good output
+BIT_SATA_PHYCLK_CREGOVRD_OP_DONE     * 7  ; Operation is complete output
+BIT_SATA_PHYCLK_CREGOVRD_OVRD_OUT    * 8  ; Overrides outputs (bits [7:5])
+BIT_SATA_PHYCLK_CREGOVRD_RESERVED0   * 9  ; (15..9) Reserved
+
+HW_SATA_PHY_CLOCK_MPLL_CTL_ADDR       *  (0x16) ;MPLL Control Register
+BIT_SATA_PHYCLK_MPLLC_CLKDRV_ANA     * 0  ; Value for analog clock drivers
+BIT_SATA_PHYCLK_MPLLC_CLKDRV_DIG     * 1  ; Value for digital clock drivers
+BIT_SATA_PHYCLK_MPLLC_OVRD_CLKDRV    * 2  ; Overrides clock driver controls
+BIT_SATA_PHYCLK_MPLLC_DIS_PARA_CREG  * 3  ; Disables parallel creg interface
+BIT_SATA_PHYCLK_MPLLC_REFCLK_DELAY   * 4  ; Delays refclk output of prescaler
+BIT_SATA_PHYCLK_MPLLC_DTB_SEL0       * 5  ; (9..5) Selects wire to drive onto
+                                          ; DTB bit 0:
+BIT_SATA_PHYCLK_MPLLC_DTB_SEL1       * 10 ; (14..10) Selects wire to drive onto
+                                          ; DTB bit 1:
+BIT_SATA_PHYCLK_MPLLC_RESERVED0      * 15 ; Reserved
+
+HW_SATA_PHY_CLOCK_MPLL_TEST_ADDR      *  (0x17) ; MPLL Test Register
+BIT_SATA_PHYCLK_MPLLT_ATB_SENSE      * 0  ; Hooks up ATB sense lines
+BIT_SATA_PHYCLK_MPLLT_MEAS_GD        * 1  ; Measures Ground For correct
+                                          ; measurements, this field must be set
+                                          ; when various meas_iv bits are set.
+BIT_SATA_PHYCLK_MPLLT_MEAS_IV        * 2  ; (12..2) Measures various MPLL
+                                          ; controls:
+BIT_SATA_PHYCLK_MPLLT_RESET_VAL      * 13 ; Value to override for mpll_reset
+BIT_SATA_PHYCLK_MPLLT_GEARSHIFT_VAL  * 14 ; Value to override for mpll_gearshift
+BIT_SATA_PHYCLK_MPLLT_OVRD_CTL       * 15 ; Overrides MPLL reset and
+                                          ; gearshift controls
+
+HW_SATA_PHY_CLOCK_SS_FREQ_ADDR        *  (0x18); Spread Spectrum Frequency Reg
+BIT_SATA_PHYCLK_SSFREQ_FREQ_CNT_INIT  * 0 ; (6..0)Frequency counter step value.
+BIT_SATA_PHYCLK_SSFREQ_FREQ_PK        * 7 ; (14..7) Peak frequency value
+BIT_SATA_PHYCLK_SSFREQ_FREQ_REG_OVRD  * 14; Override control, indicating
+                                          ; that overridden value is active
+BIT_SATA_PHYCLK_SSFREQ_RESERVED0      * 15; Reserved
+
+HW_SATA_PHY_CLOCK_SEL_STAT_ADDR       *  (0x19) ;Clock Select Status Reg
+BIT_SATA_PHYCLK_CLSEL_MPLL_SS_SEL     * 0 ; (1..0)MPLL spread spectrum sel input
+BIT_SATA_PHYCLK_CLSEL_REF_CLK_SEL     * 2 ; (9..2) Reference clock select input
+BIT_SATA_PHYCLK_CLSEL_RESERVED0       * 10; (15..10) Reserved
+
+HW_SATA_PHY_CLOCK_SEL_OVRD_ADDR       *  (0x1a) ;Clock Select Override Register
+BIT_SATA_PHYCLK_CLSELOVRD_MPLL_SS_SEL  * 0 ; (1..0)MPLL spread spectrum sel input
+BIT_SATA_PHYCLK_CLSELOVRD_REF_CLK_SEL  * 2 ; (9..2) Reference clock select input
+BIT_SATA_PHYCLK_CLSELOVRD_CLK_SEL_OVRD * 10; Override control, indicating that
+                                           ; the overridden value is active
+BIT_SATA_PHYCLK_CLSELOVRD_RESERVED0    * 11; (15..11) reserved
+
+HW_SATA_PHY_CLOCK_RESET_ADDR          *  (0x7f3f) ;SATA_PHY_CLOCK_RESET register
+BIT_SATA_PHYCLK_RESET_RESET           * 0  ; Writing a 1 to this field resets
+                                           ; the SATA2 PHY.
+BIT_SATA_PHYCLK_RESET_RESERVED0       * 1  ; (15..1) reserved
+
+; SATA control structures etc
+;
+; SATA AHCI RX FIS structure , 256 byte aligned!!
+                ^ 0
+SATA_RX_FIS     # 0
+dsfis           # &1c   ; &00..&1B, DMA Setup FIS (7 word)
+rsv0            # 4     ; &1C..&1F, Reserved
+psfis           # &14   ; &20..&33, PID Setup FIS  (5 word)
+rsv1            # &c    ; &34..&3F, Reserved
+rfis            # &14   ; &40..&53, D2H Register FIS (5 word)
+rsv2            # 4     ; &54..&57, Reserved
+sdbfis          # 8     ; &58..&5F, Set Device Bits FIS (2 word)
+ufis            # &40   ; &60..&9F, Unknown FIS
+rsv3            # &60   ; &A0..&FF, Reserved
+SATA_RX_FIS_Size # 0
+        ASSERT SATA_RX_FIS_Size = 256
+;
+; SATA command FIS structure
+                ^ 0
+SATA_CMD        # 0
+fisType         # 1
+pmPort_Cbit     # 1
+command         # 1
+features        # 1
+lbaLow          # 1
+lbaMid          # 1
+lbaHigh         # 1
+device          # 1
+lbaLowExp       # 1
+lbaMidExp       # 1
+lbaHighExp      # 1
+featuresExp     # 1
+sectorNum       # 1
+sectorNumExp    # 1
+rsv1c           # 1
+control         # 1
+rsv2c           # 48
+SATA_CMD_SIZE   # 0
+        ASSERT  SATA_CMD_SIZE = 64
+;
+;
+; SATA CMD fisType defines
+fisT_RFIS_H2D   *       &27     ; Register FIS, Host to Device
+fisT_RFIS_D2H   *       &34     ; Register FIS, Device to Host
+fisT_DAFIS      *       &39     ; DMA Activate FIS, Device to Host
+fisT_DSFIS      *       &41     ; DMA Setup FIS, bidir
+fisT_DFIS       *       &46     ; Data FIS, bidir
+fisT_BAFIS      *       &58     ; BIST Activate, bidir
+fisT_PSFIS      *       &5f     ; PIO setup FIS, Dev to host
+fisT_SDBFIS     *       &a1     ; Set Device Bits FIS, Dev to host
+;
+; sata stuff
+SATA_READ       *       0
+SATA_WRITE      *       1
+
+; SATA CmdList header, 32 bytes
+                        ^       0
+SATA_CMD_HEADER         #       0
+cmdH_info               #       4       ; descr info
+cmdH_info_cfl           *       0       ; Bit4:0, Command FIS Length
+cmdH_info_atapi         *       5       ; Bit5, ATAPI
+cmdH_info_write         *       6       ; Bit6, Write - direction of operation
+cmdH_info_prefetch      *       7       ; Bit7, Prefetchable
+cmdH_info_reset         *       8       ; Bit8, Reset
+cmdH_info_bist          *       9       ; Bit9, BIST
+cmdH_info_clear         *       10      ; Bit10, Clear Busy upon R_OK
+cmdH_info_rsv           *       11      ; Bit11, Reserved
+cmdH_info_pmp           *       12      ; Bit15:12, Port Multiplier Port
+cmdH_info_prdtl         *       16      ; Bit31:15, Physical Region Descriptor Table Len
+cmdH_prdbc              #       4       ; Physical Region Descriptor Byte Count
+cmdH_ctba               #       4       ; Command Table Descriptor Base Address, 256 align
+cmdH_ctba_u             #       4       ; Command Table Descriptor Base Address Upper 32bit
+cmdH_rsv1               #       16      ; Reserved
+SATA_CMD_HEADER_SIZE    #       0
+        ASSERT  SATA_CMD_HEADER_SIZE = 32
+; SATA Physical Region Descriptor, 16 bytes
+                        ^       0
+sataPRD                 #       0
+sataPRD_dba             #       4       ; Data Address, bit0 must be zero
+sataPRD_dbau            #       4       ; Data Address Upper 32-bits
+sataPRD_rsv             #       4       ; Reserved
+sataPRD_info            #       4       ; byte count and int on complete
+sataPRD_dbc_ioc         *       0       ; 21..0 Data Byte Count, Bit 0 must be 1
+sataPRD_IOC             *       31      ; irq on complete if 1
+sataPRD_SIZE            #       0
+        ASSERT  sataPRD_SIZE = 16
+; SATA Command Table
+                        ^       0
+sataCMDTab              #       0
+sataCMDT_CMD            #       SATA_CMD_SIZE   ; SATA_CMD structure 256 aligned
+sataCMDT_acmd           #       16              ; ATAPI cmd, max 16 bytes
+sataCMDT_resv           #       48              ; reserved
+sataCMDT_prdt           #       sataPRD_SIZE    ; theres 1, but could in theory
+                                                ; be 65535
+sataCMDT_SIZE           #       0
+
+
+; ATAPI commands
+ATAPI_COMMAND_DEVICE_RESET                      * &08
+ATAPI_COMMAND_READ_SECTOR                       * &20
+ATAPI_COMMAND_WRITE_SECTOR                      * &30
+ATAPI_COMMAND_DIAGNOSIS                         * &90
+ATAPI_COMMAND_PACKET                            * &A0
+ATAPI_COMMAND_READ_DMA_QUEUED                   * &C7
+ATAPI_COMMAND_READ_DMA                          * &C8
+ATAPI_COMMAND_WRITE_DMA                         * &CA
+ATAPI_COMMAND_WRITE_DMA_QUEUED                  * &CC
+ATAPI_COMMAND_CFA_WRITE_MULTI_W_OUT_ERASE       * &CD
+ATAPI_COMMAND_CFA_WRITE_SECTOR_W_OUT_ERASE      * &CD
+ATAPI_COMMAND_STBY_IMMEDIATE                    * &E0
+ATAPI_COMMAND_IDLE_IMMEDIATE                    * &E1
+ATAPI_COMMAND_READ_BUFFER                       * &E4
+ATAPI_COMMAND_CHK_PWR_MODE                      * &E5
+ATAPI_COMMAND_SLEEP                             * &E6
+ATAPI_COMMAND_WRITE_BUFFER                      * &E8
+ATAPI_COMMAND_IDENTIFY_DEVICE                   * &EC
+ATAPI_COMMAND_SET_FEATURES                      * &EF
+ATAPI_COMMAND_SEC_ERS_PREP                      * &F3
+ATAPI_COMMAND_FORMAT                            * &F7
+
+; SATA identify command data structure
+; defined based on ATAPI7 specification(T13/1532D)
+; all parameters are 16 bit parameters, or arrays of 16 bit (_p)
+                        ^       0
+SID_Base                        #       0
+SID_general_conf                #       2       ; 00    : general configuration
+SID_num_cylinders               #       2       ; 01    : number of cylinders (default CHS trans)
+SID_specific_conf               #       2       ; 02    : specific configuration
+SID_num_heads                   #       2       ; 03    : number of heads (default CHS trans)
+SID_num_ub_per_track            #       2       ; 04    : number of unformatted bytes per track
+SID_num_ub_per_sector           #       2       ; 05    : number of unformatted bytes per sector
+SID_num_sectors                 #       2       ; 06    : number of sectors per track (default CHS trans)
+SID_rsv5p                       #       4       ; 07-08 : number of sectors per card
+SID_rsv6                        #       2       ; 09    : reserved
+SID_serial_p                    #       20      ; 10-19 : serial number (string)
+SID_rsv7                        #       2       ; 20    : buffer type (dual ported)
+SID_rsv8                        #       2       ; 21    : buffer size in 512 increments
+SID_rsv9                        #       2       ; 22    : number of ECC bytes passed on R/W Long cmds
+SID_fw_rev_p                    #       8       ; 23-26 : firmware revision (string)
+SID_model_num_p                 #       40      ; 27-46 : model number (string)
+SID_rw_mult_support             #       2       ; 47    : max number of sectors on R/W multiple cmds
+SID_rsv10                       #       2       ; 48    : reserved
+SID_capabilities_p              #       4       ; 49-50 : LBA, DMA, IORDY support indicator
+SID_rsv11                       #       2       ; 51    : PIO data transfer cycle timing mode
+SID_rsv12                       #       2       ; 52    : single word DMA data transfer cycle timing mode
+SID_cur_field_validity          #       2       ; 53    : words 54-58 validity (0 == not valid)
+SID_rsv13                       #       2       ; 54    : number of current cylinders
+SID_rsv14                       #       2       ; 55    : number of current heads
+SID_rsv15                       #       2       ; 56    : number of current sectors per track
+SID_rsv16_p                     #       4       ; 57-58 : current capacity in sectors
+SID_mult_sectors                #       2       ; 59    : multiple sector setting
+SID_lba_total_sectors_p         #       4       ; 60-61 : total sectors in LBA mode
+SID_rsv17                       #       2       ; 62    : single word DMA support
+SID_mw_dma                      #       2       ; 63    : multi word DMA support
+SID_apio_modes                  #       2       ; 64    : advanced PIO transfer mode supported
+SID_min_dma_timing              #       2       ; 65    : minimum multiword DMA transfer cycle
+SID_rec_dma_timing              #       2       ; 66    : recommended multiword DMA cycle
+SID_min_pio_timing              #       2       ; 67    : min PIO transfer time without flow control
+SID_min_pio_iordy_timing        #       2       ; 68    : min PIO transfer time with IORDY flow control
+SID_rsv18_p                     #       12      ; 69-74 : reserved
+SID_queue_depth                 #       2       ; 75    : queue depth
+SID_rsv19_p                     #       8       ; 76-79 : reserved for SATA
+SID_major_ver                   #       2       ; 80    : major version number
+SID_minor_ver                   #       2       ; 81    : minor version number
+SID_cmd_set_supp_p              #       6       ; 82-84 : command set supported
+SID_cmd_set_enabled_p           #       6       ; 85-87 : command set/feature enabled
+SID_ultra_dma_mode              #       2       ; 88    : ultra dma modes
+SID_sec_ers_unit_time           #       2       ; 89    : time required for security erase unit completion
+SID_enhance_sec_ers_time        #       2       ; 90    : time required for enhanced security erase completion
+SID_current_pm_val              #       2       ; 91    : current advanced power management value
+SID_master_pwd_rev              #       2       ; 92    : master password revision code
+SID_hw_conf_tst_result          #       2       ; 93    : hardware configuration test result
+SID_acoustic_mng_val            #       2       ; 94    : automatic acoustic management value
+SID_stream_min_req_sz           #       2       ; 95    : stream minimum request size
+SID_stream_trans_time_dma       #       2       ; 96    : streaming transfer time - dma
+SID_stream_access_latency       #       2       ; 97    : streaming access latency - dma and pio
+SID_stream_perf_gran_p          #       4       ; 98-99 : streaming performance granularity
+SID_max_48b_lba_addr_p          #       8       ; 100-103:maximum user lba for 48b address feature set
+SID_stream_trans_time_pio       #       2       ; 104   : streaming transfer time - pio
+SID_rsv20                       #       2       ; 105   : reserved
+SID_sector_size                 #       2       ; 106   : physical sector size/logical sector size
+SID_inter_seek_delay_us         #       2       ; 107   : inter-seek delay for ISO-7799 acoustic testing in ms
+SID_world_wide_name_p           #       8       ; 108-111:world wide name
+SID_rsv21_p                     #       8       ; 112-115:reserved for world wide name extension to 128bits
+SID_rsv22                       #       2       ; 116   : reserved for technical report
+SID_sector_sz_in_word_p         #       4       ; 117-118:words per logical sector
+SID_rsv23_p                     #       16      ; 119-126:reserved
+SID_rem_stat_notify_supp        #       2       ; 127   : removable mdedia status notification feature set support
+SID_security_status             #       2       ; 128   : security status
+SID_vendor_specific_p           #       62      ; 129-159:vendor specific
+SID_cfa_pwr_mode_1              #       2       ; 160   : CFA power mode 1
+SID_rsv24_p                     #       30      ; 161-175:reserved for assignment by the CF association
+SID_sn_p                        #       60      ; 176-205:current media serial number
+SID_rsv25_p                     #       98      ; 206-254: reserved
+SID_integrity                   #       2       ; 255   : 15-8 -> checksum; 7-0 -> signature;
+SID_SIZE                         #      0
+        ASSERT (SID_SIZE) = 512
+
+        ] ; __HAL_SATA_HDR__
+        END

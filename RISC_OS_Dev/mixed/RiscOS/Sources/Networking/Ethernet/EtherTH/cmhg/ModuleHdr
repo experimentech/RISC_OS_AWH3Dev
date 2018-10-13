@@ -1,0 +1,52 @@
+#include "Global/Services.h"
+#include "VersionNum"
+
+help-string:  EtherTH Module_MajorVersion_CMHG
+title-string: EtherTH
+date-string:  Module_Date_CMHG
+
+
+initialisation-code:    module_init
+finalisation-code:      module_final
+
+service-call-handler:   module_service      Service_EnumerateNetworkDrivers,
+                                            Service_DCIProtocolStatus,
+                                            Service_MbufManagerStatus,
+                                            Service_PreReset,
+                                            Service_ResourceFSStarting
+
+swi-chunk-base-number:  0x59500
+swi-handler-code:       module_swi
+swi-decoding-table:     EtherTH,
+                        DCIVersion,
+                        Inquire,
+                        GetNetworkMTU,
+                        SetNetworkMTU,
+                        Transmit,
+                        Filter,
+                        Stats,
+                        MulticastRequest
+
+international-help-file: "Resources:$.Resources."Module_ComponentName".Messages"
+
+
+command-keyword-table:  module_commands
+        ETHInfo(min-args:0, max-args:2,
+                international:,
+                help-text:      "HInfo",
+                invalid-syntax: "SInfo"),
+
+        ETHConfig(min-args:1, max-args:3,
+                international:,
+                help-text:      "HConfig",
+                invalid-syntax: "SConfig"),
+
+        ETHTune(min-args:1, max-args:5,
+                international:,
+                help-text:      "HTune",
+                invalid-syntax: "STune")
+
+
+
+vector-handlers:        device_interrupt,
+                        ar8031_mii_interrupt

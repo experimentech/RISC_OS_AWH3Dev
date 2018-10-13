@@ -1,0 +1,29 @@
+                         +3v3  01 * * 02 +5v
+                         PA12  03 * * 04 +5v
+                         PA11  05 * * 06 GND
+                         PA06  07 * * 08 PA13 SPI1_CS
+                         GND   09 * * 10 PA14 SPI1_CLK
+                         PA01  11 * * 12 PD12 RGMII_NULL
+                         PA00  13 * * 14 GND
+                         PA03  15 * * 16 PC04 NCE0
+                         +3V3  17 * * 18 PC07 NRB1
+                         PC00  19 * * 20 GND
+                         PC01  21 * * 22 PA02 UART2_RTS
+                         PC02  23 * * 24 PC03 NCE1
+                         GND   25 * * 26 PA21 PCM0_DIN
+                         PA19  27 * * 28 PA18 PCM0_SYNC
+                         PA07  29 * * 30 GND
+                         PA08  31 * * 32 PG08 UART1_RTS
+                         PA09  33 * * 34 GND
+                         PA10  35 * * 36 PG09 UART1_CTS
+                         PA20  37 * * 38 PG06 UART1_TX
+                         GND   39 * * 40 PG07 UART1_RX
+
+
+
+PA6 LED 0
+PA13 LED 1
+
+PL2 USB OTG
+
+

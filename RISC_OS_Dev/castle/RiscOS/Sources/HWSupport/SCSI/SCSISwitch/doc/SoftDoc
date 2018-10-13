@@ -1,0 +1,308 @@
+                       The SCSI Switcher system
+                       ========================
+
+An increasing number of devices are using SCSI command protocols over
+non-SCSI connections. Examples include ATAPI (SCSI-over-ATA), Iomega Zip
+drives (SCSI-over-Parallel) and USB Mass Storage devices (SCSI-over-USB).
+
+Hitherto, the standard RISC OS SCSI programming interface has been provided
+by a "SCSIdriver" module appropriate for whichever SCSI interface was
+fitted to a machine. This system does not allow for more than one type of
+SCSI interface card to be fitted to a machine, and precludes easy integration
+of SCSI-like devices.
+
+The SCSI Switcher system rectifies the situation by acting as the "SCSIdriver"
+module, and dispatching the SCSI SWIs to multiple hardware drivers. SCSI
+hardware drivers interfacing to the SCSI Switcher can be simpler than a full
+SCSIdriver module, as the Switcher itself handles many of the higher-level
+calls and details like device reservation.
+
+Differences between SCSIdriver 2 (the SCSI Switcher) and
+SCSIdriver 1 (the original Acorn expansion card driver)
+=======================================================
+
+From the application programmers point of view, there should be little visible
+difference between a system using the SCSI Switcher and a system with a standalone
+SCSIdriver module. One point to note is that SCSI_Version may not accurately report
+the capabilities of every device - for example some devices may support
+background operations, others may not.
+
+SCSIdriver 2 has some new SWIs and service calls, detailed below.
+
+                             SERVICE CALLS
+                             =============
+
+Service_SCSIStarting
+--------------------
+In: R1 = &20100
+Out: All registers preserved to pass on
+
+Issued as SCSIdriver initialises. The SWIs will not yet be available at this
+point - use a callback to call them if you need to.
+
+Service_SCSIDying
+-----------------
+In: R1 = &20101
+Out: All registers preserved to pass on
+
+Issued before SCSIdriver dies. The SCSI system is still alive at this point,
+but a hardware driver may have shut down if it received this service call
+before you.
+
+Service_SCSIAttached
+--------------------
+In: R0 = device ID
+    R1 = &20102
+    R2 = device ID mask
+
+Issued when a new device or bus is registered with SCSIdriver. A hardware
+driver may issue this itself to indicate that a device has been attached to an
+ID already registered with SCSIdriver.
+
+The mask indicates whether a bus, a device or a unit (potentially multiple)
+has been attached; someone wanting to rescan the bus should scan all devices
+with IDs such that <device ID> AND R2 = R0.
+
+Example:  Bus 0, device 1 attached:         R0 = &01 (0:1.0), R2 = &1F (3:7.0)
+          Bus 3, device 4, unit 5 attached: R0 = &BC (3:4.5), R2 = &FF (3:7.7)
+          Bus 2 attached:                   R0 = &10 (2:0.0), R2 = &18 (2:0.0)
+
+Service_SCSIDetached
+--------------------
+In: R0 = device ID
+    R1 = &20103
+    R2 = device ID mask
+
+Issued when a new device or bus is deregistered with SCSIdriver. A hardware
+driver may issue this itself to indicate that a device has been detached
+without deregistering from SCSIdriver. See Service_SCSIAttached for details
+of the ID mask.
+
+                                 SWIS
+                                 ====
+
+SCSI_Register (SWI &403FF)
+=============
+  R0 
+     Bit 0:      0 => device, 1 => bus
+     Bits 8-15:  highest device number (if bus)
+     Bits 16-23: default host ID (if bus) - 255 signifies no host ID
+     other bits reserved
+  R1 -> handler code
+  R2 = handler R12 value
+  R3 = handler R8 value
+Exit:
+  R0 = device / bus ID (bus ID has LUN/Device fields 0)
+
+This call registers a hardware driver with the SCSI Switcher. The handler
+routine will be called to request various actions (see section below).
+
+SCSI_Deregister (SWI &403FE)
+===============
+  R0 = device / bus ID
+  R1 -> handler code
+  R2 = handler R12 value
+  R3 = handler R8 value
+Exit:
+  -
+
+This call deregisters a hardware driver with the SCSI Switcher. Only the
+bus part of the ID is significant for bus drivers.
+
+The rest of this document covers the information required to write a SCSI
+hardware driver that interfaces to the SCSI Switcher
+
+
+                         WRITING A SCSI HARDWARE DRIVER
+                         ==============================
+
+Buses versus devices
+====================
+Each registration from a hardware driver may provide either a bus, or a
+single device. A standard SCSI interface card would typically provide a bus, a
+USB mass storage driver would typically provide multiple individual devices.
+Depending on the type of registration, the handler routines are called slightly
+differently. This is detailed in the relevant calls.
+
+Reporting operation results
+===========================
+If a command completes, the status byte (eg &00 for GOOD, &02 for CHECK
+CONDITION) is returned in R0. Higher-level functions like sending automatic
+REQUEST SENSE commands (or not), or retrying after Unit Attention (if
+enabled) is handled by the dispatcher. The driver should just return the
+top-level response.
+
+Device IDs
+==========
+All driver entries use standard device IDs:
+  Bits 0..2 Device ID
+       3..4 Bus ID
+       5..7 LUN
+
+The LUN is passed down to the driver to treat as it wishes (eg to be inserted
+into the CDB, placed into an IDENTIFY message, or used in some other
+encapsulation scheme). It is not interpreted by the switcher.
+
+Device reservation (the SCSI R8 access lock) is handled by the dispatcher.
+
+Error returning
+===============
+All driver entries can return a standard SCSI error by returning with V set
+and R0 < 256 - this will be translated into the appropriate standard RISC OS
+SCSI error with number &201nn and the corresponding message. Any other error
+can be returned with V set and R0 >= 256 being a pointer to an error block.
+
+Handler routine
+===============
+  R0..R7 depend on entry number
+  R8  = handle
+  R11 = reason codes
+  R12 = workspace pointer
+
+Any unrecognised or unimplemented reason codes must return with V set and
+R0 = 1 (corresponding to the standard SCSI error "Unknown SCSI SWI number").
+
+All entry points may corrupt R10-R12. All other registers must be preserved
+except where specified by a particular reason code.
+
+Features
+--------
+  R11 = 0
+Out:
+  R1 bit 5: supports scatter lists
+     bit 1: supports background operations
+     all other bits reserved (must be 0)
+
+If a device supports background operations, all operation requests given
+to it will be background ones (foreground SCSI_Op SWIs will be translated
+into background ones by the switcher).
+
+Similarly, if a device supports scatter lists, then all operation requests
+given to it will use scatter lists.
+
+Reset Bus [Buses only]
+---------
+  R1 = host ID
+  R11 = 1
+
+Sets a new host ID and causes a full reset of the SCSI bus by driving the
+SCSI bus RESET line. All commands in progress should be silently cancelled.
+Corresponds to SCSI_Initialise 0. The host ID is the device ID part only -
+the LUN and Card fields are zero.
+
+This call is only issued to bus drivers.
+
+Foreground operation
+--------------------
+ R0 Bits 0..15   Device ID
+    Bit 20       Inhibit Identify message (Parallel SCSI-specific)
+    Bit 21       Inhibit Disconnection (Parallel SCSI-specific)
+    Bits 24..25  00 => no data transfer, 01 => read, 10=>write, 11=>reserved
+    Bit 26       Scatter Bit, if set, R3 is a pointer to a scatter list.
+    Bit 27       If clear, poll escape during transfer and abort if escape
+                 pressed
+    Bit 29       Clear (=> foreground operation)
+    Other bits should be ignored
+ R1 = Length of SCSI control block
+ R2 = Ptr to SCSI control block
+ R3 = RAM ptr for start of transfer or pointer to scatter list of address length
+      pairs if Bit 26 of R0 is set.
+ R4 = Length of transfer (in bytes).
+ R5 = Timeout in centiseconds or 0 for no timeout
+ R11 = 4
+Out:
+ R0 = status byte or error value (depending on V)
+ R4 = Number of bytes not transferred
+
+This call is only issued for drivers that do not support background operations.
+
+The length will be 0 if and only if "no data transfer" is flagged.
+
+The scatter list must not be updated. The driver should accept FileCore-style
+wrapping (ie if an address entry is between &FFFF0000 and &FFFFFFFF, and the
+length field is 0, then that should be treated as an instruction to push the
+scatter list pointer backwards by an offset of up to 64K).
+
+Flag bits 20 and 21 correspond to the settings of SCSI_Control 6, and are
+specific to Parallel (standard) SCSI.
+
+Background operation
+--------------------
+ R0 Bits 0..7    Device ID
+    Bit 20       Inhibit Identify message (Parallel SCSI-specific)
+    Bit 21       Inhibit Disconnection (Parallel SCSI-specific)
+    Bits 24..25  00 => no data transfer, 01 => read, 10=>write, 11=>reserved
+    Bit 26       Scatter Bit, if set, R3 is a pointer to a scatter list.
+    Bit 29       Set (=> background operation)
+ R1 Length of SCSI control block
+ R2 Ptr to SCSI control block (guaranteed valid until command completes)
+ R3 = RAM ptr for start of transfer or pointer to scatter list of address length
+      pairs if Bit 26 of R0 is set.
+ R4 Length of transfer (in bytes).
+ R5 Command handle to pass in R5 for background call back
+ R6 Address to call back when transfer is complete.
+ R7 Workspace pointer to pass in R12 for background call back.
+ R11 = 5
+Out:
+If completed immediately
+ R0 = status byte or error value (depending on V)
+ R4 = amount not transferred
+else
+ R0 = -1
+ R1 = driver handle for operation
+
+The length will be 0 if and only if "no data transfer" is flagged.
+
+Completion/errors can be signalled either immediately, or by returning with
+R0=-1, then calling the callback routine at a later date.
+
+If an immediate error is returned, this will be passed straight back to the
+user, unless the error is &2010D ("Queue full"). This will be taken as an
+indication that the driver is unable to accept the command at this time (eg
+if a driver that can only can only handle 1 command at a time is issued a 2nd
+command while a previous command is still active). The command will be
+reoffered the next time a command for this driver completes. Queue full must
+not be returned if no commands are currently running for the driver.
+
+The scatter list must not be updated. The driver should accept FileCore-style
+wrapping (ie if an address entry is between &FFFF0000 and &FFFFFFFF, and the
+length field is 0, then that should be treated as an instruction to push the
+scatter list pointer backwards by an offset of up to 64K).
+
+Flag bits 20 and 21 correspond to the settings of SCSI_Control 6, and are
+specific to Parallel (standard) SCSI.
+
+The callback must operate as follows:
+    The call is made in privileged mode with IRQs disabled.
+    If the operation completed, V is clear & R0 is set to the SCSI status byte.
+    If an error occurred, V is set and R0 is an error number or pointer.
+    R4 should be set to the data not transferred.
+    R5 and R12 must be set to the values passed in.
+    All registers will be preserved.
+                               
+Cancel background operation
+---------------------------
+ R0 = flags:    Bit 11 = Timeout
+                Bit 12 = Escape
+                Bit 13 = Abort operation
+ R1 = device ID
+ R2 = driver handle for operation
+ R11 = 6
+
+This call is a request to cancel a pending background operation. If the
+driver is able to cancel the operation, the callback routine (as passed in
+the background operation request) should be called with an appropriate error,
+eg R0=&0B ("Timeout"); R0 -> {17,"Escape"}; R0=&12 ("Operation aborted").
+
+Request host description [Buses only]
+------------------------
+ R0 -> 28-byte buffer  [0..7] = Vendor, [8..23] = Product, [24..27] = Revision
+ R1 = device ID
+ R11 = 7
+
+The buffer should be filled in with ASCII data describing the host adapter
+for the bus, to be used by SCSI_Initialise 3 (and hence *SCSIDevices). The data
+corresponds to bytes 8-35 of a SCSI INQUIRY reply.
+
+
+

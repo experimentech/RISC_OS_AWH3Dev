@@ -1,0 +1,179 @@
+;
+; Copyright (c) 2011, RISC OS Open Ltd
+; All rights reserved.
+;
+; Redistribution and use in source and binary forms, with or without
+; modification, are permitted provided that the following conditions are met:
+;     * Redistributions of source code must retain the above copyright
+;       notice, this list of conditions and the following disclaimer.
+;     * Redistributions in binary form must reproduce the above copyright
+;       notice, this list of conditions and the following disclaimer in the
+;       documentation and/or other materials provided with the distribution.
+;     * Neither the name of the copyright holder nor the names of their
+;       contributors may be used to endorse or promote products derived from
+;       this software without specific prior written permission.
+;
+; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+; WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+; DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+; DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+; ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+
+        SUBT    GPIO HAL device constants
+
+OldOpt  SETA    {OPT}
+        OPT     OptNoList+OptNoP1List
+
+ [ :LNOT: :DEF: Included_Hdr_GPIODevice
+                       GBLL Included_Hdr_GPIODevice
+Included_Hdr_GPIODevice SETL {TRUE}
+
+;
+; Extra entries for basic GPIO device with all driver code in the GPIO module
+; HALDevice_Version = 0           
+                                 ^       HALDeviceSize
+HALDevice_GPIOType               #       4
+HALDevice_GPIORevision           #       4
+HALDevice_GPIO_Size              *       :INDEX: @
+;
+; Extra entries for API 0.1 with basic pin based GPIO control in the HAL
+; HALDevice_Version = 1           
+HALDevice_GPIOReadBit            #       4
+HALDevice_GPIOWriteBit           #       4
+HALDevice_GPIOSetAsInput         #       4
+HALDevice_GPIOSetAsOutput        #       4
+HALDevice_GPIOSetAndEnableIRQ    #       4
+HALDevice_GPIOIRQClear           #       4
+HALDevice_GPIODisableIRQ         #       4
+HALDevice_GPIOReadBitAddr        #       4
+HALDevice_GPIODeviceNumber       #       4
+HALDevice_GPIOReservedAPI1       #       4
+HALDevice_GPIO_Size_0_1          *       :INDEX: @
+;
+; Extra entries for API 1.0 with register wide GPIO control in the HAL
+; HALDevice_Version = &10000
+                                 ^       HALDeviceSize
+HALDevice_GPIOPorts              #       4
+HALDevice_GPIONumber             #       4
+HALDevice_GPIOEnumerate          #       4
+HALDevice_GPIOSetDataBits        #       4
+HALDevice_GPIOClearDataBits      #       4
+HALDevice_GPIOToggleDataBits     #       4
+HALDevice_GPIOReadDataBits       #       4
+HALDevice_GPIODataDirection      #       4
+HALDevice_GPIOReadMode           #       4
+HALDevice_GPIOWriteMode          #       4
+HALDevice_GPIOPullControl        #       4
+HALDevice_GPIOPullDirection      #       4
+HALDevice_GPIOEdgeControl        #       4
+HALDevice_GPIOEdgePollStatus     #       4
+HALDevice_GPIO_Size_1_0          *       :INDEX: @
+
+; HALDevice_GPIOEnumerate structure
+                                 ^       0
+GPIOEnumerate_Pin                #       1 ; 5 bit value
+GPIOEnumerate_PinFlags_Output    * 1:SHL:5 ; Capabilities of the pin when used as GPIO
+GPIOEnumerate_PinFlags_Input     * 1:SHL:6
+                                 #       3 ; Spare flags
+GPIOEnumerate_ModesAllowed       #       4 ; Bit field
+GPIOEnumerate_GroupList          #       0 ; Repeats of...
+GPIOEnumerate_GroupListEnd       *      -1
+                                 ^       0
+GPIOGroupList_Number             #       1
+GPIOGroupList_Mode               #       1 ; Opaque 5 bit value
+GPIOGroupList_Type               #       2
+GPIOGroupList_Size               *       :INDEX: @
+
+; Group list types
+                                 ^       0
+GPIOType_GPIO                    #       1 ; GPIO
+GPIOType_I2C                     #       1 ; I2C bus SDA,SCL
+GPIOType_GPCLK                   #       1 ; General Purpose Clock
+GPIOType_SPI                     #       1 ; SPI bus MISO,MOSI,SCLK,CE
+GPIOType_PWM                     #       1 ; Pulse Width Modulator
+GPIOType_UART                    #       1 ; Serial bus TX,RX,CTS,RTS,DCD,DTR,DSR,RI
+GPIOType_PCM                     #       1 ; PCM Audio CLK,FS,DIN,DOUT
+GPIOType_BSC                     #       1 ; BSC bus SDA,SCL,MISO,CE
+GPIOType_JTAG                    #       1 ; JTAG bus TRST,RTCK,TDO,TCK,TDI,TMS
+GPIOType_USB                     #       1 ; USB D+,D-
+GPIOType_LED                     #       1 ; Onboard LED
+GPIOType_SW                      #       1 ; Onboard switch
+
+; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+; NOTE: The following GPIOType/GPIORevision pairs are due for
+; retirement as they were only needed by the original 0.0 API
+; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+;
+; Type & revision values specific to HALDeviceID_GPIO_OMAP3:
+
+                                 ^       0
+GPIOType_OMAP3_BeagleBoard       #       1 ; It's a BeagleBoard or BB-xM
+GPIOType_OMAP3_DevKit8000        #       1 ; It's a DevKit 8000
+GPIOType_OMAP3_IGEPv2            #       1 ; It's an IGEP v2
+GPIOType_OMAP3_Pandora           #       1 ; It's a Pandora
+GPIOType_OMAP3_TouchBook         #       1 ; It's a TouchBook
+
+; BeagleBoard revision values:
+
+                                 ^       0
+                                           ; BeagleBoard:
+GPIORevision_BeagleBoard_AB      #       1 ; Rev A or B
+GPIORevision_BeagleBoard_C123    #       1 ; Rev C1, C2 or C3
+GPIORevision_BeagleBoard_C4      #       1 ; Rev C4
+                                           ; BeagleBoard-xM:
+GPIORevision_BeagleBoard_xMA     #       1 ; Rev A
+GPIORevision_BeagleBoard_xMB     #       1 ; Rev B
+GPIORevision_BeagleBoard_xMC     #       1 ; Rev C
+
+; DevKit revision values:
+
+                                 ^       0
+GPIORevision_DevKit8000_Unknown  #       1
+
+; IGEP revision values:
+
+                                 ^       0
+GPIORevision_IGEPv2_BC           #       1 ; Rev B or C (B-compatible)
+GPIORevision_IGEPv2_C            #       1 ; Rev C (not a B-compatible one)
+
+; Pandora revision values:
+
+                                 ^       0
+GPIORevision_Pandora_Unknown     #       1
+
+; TouchBook revision values:
+
+                                 ^       0
+GPIORevision_TouchBook_Unknown   #       1
+
+; Type & revision values specific to HALDeviceID_GPIO_OMAP4:
+
+                                 ^       0
+GPIOType_OMAP4_Panda             #       1 ; It's a PandaBoard or PandaBoard-ES
+
+; Panda revision values:
+
+                                 ^       0
+GPIORevision_Panda               #       1 ; PandaBoard
+GPIORevision_PandaES             #       1 ; PandaBoard-ES
+
+; iMx6 type and revision values:
+
+                                 ^       0
+GPIOType_iMx6Q                   #       1 ; iMx6Quad
+
+                                 ^       0
+GPIORevision_iMx6Q_WBrevB        #       1 ; Initial development
+GPIORevision_iMx6Q_WBrevC1       #       1 ; Subsequent
+
+ ]
+
+        OPT     OldOpt
+        END

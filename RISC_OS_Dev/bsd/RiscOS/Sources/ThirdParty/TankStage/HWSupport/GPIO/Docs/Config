@@ -1,0 +1,25 @@
+Config block layout
+
+GPIO number	:Bits 0-7
+Pin Mode	;Bits 8-11
+I/O mode	:Bit 12
+PullUp/Down	:Bit 13
+input enable	:Bit 14
+Extended	:Bit 15
+Level 0		:Bit 16
+Level 1		:Bit 17
+Rising		:Bit 18
+Falling		:Bit 19
+Debounce	:Bit 20
+IRQ 1		:Bit 21
+IRQ 2		:Bit 22
+
+
+
+
+
+
+
+
+I2Cflag		:Bit 31
+

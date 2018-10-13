@@ -1,0 +1,13 @@
+Various user setable VarVals with which to tune proceedings:
+
+USB$PowerDownTime      default 200(ms)   Min power down time for a device to
+                                         correctly reset device
+
+USB$PortPowerUpDelay   default 300(ms)   Min time to wait whilst device powers
+                                         up
+
+USB$PortResetDelay     default 100(ms)   Min delay whilst a device is being
+                                         reset
+
+USB$PortStartupDelay   default 100(ms)   Delay after port fully powered up, and
+                                         after issuing port reset command

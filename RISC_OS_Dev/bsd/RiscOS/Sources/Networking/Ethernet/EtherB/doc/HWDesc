@@ -1,0 +1,34 @@
+EtherB NIC
+----------
+Fitted with 80C04 or 80C04A
+ BUSMODE = 1 (uses Intel style nCS/nRD/nWR strobes)
+ BUSSIZE = 1 (but is software detected anyway)
+ nFFEA = 0   (full feature)
+
+The nADUPLEX pin 21 is floating, therefore although the 80C04A has AutoDUPLEX technology (TM) the driver cannot use this. Therefore the stats always report half duplex, and the NetBSD driver declares as simplex, and RX_TX_DISABLE is set in config register 2.
+
+Survey of option links
+----------------------
+J2 -> NIC header A13 (LA9)
+J3 -> NIC header C13 (LA8)
+J4 -> NIC header A12 (LA7)
+J5 -> LONG on 83C94, selecting between 5V or 0V. When high (5V) this increases
+      the receive sensitivity so cables longer than 100m can be used.
+
+                     +---------------------+    +-------+
+    o 5V o E1 o LA9 =| E1              E32 |=   | A B C |
+                     |                     |    |       | 16
+    o 5V o E31o LA8 =|                 E31 |=   |       |
+                     |                     |    |   N   | 15
+    o 5V o E30o LA7 =|                 E30 |=   |   I   |
+                     |                     |    |   C   | 14
+                    =|     27Cxxx EPROM    |=   |       |
+                     |                     |    |       | 13
+                    =|                          |       |
+                     |                          |       | 12
+                    =|
+                     |
+
+With a 27C256 EPROM, there are only 28 pins, so the state of J2 & J3 don't matter. J4 must be in the 5V position since pin E30 becomes the Vcc pin on the installed chip.
+
+With a 27C010 EPROM, E30 is no connect, E31 is nPGM, E1 is Vpp, so all three jumpers should be in the 5V position.

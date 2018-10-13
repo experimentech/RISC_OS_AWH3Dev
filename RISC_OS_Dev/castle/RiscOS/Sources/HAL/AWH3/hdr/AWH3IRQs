@@ -1,0 +1,231 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+;hdr2h safe
+
+;AllWinner H3 interrupt map.
+        [       :LNOT: :DEF: __HAL_AWH3IRQsHDR__
+        GBLL    __HAL_AWH3IRQsHDR__
+
+
+INT_SGI_0                   *               0
+INT_SGI_1                   *               1
+INT_SGI_2                   *               2
+INT_SGI_3                   *               3
+INT_SGI_4                   *               4
+INT_SGI_5                   *               5
+INT_SGI_6                   *               6
+INT_SGI_7                   *               7
+INT_SGI_8                   *               8
+INT_SGI_9                   *               9
+INT_SGI_10                  *               10
+INT_SGI_11                  *               11
+INT_SGI_12                  *               12
+INT_SGI_13                  *               13
+INT_SGI_14                  *               14
+INT_SGI_15                  *               15
+
+INT_PPI_0                   *               16
+INT_PPI_1                   *               17
+INT_PPI_2                   *               18
+INT_PPI_3                   *               19
+INT_PPI_4                   *               20
+INT_PPI_5                   *               21
+INT_PPI_6                   *               22
+INT_PPI_7                   *               23
+INT_PPI_8                   *               24
+INT_PPI_9                   *               25
+INT_PPI_10                  *               26
+INT_PPI_11                  *               27
+INT_PPI_12                  *               28
+INT_PPI_13                  *               29
+INT_PPI_14                  *               30
+INT_PPI_15                  *               31
+INT_UART_0                  *               32
+INT_UART_1                  *               33
+INT_UART_2                  *               34
+INT_UART_3                  *               35
+;                                           36
+;                                           37
+INT_TWI_0                   *               38
+INT_TWI_1                   *               39
+INT_TWI_2                   *               40
+;                                           41
+;                                           42
+INT_PA_EINT                 *               43
+INT_OWA                     *               44
+INT_I2S_PCM0                *               45
+INT_I2S_PCM1                *               46
+INT_I2S_PCM2                *               47
+;                           *               48
+INT_PG_EINT                 *               49
+INT_TIMER_0                 *               50
+INT_TIMER_1                 *               51
+;                           *               52
+;                           *               53
+;                           *               54
+;                           *               55
+;                           *               56
+INT_WATCHDOG                *               57
+;                           *               58
+;                           *               59
+;                           *               60
+INT_AUDIO_CODEC             *               61
+INT_KEYADC                  *               62
+INT_THS                     *               63
+INT_EXTERNAL_NMI            *               64
+
+;OpenRISC Core stuff. I think?
+INT_R_TIMER_0               *               65
+INT_R_TIMER_1               *               66
+;                           *               67
+INT_R_WATCHDOG              *               68
+INT_CIR_RX                  *               69
+INT_R_UART                  *               70
+;                           *               71
+INT_R_ALARM_0               *               72
+INT_R_ALARM_1               *               73
+INT_R_TIMER_2               *               74
+INT_R_TIMER_3               *               75
+INT_R_TWI                   *               76
+INT_R_PL_EINT               *               77
+INT_R_TWD                   *               78
+;                           *               79
+;                           *               80
+INT_M_BOX                   *               81
+INT_DMA                     *               82
+INT_HS_TIMER                *               83
+;                           *               84
+;                           *               85
+;                           *               86
+;                           *               87
+INT_SMC                     *               88
+;                           *               89
+INT_VE                      *               90
+;                           *               91
+INT_SD_MMC_0                *               92
+INT_SD_MMC_1                *               93
+INT_SD_MMC_2                *               94
+;                           *               95
+;                           *               96
+INT_SPI_0                   *               97
+INT_SPI_1                   *               98
+;                           *               99
+;                           *               100
+;                           *               101
+INT_NAND                    *               102
+INT_USB_OTG_DEVICE          *               103
+INT_USB_OTG_EHCI_0          *               104
+INT_USB_OTG_OHCI_0          *               105
+INT_USB_EHCI_1              *               106
+INT_USB_OHCI_1              *               107
+INT_USB_EHCI_2              *               108
+INT_USB_OHCI_2              *               109
+INT_USB_EHCI_3              *               110
+INT_USB_OHCI_3              *               111
+
+INT_SS_S                    *               112
+INT_TS                      *               113
+INT_EMAC                    *               114
+INT_SCR                     *               115
+INT_CSI                     *               116
+INT_CSI_CCI                 *               117
+INT_LCD_0                   *               118
+INT_LCD_1                   *               119
+INT_HDMI                    *               120
+;                           *               121
+;                           *               122
+;                           *               123
+INT_TVE                     *               124
+INT_DIT                     *               125
+INT_SS_NS                   *               126
+INT_DE                      *               127
+;                           *               128
+INT_GPU_GP                  *               129
+INT_GPU_GPMMU               *               130
+INT_GPU_PP0                 *               131
+INT_GPU_PPMMU0              *               132
+INT_GPU_PMU                 *               133
+INT_GPU_PP1                 *               134
+INT_GPU_PPMMU1              *               135
+;                           *               136
+;                           *               137
+;                           *               138
+;                           *               139
+INT_CTI0                    *               140
+INT_CTI1                    *               141
+INT_CTI2                    *               142
+INT_CTI3                    *               143
+INT_COMMTX0                 *               144
+INT_COMMTX1                 *               145
+INT_COMMTX2                 *               146
+INT_COMMTX3                 *               147
+INT_COMMRX0                 *               148
+INT_COMMRX1                 *               149
+INT_COMMRX2                 *               150
+INT_COMMRX3                 *               151
+INT_PMU0                    *               152
+INT_PMU1                    *               153
+INT_PMU2                    *               154
+INT_PMU3                    *               155
+INT_AXI_ERROR               *               156
+
+;needs the  next clean multiple of 16.
+;160 / 16 = 10
+
+;BELOW IS I.MX6 COMPAT STUFF. Poached from its header
+SW_INTERRUPT_0          *               INT_SGI_0   ;< Software interrupt 0.
+SW_INTERRUPT_1          *               INT_SGI_1   ;< Software interrupt 1.
+SW_INTERRUPT_2          *               INT_SGI_2   ;< Software interrupt 2.
+SW_INTERRUPT_3          *               INT_SGI_3   ;< Software interrupt 3.
+SW_INTERRUPT_4          *               INT_SGI_4   ;< Software interrupt 4.
+SW_INTERRUPT_5          *               INT_SGI_5   ;< Software interrupt 5.
+SW_INTERRUPT_6          *               INT_SGI_6   ;< Software interrupt 6.
+SW_INTERRUPT_7          *               INT_SGI_7   ;< Software interrupt 7.
+SW_INTERRUPT_8          *               INT_SGI_8   ;< Software interrupt 8.
+SW_INTERRUPT_9          *               INT_SGI_9   ;< Software interrupt 9.
+SW_INTERRUPT_10         *               INT_SGI_10  ;< Software interrupt 10.
+SW_INTERRUPT_11         *               INT_SGI_11  ;< Software interrupt 11.
+SW_INTERRUPT_12         *               INT_SGI_12  ;< Software interrupt 12.
+SW_INTERRUPT_13         *               INT_SGI_13  ;< Software interrupt 13.
+SW_INTERRUPT_14         *               INT_SGI_14  ;< Software interrupt 14.
+SW_INTERRUPT_15         *               INT_SGI_15  ;< Software interrupt 15.
+
+;Ooh. Are these 1 based?
+IMX_INT_UART1           *               INT_UART_0  ;< Logical OR of UART1 interrupt requests.
+IMX_INT_UART2           *               INT_UART_1  ;< Logical OR of UART2 interrupt requests.
+IMX_INT_UART3           *               INT_UART_2  ;< Logical OR of UART3 interrupt requests.
+IMX_INT_UART4           *               INT_UART_3  ;< Logical OR of UART4 interrupt requests.
+
+IMX_INT_I2C1            *               INT_TWI_0  ;< I2C1 interrupt request.
+IMX_INT_I2C2            *               INT_TWI_1  ;< I2C2 interrupt request.
+IMX_INT_I2C3            *               INT_TWI_2  ;< I2C3 interrupt request.
+
+IMX_INT_TEMPERATURE     *               INT_THS  ;< Temperature Sensor (temp.
+IMX_INT_WDOG1           *               INT_WATCHDOG ;< WDOG1 timer reset
+
+
+      ] ; __HAL_AWH3IRQsHDR__
+
+
+
+
+
+
+
+        END

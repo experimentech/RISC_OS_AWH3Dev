@@ -1,0 +1,150 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+;hdr2h safe
+
+;UART.hdr
+
+;base addresses - defined in AllWinnerH3.hdr
+;UART_0		*	&01C28000
+;UART_1		*	&01C28400
+;UART_2		*	&01C28800
+;UART_3		*	&01C28C00
+;R_UART		*	&01F02800
+
+;ignoring R_UART
+UART_Number *   4
+;UART Registers
+
+UART_RBR	*	&00
+UART_THR	*	&00
+UART_DLL	*	&00
+UART_DLH	*	&04
+UART_IER	*	&04
+UART_IIR	*	&08
+UART_FCR	*	&08
+UART_LCR	*	&0C
+UART_MCR	*	&10
+UART_LSR	*	&14
+UART_MSR	*	&18
+UART_SCH	*	&1C
+UART_USR	*	&7C
+UART_TFL	*	&80
+UART_RFL	*	&84
+UART_HALT	*	&A4
+
+;Register flags etc
+
+;UART_RBR
+RBR_RBR         *   2_11111111
+
+;UART_THR
+THR_THR         *   2_11111111
+
+;UART_DLL
+DLL_DLL         *   2_11111111
+
+;UART_DLH
+DLH_DLH         *   2_11111111
+
+;UART_IER
+IER_PTIME       *   2_10000000
+IER_EDSSI       *   2_00001000
+IER_ELSI        *   2_00000100
+IER_ETBEI       *   2_00000010
+IER_ERBFI       *   2_00000001
+
+;UART_IIR
+IIR_FEFLAG      *   2_11000000
+IIR_IID         *   2_00001111
+;IID interrupt status
+;0000: MODEM status
+;0001: No interrupt pending
+;0010: THR empty
+;0100: Received data available
+;0110: Receiver line status
+;0111: Busy detect
+;1100: Character timeout
+
+;UART_FCR
+FCR_RT          *   2_11000000
+FCR_TFT         *   2_00110000
+FCR_DMAM        *   2_00001000
+FCR_XFIFOR      *   2_00000100
+FCR_RFIFOR      *   2_00000010
+FCR_FIFOE       *   2_00000001
+
+;UART_LCR
+LCR_DLAB        *   2_10000000
+LCR_BC          *   2_01000000
+LCR_EPS         *   2_00110000
+LCR_PEN         *   2_00001000
+LCR_STOP        *   2_00000100
+LCR_DLS         *   2_00000011
+
+;UART_MCR
+MCR_AFCE        *   2_00100000
+MCR_LOOP        *   2_00010000
+MCR_RTS         *   2_00000010
+MCR_DTR         *   2_00000001
+
+;UART_LSR
+LSR_FIFOERR     *   2_10000000
+LSR_TEMT        *   2_01000000
+LSR_THRE        *   2_00100000
+LSR_BI          *   2_00010000
+LSR_FE          *   2_00001000
+LSR_PE          *   2_00000100
+LSR_OE          *   2_00000010
+LSR_DR          *   2_00000001
+
+;UART_MSR
+MSR_DCD         *   2_10000000  ;Oh... Can't just use DSD can I!
+MSR_RI          *   2_01000000
+MSR_DSR         *   2_00100000
+MSR_CTS         *   2_00010000
+MSR_DDCD        *   2_00001000
+MSR_TERI        *   2_00000100
+MSR_DDSR        *   2_00000010
+MSR_DCTS        *   2_00000001
+
+;UART_SCH
+SCH_SCRATCH_REG *   2_11111111
+
+;UART_USR
+USR_RFF         *   2_00010000
+USR_RFNE        *   2_00001000
+USR_TFE         *   2_00000100
+USR_TFNF        *   2_00000010
+USR_BUSY        *   2_00000001
+
+;UART_TFL
+TFL_TFL         *   2_01111111
+
+;UART_HALT
+HALT_SIR_RX_INVERT * 2_00100000
+HALT_SIR_TX_INVERT * 2_00010000
+HALT_CHANGE_UPDATE * 2_00000100
+HALT_CHCFG_AT_BUSY * 2_00000010
+HALT_HALT_TX       * 2_00000001
+
+UARTCLK         *       24000000
+
+
+
+   END

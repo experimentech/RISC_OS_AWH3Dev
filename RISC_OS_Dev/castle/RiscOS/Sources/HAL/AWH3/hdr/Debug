@@ -1,0 +1,96 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+;----------------------
+; Macros
+;----------------------
+
+
+      [ Debug :LAND: :LNOT: :DEF: DebugExported
+        IMPORT  DebugHALPrint
+        IMPORT  DebugHALPrintReg
+        IMPORT  DebugHALPrintByte
+        IMPORT  DebugCallstack
+        IMPORT  DebugMemDump
+      ]
+
+        MACRO
+        DebugChar $temp1,$temp2,$char
+      [ Debug :LAND: {FALSE}
+        LDR     $temp1, DebugUART
+        MOV     $temp2,#$char
+        STRB    $temp2,[$temp1]
+      ]
+        MEND
+
+        MACRO
+        DebugTX $str
+      [ Debug
+        BL      DebugHALPrint
+        =       "$str", 13, 10, 0
+        ALIGN
+      ]
+        MEND
+
+        MACRO
+        DebugReg $reg, $str
+      [ Debug
+        Push   "$reg"
+        [ "$str" <> ""
+        BL     DebugHALPrint
+        =      "$str",0
+        ALIGN
+        ]
+        BL     DebugHALPrintReg
+      ]
+        MEND
+
+        MACRO
+        DebugRegByte $reg, $str
+      [ Debug
+        Push   "$reg"
+        [ "$str" <> ""
+        BL     DebugHALPrint
+        =      "$str",0
+        ALIGN
+        ]
+        BL     DebugHALPrintByte
+      ]
+        MEND
+;just fall through them if used.
+        MACRO
+        DebugTime $temp,$str
+;These don't even exist in the target.
+      [ DebugTiming
+;        LDR     $temp,L4_32KTIMER_Log
+;        LDR     $temp,[$temp,#16] ; REG_32KSYNCNT_CR
+;        DebugReg $temp, "$str"
+      ]
+        MEND
+
+        MACRO
+        DebugTimeNoMMU $temp,$str
+      [ DebugTiming
+ ;       LDR     $temp,=&48320000
+ ;       LDR     $temp,[$temp,#16]
+ ;       DebugReg $temp, "$str"
+      ]
+        MEND
+
+
+    END
+

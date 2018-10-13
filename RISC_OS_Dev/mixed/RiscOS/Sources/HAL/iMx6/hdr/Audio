@@ -1,0 +1,73 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+; 
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+; 
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_AUDIO_HDR__
+        GBLL    __HAL_AUDIO_HDR__
+                                                             
+        GET     Hdr:AudioDevice
+        GET     Hdr:MixerDevice
+
+        ; Despite being labelled LINE OUT on the case, the Wandboard actually
+        ; uses the headphone out signal. Disable the code related to it to
+        ; avoid confusion.
+        GBLL    UseLineOut
+UseLineOut SETL {FALSE}
+
+
+; Audio device
+                        ^       0, a1
+; Public bits
+AudioDevice             #       HALDevice_Audio_Size_1
+; Private bits
+AudioWorkspace          #       4       ; HAL SB
+AudioRate               #       4       ; Pointer to current audio rate
+AudioEnabled            #       1       ; Nonzero if sound enabled (mixer mute changes should be applied immediately)
+AudioPower              #       1       ; Nonzero if power is on
+SGTLInit                #       1       ; Nonzero if SGTL is initialised
+                        #       1       ; Spare
+Audio_DeviceSize        *       :INDEX: @
+
+; Mixer device
+
+                         ^       0
+MixerChannel_DAC         #       1 ; CHIP_DAC_VOL
+ [ UseLineOut
+MixerChannel_LineOut     #       1 ; CHIP_LINE_OUT_VOL
+ ]
+MixerChannel_HP          #       1 ; CHIP_ANA_HP_CTRL
+MixerChannels            *       :INDEX: @
+
+                        ^       0, a1
+; Public bits
+MixerDevice             #       HALDevice_Mixer_Size + 4        ; +4 for API 0.1
+; Private bits
+MixerDACVol             #       2 ; Cached CHIP_DAC_VOL reg
+ [ UseLineOut
+MixerLineOut            #       2 ; Cached CHIP_LINE_OUT_VOL reg
+ ]
+MixerHP                 #       2 ; Cached CHIP_ANA_HP_CTRL reg
+MixerADCDACMute         #       2 ; Cached mute settings from CHIP_ADCDAC_CTRL
+MixerAnaMute            #       2 ; Cached mute settings from CHIP_ANA_CTRL
+                        AlignSpace
+Mixer_DeviceSize        *       :INDEX: @
+
+Audio_WorkspaceSize     *       (Audio_DeviceSize + Mixer_DeviceSize)
+
+        ] ; __HAL_AUDIO_HDR__
+
+        END

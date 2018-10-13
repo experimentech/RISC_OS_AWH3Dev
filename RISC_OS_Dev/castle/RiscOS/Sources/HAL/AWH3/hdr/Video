@@ -1,0 +1,33 @@
+;base addresses
+;&01ee0000 (sun8i, sun50i) -h3 is sun8i
+;&03d00000 (sun9i) - aarch64
+;Not sure this file is actually used any more.
+
+MODE_1BPP    *    1 << 0
+MODE_2BPP    *    1 << 1
+MODE_4BPP    *    1 << 2
+MODE_8BPP    *    1 << 3
+MODE_16BPP   *    1 << 4
+MODE_32BPP   *    1 << 5
+
+FB_START     *    &7Fe79000
+FB_SIZE      *    &00178e00
+
+;Random video stuff
+
+;BUS_CLK_HDMI_GATE no idea
+
+
+;HDMI_SLOW_CLK ;For HDMI CEC maybe?
+
+;PLL3_CLK
+;From Sunxi wiki:
+; is input to PHY PLL. 1/16 pre divider for TCON? pixclk.
+
+;HDMI_CLK - Unused
+
+;Resets-
+;HDMI0_RST - resets inner controller
+;HDMI1_RST resets the outer wrapper. (obfuscated thing / PHY?)
+
+        END

@@ -1,0 +1,3 @@
+Dir <Obey$Dir>
+WimpSlot -min 32768K
+amu_machine rom _debug linked.AWH3 THROWBACK=-throwback

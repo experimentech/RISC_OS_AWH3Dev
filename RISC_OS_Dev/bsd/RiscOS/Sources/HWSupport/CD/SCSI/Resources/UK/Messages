@@ -1,0 +1,6 @@
+#{DictTokens}
+BadArgs:Bad argument
+BadResp:Bad response from device
+NotAud:Not audio
+NoTrack:No such track
+SWINSup:Soft-load driver does not support this CD_ SWI

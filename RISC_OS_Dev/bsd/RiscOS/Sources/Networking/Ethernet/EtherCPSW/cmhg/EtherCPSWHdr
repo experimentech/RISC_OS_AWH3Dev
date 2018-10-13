@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2014, Elesar Ltd
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met: 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Elesar Ltd nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+#include "Global/Services.h"
+#include "VersionNum"
+
+title-string:           Module_ComponentName
+
+help-string:            Module_ComponentName Module_MajorVersion_CMHG Module_MinorVersion_CMHG
+
+date-string:            Module_Date_CMHG
+
+international-help-file:"Resources:$.Resources."Module_ComponentName".Messages"
+
+initialisation-code:    ethercp_init
+
+finalisation-code:      ethercp_final
+
+service-call-handler:   ethercp_services Service_EnumerateNetworkDrivers,
+                                         Service_DCIProtocolStatus,
+                                         Service_MbufManagerStatus,
+                                         Service_ResourceFSStarting,
+                                         Service_PreReset
+
+swi-chunk-base-number:  0x59600
+
+swi-handler-code:       ethercp_swis
+
+swi-decoding-table:     EtherCP,
+                        DCIVersion Inquire GetNetworkMTU SetNetworkMTU,
+                        Transmit Filter Stats
+
+vector-handlers:        intr
+
+generic-veneers:        ethercp_driver_linked,
+                        ethercp_heartbeat
+
+command-keyword-table:  ethercp_commands
+        ECPInfo(min-args:0, max-args:1,
+                international:,
+                help-text:      "HECPI",
+                invalid-syntax: "SECPI"),
+
+        ECPTest(min-args:0, max-args:1,
+                international:,
+                help-text:      "HECPT",
+                invalid-syntax: "SECPT"),
+
+        ECPVirtual(min-args:1, max-args:1,
+                configure:,
+                international:,
+                help-text:      "HECPV",
+                invalid-syntax: "SECPV"),
+
+        ECPLink(min-args:2, max-args:4,
+                configure:,
+                international:,
+                help-text:      "HECPL",
+                invalid-syntax: "SECPL"),
+
+        ECPAdvertise(min-args:2, max-args:8,
+                configure:,
+                international:,
+                help-text:      "HECPA",
+                invalid-syntax: "SECPA"),
+
+        ECPFlowControl(min-args:2, max-args:2,
+                configure:,
+                international:,
+                help-text:      "HECPFC",
+                invalid-syntax: "SECPFC")

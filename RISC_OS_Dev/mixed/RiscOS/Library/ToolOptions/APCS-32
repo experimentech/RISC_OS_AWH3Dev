@@ -1,0 +1,47 @@
+| This source code in this file is licensed to You by Castle Technology
+| Limited ("Castle") and its licensors on contractual terms and conditions
+| ("Licence") which entitle you freely to modify and/or to distribute this
+| source code subject to Your compliance with the terms of the Licence.
+| 
+| This source code has been made available to You without any warranties
+| whatsoever. Consequently, Your use, modification and distribution of this
+| source code is entirely at Your own risk and neither Castle, its licensors
+| nor any other person who has contributed to this source code shall be
+| liable to You for any loss or damage which You may suffer as a result of
+| Your use, modification or distribution of this source code.
+| 
+| Full details of Your rights and obligations are set out in the Licence.
+| You should have received a copy of the Licence with this source code file.
+| If You have not received a copy, the text of the Licence is available
+| online at www.castle-technology.co.uk/riscosbaselicence.htm
+| 
+| Tool options for APCS-32
+|
+
+                                 Set Alias$CC %%CC -APCS 3/32bit/fpe3 -memaccess -L22-S22-L41 %%*0
+If "<Machine>"="Archimedes" then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -memaccess -L22-S22+L41 %%*0
+If "<Machine>"="All32"      then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 3 -memaccess -L22-S22-L41 %%*0
+If "<Machine>"="26"         then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -memaccess -L22-S22+L41 %%*0
+If "<Machine>"="32"         then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 3 -memaccess -L22-S22+L41 %%*0
+If "<Machine>"="Tungsten"   then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 5TE -memaccess +L22+S22+L41 %%*0
+If "<Machine>"="ARM11ZF"    then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 6 -memaccess +L22+S22-L41 %%*0
+If "<Machine>"="RPi"        then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 6 -memaccess +L22+S22-L41 %%*0
+If "<Machine>"="CortexA8"   then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 7 -memaccess +L22+S22-L41 %%*0
+If "<Machine>"="CortexA9"   then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 7 -memaccess +L22+S22-L41 %%*0
+If "<Machine>"="CortexA7"   then Set Alias$CC %%CC -APCS 3/32bit/fpe3 -cpu 7 -memaccess +L22+S22-L41 %%*0
+Unset Build$ObjAsmCPU
+if "<Machine>"="All32"      then Set Build$ObjAsmCPU -cpu 3
+if "<Machine>"="32"         then Set Build$ObjAsmCPU -cpu 3
+if "<Machine>"="Tungsten"   then Set Build$ObjAsmCPU -cpu 5TE
+if "<Machine>"="ARM11ZF"    then Set Build$ObjAsmCPU -cpu 6Z --fpu VFPv2
+if "<Machine>"="RPi"        then Set Build$ObjAsmCPU -cpu 6Z --fpu VFPv2
+if "<Machine>"="CortexA8"   then Set Build$ObjAsmCPU -cpu Cortex-A8
+if "<Machine>"="CortexA9"   then Set Build$ObjAsmCPU -cpu Cortex-A9
+if "<Machine>"="CortexA7"   then Set Build$ObjAsmCPU -cpu Cortex-A7
+Set Alias$ObjAsm %%ObjAsm -APCS 3/32bit/fpe3 <Build$ObjAsmCPU> %%*0
+| Declare an alias for VFP APCS variants (necessary to get the correct word ordering with DCFD)
+Set Alias$ObjAsmVFP %%ObjAsm -APCS 3/32bit/vfp <Build$ObjAsmCPU> %%*0
+Set Alias$CMHG %%CMHG -32bit %%*0
+Set Alias$ResGen %%ResGen -32bit %%*0
+Set Alias$DefMod %%DefMod.!Run -32bit %%*0
+Set Alias$-Wipe X Wipe %%*0

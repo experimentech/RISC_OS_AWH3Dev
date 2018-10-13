@@ -1,0 +1,53 @@
+SDFS SPECIFICATION
+
+SDFS is a filing system that provides access to MMC or SD memory card reader
+slots attached directly to the system. For the avoidance of doubt, this excludes
+any such card readers which are attached via a USB interface: these feature an
+intermediate controller which makes the memory card appear like a generic
+USB memory device, and does not permit direct access to the MMC/SD command set.
+
+SDFS is a FileCore filing system, so in many ways it acts like ADFS, SCSIFS or
+RAMFS.
+
+SWI SDFS_DiscOp (SWI &59040)
+SWI SDFS_Drives (SWI &59042)
+SWI SDFS_FreeSpace (SWI &59043)
+SWI SDFS_DescribeDisc (SWI &59045)
+SWI SDFS_MiscOp (SWI &59049)
+SWI SDFS_SectorDiscOp (SWI &5904A)
+SWI SDFS_FreeSpace64 (SWI &5904B)
+SWI SDFS_DiscOp64 (SWI &5904C)
+
+These SWIs are all identical to the equivalent FileCore ones, except that the
+caller does not need to set up R8 on entry.
+
+
+SWI SDFS_ReadCardInfo (SWI &59060)
+
+On entry
+
+R0 = reason code:
+       0 => return card capacity in bytes in R2-R3 (64-bit little-endian)
+       1 => return card location (slot, bus, RCA) in R2
+       other values reserved for future use
+R1 = drive number
+
+On exit
+
+Some registers may be used to return results, depending upon the reason code in
+R0. Other registers are preserved.
+
+Not reentrant
+
+
+*SDFS
+
+Selects SDFS as the current filing system. This command takes no parameters.
+
+
+*Configure SDFSdrive
+
+Sets the drive number that SDFS defaults to when it starts (e.g. during boot)
+
+Syntax: *Configure SDFSdrive <drive>
+

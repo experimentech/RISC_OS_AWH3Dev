@@ -1,0 +1,410 @@
+USB API 
+=======
+
+This API details the programming interface through which device drivers
+can communicate with devices via the USB bus. 
+
+
+Versions
+--------
+
+Version  Date       Author   Change
+0.95     20/8/2017  RPS      Tidy up sections, change IYONIX specifics to
+                             refer to RISC OS 5 generically
+0.94     30/5/2013  RPS      Clarify availability of R6 options for
+                             call device 'USB Control Request'
+0.93     18/7/2010  JL       Updated for USBDriver 0.49
+0.92     06/3/2010  TM       Clear Stall/Transfer info added
+0.91     11/4/2003  JWB      Minor corrections.
+0.90     10/4/2003  JWB      Major modifications to reflect the capabilities
+                             built into RISC OS 5 and the IYONIX pc. This
+                             reflects a significant change in the manner in
+                             which the USB driver is called, but does lead to
+                             a significant simplification of the whole
+                             process.
+
+Where differences in the current implementations exist, these are noted.
+
+
+Introduction
+------------
+
+Sections: 
+ - DeviceFS interface
+ - DeviceFS calls
+ - Command completion status
+ - Service calls
+ - SWIs
+ - Aliases and alias matching
+ - Commands
+ - DeviceFS issues
+ - Acknowledgement
+
+The Universal Serial Bus (USB) is a simple interconnect system widely
+standardised and for which a large range of devices is available. For use
+on RISC OS specific drivers will (always) need to be adapted or written.
+It is useful, however, to provide a relatively simple programming
+interface (API) that will permit developers of device drivers to create
+drivers that will operate on a variety of different USB host adaptor
+cards within the RISC OS environment. This document describes such an
+API which is compatible with both RISC OS 5 and version 0.90 and later
+of Castle's 4 port USB podule.
+
+No attempt is made to describe how to control devices over the USB bus
+using USB protocols. It merely describes the low level interface through
+which these commands may be issued in a manner that is not directly
+dependant on the hardware providing the USB host interface.
+
+The naming convention used for devices is USBxxnnn, where all device
+names start USB, followed by 0 or more vendor specific characters (nn)
+and a number (nnn) in the range 0 to 999.
+
+RISC OS 5 uses "USBnnn" e.g. "USB2".
+Castle's USB podule uses "USBDnnn" e.g. "USBD2".
+Examples given in this document use "USBD" as the driver name.
+
+
+DeviceFS interface
+------------------
+
+Device specific drivers communicate with the low level USB host driver,
+and thence the USB hardware and attached devices, via FileSwitch and
+DeviceFS_CallDevice. Streams are opened to or from an endpoint using
+special fields to define requirements. 
+
+The special field can have some or all of the following:
+
+Value         Meaning                                                        OS 5?    Podule?    
+interface/N   Interface to use. Defaults to the first suitable one.          Yes      Yes            
+alternate/N   Interface alternate to use. Defaults to the first suitable     Yes      Yes            
+              one.                                                                                   
+endpoint/N    Desired endpoint. Defaults to the first suitable one.          Yes      Yes            
+report/N      Desired HID report. If specified,only this information will    Yes      No             
+              be made available.                                                                     
+control       The type of transfer required. Defaults to bulk, or what a     Yes      Yes            
+isochronous   specified endpoint requires. (Isochronous is not fully                                           
+bulk          supported at present.)                                                                 
+interrupt/S                                                                                          
+nosync        Synchronisation type. Only relevant to isochronous             No       No             
+async         transfers.                                                                             
+adaptive                                                                                             
+sync/S                                                                                               
+data          Only relevant to isochronous transfers.                        No       No             
+feedback                                                                                             
+implicit/S                                                                                           
+usbtimeout/N  Command timeout in milliseconds. Default is no timeout.        Yes      No             
+size/N        The preferred stream buffer size to use. Some devices may      Yes      Yes            
+              benefit from a larger buffer than the default.                                     
+nopad/S       Disable the code that adds padding bytes to received data if   0.49+    No
+              it is shorter than the requested read size.
+short/S       Force a 'short packet' to be sent at the end of each transfer. 0.49+    No
+              Ordinarily short packets are only sent if the data is not a
+              multiple of the max packet size; however by specifiying the
+              'short' flag this will force a short packet to be sent even if
+              the data is an exact multiple. This is equivalent to the
+              USBD_FORCE_SHORT_XFER flag used by the core NetBSD code.
+
+Numbers are converted using OS_ReadUnsigned so if the string starts with base_,
+this base is used or if the string starts with & then it is hexadecimal. If
+there is no prefix then it is decimal.
+
+Two special fields have been added that are acted on by later versions of
+DeviceFS. The same functionality is also available via an IOCTL call.
+
+Value      IOCTL  Action                                                       OS 5?    Podule?    
+Nosleep    4      true/false. Any DeviceFS stream, if opened with the special  Yes      No         
+sleep/S           field entry 'sleep' will issue OS_UpCall 6 when it would                                 
+                  otherwise block thus allowing Taskwindows to continue                                  
+                  multitasking. Default nosleep. (Note.. in currently                              
+                  available versions of DeviceFS, without this sleep                                
+                  ability, the same effect can be achieved by polling the                            
+                  buffer associated with the stream and only making such a                                    
+                  'blocking' call if there is data (or space as relevant)                                
+                  in the buffer. If no data/space is available, then an                                   
+                  UpCall 6 can be issued. (See later for details of a                              
+                  call to provide this information)                                                
+timeout/N  5      Time in cs This will cause the stream to issue a timeout     Yes      No         
+                  error if it sleeps for too long. The default is 0 meaning                                
+                  sleep for ever.                                                                  
+
+Each USB device, when plugged in, is "enumerated" and a separate device is created within DeviceFS. Each time a device is "enumerated" it has a new device number created. Devices thus range from "USBD0" to "USBD999" (or "USB0" to "USB999") before starting at 0 again.
+
+Examples:
+To open an interrupt in connection to USBD3 endpoint 1 (which is an interrupt endpoint) from BASIC:
+port% = OPENIN"devices#endpoint1:usbd3"
+To open a bulk (by default) out connection to USB3 endpoint 2 from BASIC:
+out% = OPENOUT"devices#endpoint2:usb3"
+To open a bulk (by default) in connection from USBD3 endpoint 1 from BASIC:
+in% = OPENIN"devices#endpoint1:usbd3"
+ 
+
+DeviceFS calls
+--------------
+
+There are 9 extension calls into the DeviceFS driver which are passed directly to the USB driver via DeviceFS_CallDevice, these are shown in the table below.
+
+Register  Value       Entry                                                   OS 5?    Podule?    
+USB Control Request                                                           Yes      Yes        
+R0        1<<31 + 0   Send request to a device's default control pipe and                         
+                      return the reply.                                                           
+R1                    Device name eg "usbd"                                                       
+R3        Byte 0      BmRequestType                                                               
+          Byte 1      BRequest                                                                    
+          Bytes 2,3   WValue                                                                      
+R4        Bytes 0,1   WIndex                                                                      
+          Bytes 2,3   WLength                                                                     
+R5                    Pointer to data buffer.                                                     
+R6        0           Return on command completion, command failure,        }                     
+                      or command timeout.                                   }                     
+          Bit 0 = 1   Return after commencing the command with R7           }                     
+                      containing the address of a pollable status byte.     }                     
+                      See below for details of return values                }                     
+          Bit 1 = 1   On entry, R7 contains the address of a routine to be  } No       Yes                    
+                      called on command completion. R8 will contain the     }                     
+                      value to be used for the R12 value when this is       }                     
+                      called. See below for details of this call.           }                     
+R7                    Callback address if R6 bit 1 set.                     }                     
+R8                    Private word for Callback address in R7 if            }                     
+                      R6 bit 1 set.                                         }
+Check Buffer Space                                                            Yes      Yes        
+R0        1<<31 + 2   Interrogate the free space and data available in the                        
+                      buffer associated with a DeviceFS stream. (note:                            
+                      not all drivers will implement this, as the                                 
+                      information can be directly discovered)                                     
+R1                    Device name eg "usbd"                                                       
+R2                    Stream handle as returned by fileswitch.                                    
+Returns:R3            Bytes available in buffer                                                   
+Returns:R4            Bytes free in buffer                                                        
+Return Handles                                                                Yes      Yes        
+R0        1<<31 + 3   Return the buffer handle and DeviceFS stream                                
+                      handle for this stream                                                      
+R1                    Device name eg "usbd"                                                       
+R2                    Stream handle as returned by fileswitch.                                    
+Returns:R3            Buffer handle                                                               
+Returns:R4            DeviceFS stream handle                                                      
+Get Location                                                                  Yes      No
+R0        1<<31 + 4   Get Device Location on bus.                                                 
+R1                    Device name eg "usbd"                                                       
+R3                    Pointer to 6 byte block.                                                    
+Returns:              Block filled in with 6 byte array: bus, port1, port2,                        
+                      port3, port4, port5. This indicates the physical                            
+                      location of the usb device. This provides a method                          
+                      of identifying the same device across reboots.                              
+Clear Stall                                                                   Yes      ???
+R0        1<<31 + 5   Clears USB stall condition for requested pipe
+R1                    Device name eg "usbd"                                                       
+R2                    Stream handle as returned by fileswitch.                                    
+
+The following calls were added with USBDriver 0.49:
+
+Transfer Info                                                                 Yes      No
+R0        1<<31 + 6   Returns some information about actual/last transfer
+                      for the requested stream                                                      
+R1                    Device name eg "usbd"                                                       
+R2                    USB Stream handle as returned by 'Return handles 2' in R5
+Returns:R0            Bytes received/sent up to now.
+Returns:R1            Total Bytes to transfer requested
+Returns:R3            Transfer Status:
+                      -1 - Transfer terminated with error
+                       0 - Transfer in progress
+                       1 - Transfer successfully completed
+Returns:R4            After end of transfer number of Bytes with which
+                      Buffer has been padded up to requested length in case
+                      of receiving a short package.
+Return Handles 2                                                              Yes      No      
+R0        1<<31 + 7   Return the buffer handle and DeviceFS stream                                
+                      handle for this stream                                                      
+R1                    Device name eg "usbd"                                                       
+R2                    Stream handle as returned by fileswitch.                                    
+Returns:R3            Buffer handle                                                               
+Returns:R4            DeviceFS stream handle                                                      
+Returns:R5            USB Stream handle
+Returns:R6            Device drivers handle for usage with DeviceFS_CallDevice
+Get/Set Options                                                               Yes      No
+R0        1<<31 + 8   Get/set current options
+R1                    Device name eg "usbd"                                                       
+R2                    USB Stream handle as returned by 'Return handles 2' in R5
+R3                    EOR mask of bits to change (similar to OS_Byte)
+R4                    AND mask of bits to change (similar to OS_Byte)
+Returns:R3            Previous flags value
+Returns:R4            New flags value
+                      Flags in version 0.49 of USBDriver are:
+                      bit 0 - 'nopad' flag
+                      bit 1 - 'short' flag
+                      bits 2+ - reserved, reads return 0, writes ignored
+                      Note that modifying flags is only guaranteed to work
+                      correctly if no transfer is active for that stream
+
+Note: The "Check Buffer Space" call has been added to enable users to code simple drivers in higher level languages such as BASIC. On RISC OS 4 and earlier, commands such as BGET of BPUT will not return if there is no data or space in the stream's buffer. With this call the user can only make such blocking calls when they wont be blocked.
+
+Note: The 'USB Control Request' can optionally be polled or called back (see below). The most compatible operation for both RISC OS 5 and podule versions is to use R6=0.
+
+
+Command completion status 
+-------------------------
+(Podule only)
+There are currently 2 defined status values detectable in the pollable byte.
+
+0   command not completed.
+1   command completed successfully.
+2   command currently receiving a NAK.
+3   command has received a STALL and finished.
+4   command retrying.
+5   command has received a USB timeout.
+6   command is set inactive.
+ 
+If a callback on completion is requested, the routine will be called back with registers set as follows:
+
+R0    completion status as above
+R12   set to the value passed through in R8 when the callback was requested
+      Your routine may be called within an interrupt service routine, so
+      care should be taken to ensure that non re-entrant SWIs are not
+      called, and that you spend the minimum time in your callback routine. 
+
+
+Service calls
+-------------
+
+There is 1 defined service call at present, Service_USB (0xD2). It has 3 variants, distinguished by the value in R0 on entry. It is issued by the hub controller within the driver, once it has successfully "enumerated" a device, to report the presence of a newly connected device. It can also be issued by other parties wishing to find what devices are available if they are unable to receive service calls (e.g are applications), or if they arrived after a device was connected.
+
+Service_USB
+
+Register  Value  Meaning
+R1        0xD2   Service_USB service call number. R1 should be passed
+                 onwards without claiming the call. The value in R0
+                 determines the usage of this.
+R2        name   Name driver uses (reason codes 3 and 4) e.g. "USB"                 
+R0        0      New device connected. Issued by the USB controller,
+                 this call reports that a new device has been connected
+                 and is available for use. R2 is a pointer to a structure
+                 of type USBServiceCall. The format of this is specified
+                 in the USBDevFS.txt header file . The current version
+                 of this header file is 0.75 (8 March 2003). Access to
+                 a device can be claimed by opening a file for that
+                 device/endpoint. Please see the sample drivers for
+                 an example of this.
+R0        1      Report connected devices. Issued with R2 set to zero.
+                 Each controller adds USBServiceAnswer pointers in a
+                 linked list. If R2 = NULL, then the controller sets
+                 R2 to point to a chunk of RMA containing a
+                 USBServiceAnswer structure, with the link field set
+                 to NULL. Subsequent devices are reported by scanning
+                 the list of pointers until a NULL next pointer is found
+                 and replacing the NULL with a pointer to a further
+                 chunk of RMA, with its link pointer set to NULL. It
+                 is the responsibility of the issuer of this service
+                 call to free the memory chunks returned.
+R0        2      Device has gone. (not used)
+                 Since each USB device is a unique DeviceFS
+                 device, the DeviceFS_DeviceDead service call will
+                 provide this information.
+R0        3      USB driver module starting.
+R0        4      USB driver module dying.                
+R0        5      USB driver module dead.                
+
+
+SWIs
+----
+
+The USBDriver module provides one SWI suitable for use by USB device drivers:
+
+SWI USBDriver_Version (0x54a45)
+    In:  N/A
+    Out: R0 = USBDriver module version number, *100
+
+    This SWI is only available in USBDriver version 0.49 and above.
+
+
+Aliases and alias matching
+--------------------------
+
+A powerful Alias matching system is employed to provide a system for locating and launching specific applications and tools when relevant USB devices become available.
+Once a device is connected and "enumerated" several things happen:
+ - A device is created for it within DeviceFS. 
+ - The USB_Connected service call is issued. 
+ - An Alias is created for it with just vendor and product IDs in place. 
+ - A check is made for a matching alias, and if found it is launched. 
+ - If no alias was launched, a second Alias is created with additional
+   configuration information. 
+ - A new check is made for an alias match. 
+
+The alias created is of the form USB$Device_LL_SS_TT_VVVV_PPPP_CC_II_RRRR_USBDnnn (or USBnnn)
+
+
+Code  Meaning         Value at first check  Value at second check              
+LL    class           00                    class                              
+SS    subclass        00                    subclass                           
+TT    protocol        00                    protocol                           
+VVVV  vendorID        vendorID              vendorID                           
+PPPP  productID       productID             productID                          
+CC    current         -1                    configuration                      
+      configuration                                                            
+II    interface       -1                    interface                          
+RRRR  release number  -1                    product release number             
+nnn   device number   usb device number     usb device number                  
+
+ 
+When first created this alias is set to the number nnn.
+The second time around it has 3 numbers:           nnn interface alternate.
+
+Aliases are searched in accordance with the USB Common Class Specification (revision 1.0). This means that the following searches shall be done:
+
+Alias$@USBDevice_*_*_*_V_P___R
+Alias$@USBDevice_*_*_*_V_P___*
+Alias$@USBDevice_L_S_T_V_*___*
+Alias$@USBDevice_L_S_*_V_*___*
+Alias$@USBDevice_L_S_T_*_*___*
+Alias$@USBDevice_L_S_*_*_*___*
+
+If a driver is found at that stage then it can participate in choosing the configuration for the driver. Otherwise the system software chooses an appropriate configuration and the search is proceeded using the following, taking each interface in turn, taking the class and subclass data from the interface descriptor:
+
+Alias$@USBDevice_*_*_*_V_P_C_I_R
+Alias$@USBDevice_*_*_*_V_P_C_I_*
+Alias$@USBDevice_L_S_T_V_*_*_*_*
+Alias$@USBDevice_L_S_*_V_*_*_*_*
+Alias$@USBDevice_L_S_T_*_*_*_*_*
+Alias$@USBDevice_L_S_*_*_*_*_*_*
+
+If a match is made, the alias will be executed. This permits (e.g.) an obey file to be created containing lines such as:
+   
+Alias @USBDevice____03F0_0417____ Do Path HPLJ1220 USB%%0#usbtimeout10000;size16384:|mUSBSetInterface %%0 0 1|M||%%*0
+
+Which sets up an alias for a device (vendor) 03F0 and (product) 0417 (which is an HPLJ1220C printer) which will create a path variable "HPLJ1220:" and choose interface 0 alternate 1 as the desired interface to use.
+
+This second example will execute the alias if it is already set up when the obey file is run:
+
+If "<USB$Device_*_*_*_03F0_0417_*_*_*_*>" <> "" Then Do @USBDevice____03F0_0417____ <USB$Device_*_*_*_03F0_0417_*_*_*_*>
+
+
+Commands
+--------
+
+Command                        Usage                                             OS 5?    Podule?
+USBDBuses                      Displays a list of available USB buses            Yes      No        
+USBBuses                                                                                            
+USBDDevices                    Displays a list of available USB devices          Yes      No        
+USBDevices                                                                                          
+USBDDevInfo <n>                Displays device information on device <n>         Yes      No        
+USBdevInfo                                                                                          
+USBDConfInfo <n>               Displays configuration information on device <n>  Yes      No        
+USBConfInfo                                                                                          
+USBDSetConfig <n><m>           Set configuration value for device <n> to         Yes      Yes       
+USBSetConfig                   configuration <m>                                                    
+USBDSetInterface <n><m><p>     Set device <n> to interface <m>                   Yes      Yes       
+USBSetInterface                and alternate <p>                                                    
+USBDReset <n>                  Force device <n> to be reset and                  Yes      No        
+USBReset                       "enumerated" again.                                                  
+USBDQuirk <A|R|L> <v><p><d><f> Apply workaround flags <f> to the vendor <v>      Yes      ???
+USBQuirk                       product <v> device <d>
+
+
+DeviceFS issues
+---------------
+
+This is for others intending to provide a DeviceFS interface to their USB cards. When writing a DeviceFS driver the DeviceFS driver entry 0 (initialise) is missing a vital parameter on versions of DeviceFS prior to that shipped with RISC OS 4. The RISC OS 4 (or 5) entry provides the fileswitch stream handle in R4. For earlier DeviceFS versions, this handle may be found as a 32 bit value at offset 44 from the pointer supplied in R2.
+
+
+Acknowledgement
+---------------
+
+This product includes software developed by the NetBSD Foundation, Inc. and its contributors.

@@ -1,0 +1,4 @@
+PiLED is a simple program to show the use of the SWI's.
+It reads the OE state of GPIO16 and then changes it to output if needed,
+so that it can then switch the File LED on and off when you press any key.
+Press Close to exit the program.

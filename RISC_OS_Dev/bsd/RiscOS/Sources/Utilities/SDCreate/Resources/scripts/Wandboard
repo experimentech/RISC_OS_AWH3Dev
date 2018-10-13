@@ -1,0 +1,21 @@
+Wandboard
+=========
+
+Welcome to RISC OS for the iMx6 (Wandboard).
+
+
+IMPORTANT
+=========
+
+Note that the bootloader built into the ARM processor on the Wandboard looks
+for the operating system at a fixed sector address on the SDFS::1 drive.
+To keep it fixed at that one place it is stored in hidden sectors that can't
+be seen in the Filer, which means to update the ROM you must re-run SDCreate.
+
+The rest of the space is formatted as FAT16 and can be used for any purpose,
+for example keeping a backup !Boot application. Beware! Re-running SDCreate
+will overwrite the contents of SDFS::1 each time.
+
+This text file can be deleted - it is not required for booting.
+
+-- RISC OS Open

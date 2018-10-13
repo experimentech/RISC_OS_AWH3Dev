@@ -1,0 +1,171 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_STATICWS_HDR__
+        GBLL    __HAL_STATICWS_HDR__
+
+; NOTE - sb used as workspace register rather than r12 (simplifies interworking with C, and was easier than changing everything to use r12 after the code was moved from the HAL)
+sb              RN      9
+
+                 ^ 0
+AudioBuffer_Log  # 4 ; Log addr of our audio buffer
+AudioBuffer_Phys # 4 ; Phys addr of our audio buffer
+AudioBuffer_Src  # 4 ; Log addr of source data from RISC OS
+AudioBuffer_Size * :INDEX: @
+
+; NOTE.. all items at start workspace are duplicated in h.ws in the StaticWS structure  .. KEEP THESE IN SYNC!!
+                ^       0,sb
+StaticWS_C_Base #       0
+ScrInit         #       4 ; Phys addr of screen start
+CCM_Base        #       4 ; CCM base address
+IOMUXC_Base     #       4 ; IOMUXC base address
+HDMI_Log        #       4 ; HDMI base address
+SRC_Log         #       4 ; System Reset unit logical address
+IPU1_Log        #       4 ;
+IPU2_Log        #       4 ;
+CCMAn_Log       #       4 ;
+;
+myHDMI_infos    #       0 ; start of hdmi_data_info_s structure
+enc_in_format   #       4
+enc_out_format  #       4
+enc_color_depth #       4
+colorimetry     #       4
+pix_repet_factor #      4
+hdcp_enable     #       4
+video_mode      #       4
+
+myHDMI_vmode_infos    # 0 ; start of hdmi_vmode_s structure
+mCode                 # 4
+mHdmiDviSel           # 4
+mRVBlankInOSC         # 4
+mRefreshRate          # 4
+mHActive              # 4
+mVActive              # 4
+mHBlanking            # 4
+mVBlanking            # 4
+mHSyncOffset          # 4
+mVSyncOffset          # 4
+mHSyncPulseWidth      # 4
+mVSyncPulseWidth      # 4
+mHSyncPolarity        # 4
+mVSyncPolarity        # 4
+mDataEnablePolarity   # 4
+mInterlaced           # 4
+mPixelClock           # 4
+mHBorder              # 4
+mVBorder              # 4
+mPixelRepetitionInput # 4
+
+ml2bpp                # 4
+
+myidmacinfo         #   ipu_idmac_info_size ; used in ipu_idmac
+
+myHDMI_dev_panel        # 0 ; start of ips_dev_panel_t structure
+mpanel_name             # 32;
+mpanel_id               # 4;
+mpanel_type             # 4;
+mcolorimetry            # 4;
+mrefresh_rate           # 4;
+mwidth                  # 4;
+mheight                 # 4;
+mpixel_clock            # 4;
+mhsync_start_width      # 4;
+mhsync_width            # 4;
+mhsync_end_width        # 4;
+mvsync_start_width      # 4;
+mvsync_width            # 4;
+mvsync_end_width        # 4;
+mdelay_h2v              # 4;
+mpinterlaced            # 4;
+mclk_sel                # 4; 0 = internal clock, 1 = external clock 
+mclk_pol                # 4;
+mhsync_pol              # 4;
+mvsync_pol              # 4;
+mdrdy_pol               # 4;
+mdata_pol               # 4;
+mpanel_init             # 4;
+mpanel_deinit           # 4;
+
+; end of StaticWS C header
+HALDevice       #       4 ; Pointer to the video HAL device created by the HAL
+
+mIPUFormat      #       4
+
+InitFlags       #       4
+InitFlag_ResFiles     * 1  ; ResourceFS files have been registered
+ [ HijackHAL
+InitFlag_HALHijacked  * 2  ; HAL video driver has been hijacked
+ ]
+InitFlag_GVRegistered * 4  ; GraphicsV driver number has been allocated
+InitFlag_VSyncClaim   * 8  ; VSync IRQ has been claimed
+InitFlag_GVClaim      * 16 ; GraphicsV has been claimed
+InitFlag_GVStarted    * 32 ; GraphicsV driver has started
+
+MessageFile_Block # 16
+MessageFile_Open  #  4
+
+PointerPhys     #       4 ; Phys addr of pointer image
+PointerLog      #       4 ; Log addr of pointer image
+PointerPal      #       16 ; Pointer palette
+PointerX        #       4 ; Pointer delta values - offset of image within buffer
+PointerY        #       4
+PointerPalDirty #       1 ; Nonzero if pointer palette has changed
+PointerDisabled #       1 ; Nonzero if pointer is disabled
+
+GVinstance      #       1
+HDMIEnabled     #       1 ; Whether we run the interface in HDMI or DVI mode
+ [ CustomBits
+MonitorType     #       1
+                #       3 ; back to word alignment
+ ]
+
+DMB_Write       #       4 ; DMB_Write ARMop
+
+DI_ext_clk_rate #       4 ; Rate (in Hz) of current DI external clock
+
+GammaOut        #       17 ; Gamma curve values
+                #       3
+
+ [ HDMIAudio
+; Audio driver workspace
+AudioDevice        #     HALDevice_Audio_Size_2 ; HAL device
+AudioBuffers       #     AudioBuffer_Size*2
+AudioDestBuffSize  #     4 ; Our DMA buffer size (twice size of src buffer)
+AudioCSWEnd        #     4 ; End of used CSW data
+AudioBuffIndex     #     1 ; Current buffer index
+AudioOn            #     1 ; Nonzero if playback active
+AudioRegistered    #     1 ; Nonzero if HAL device registered
+AudioActive        #     1 ; Nonzero if HAL device activated
+AudioSemaphore     #     1 ; Nonzero if in IRQ handler
+AudioRates         #     1 ; Mask of which audio rates are supported by mode/monitor
+                   #     2
+AudioRate          #     4 ; Current sample rate (Hz)
+AudioCallback      #     4 ; Callback into SoundDMA for buffer filling
+AudioCallbackParam #     4
+VFPSup_Context     #     4 ; VFPSupport context used by DMA pre-processor
+VFPSup_WS          #     4 ; VFPSupport FastAPI workspace
+VFPSup_ChangeCtx   #     4 ; VFPSupport FastAPI context change func
+AudioCSW           #     40*8 + 8 ; Channel status word + other control bits, in right format for DMA pre-process code. 8 bytes extra allocated so that we can repeat those bytes to make bits 41-191 of the full CSW/sub-packet.
+AudioRateTable     #     AudioRateTableSize*7
+ ]
+
+TotalRAMRequired *      :INDEX: @
+
+        ] ; __HAL_STATICWS_HDR__
+
+        END

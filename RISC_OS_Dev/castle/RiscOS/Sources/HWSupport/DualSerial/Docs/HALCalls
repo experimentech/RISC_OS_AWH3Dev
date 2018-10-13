@@ -1,0 +1,31 @@
+	Conversion of DualSerial to HAL calling conventions
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+v1 of the HAL contains a list of functions, and a static workspace pointed to
+by r9.  HAL functions are called using ATPCS.  This to call a HAL function
+you need to do:
+
+	LDR	r9, [pw, #HALWS]
+	LDR	r0, [pw, #port]
+	; possibly stack r1-r3
+	MOV	lr, pc
+	LDR	pc, [pw, #my_method]
+	; possibly unstack r1-r3
+
+	LDR	r0, [pw, #Softc]
+	LDR	r1, [r0, #Methods]
+	MOV	lr, pc
+	LDR	pc, [r1, #my_method]
+	
+	LDR	r0, [pw, #port]
+	LDR	r1, [pw, #Softc]
+	MOV	lr, pc
+	LDR	pc, [r1, #my_method]
+	
+	LDR	r0, [pw, #Softc]
+	MOV	lr, pc
+	LDR	pc, [r0, #my_method]
+	
+	LDR	r0, [pw, #port]
+	MOV	lr, pc
+	LDR	pc, [pw, #my_method]

@@ -1,0 +1,287 @@
+# Makefile for SDIODriver
+
+COMPONENT   = SDIODriver
+ASMHDRS     = SDIO SDHCIDevice
+ASMCHDRS    = SDIO SDHCIDevice
+HDRS        =
+CMHGFILE    = SDIOHdr
+CMHGDEPENDS = device module swi
+OBJS        = cardreg command device fgopcb globals message module op probe register stuff swi trampoline util
+LIBS        = ${SYNCLIB}
+ROMCDEFINES = -DROM_MODULE
+
+# Enable one of the following groups, depending on what sort of debug you want
+
+#CFLAGS     += -DDEBUG_ENABLED
+
+#CFLAGS     += -DDEBUG_ENABLED -DDEBUGLIB -DDEBUGLIB_NOBRACKETS
+#LIBS       += ${DEBUGLIBS} ${NET5LIBS}
+
+#OBJS       += gpiodebug
+#CFLAGS     += -DGPIODEBUG
+
+include CModule
+
+expasmc.SDHCIDevice: hdr.SDHCIDevice h.SDHCIDevice
+	${HDR2H} hdr.SDHCIDevice ${C_EXP_HDR}.SDHCIDevice
+	FAppend ${C_EXP_HDR}.SDHCIDevice h.SDHCIDevice ${C_EXP_HDR}.SDHCIDevice
+
+# Dynamic dependencies:
+o.cardreg:	c.cardreg
+o.cardreg:	h.cardreg
+o.cardreg:	h.globals
+o.cardreg:	C:Global.h.HALDevice
+o.cardreg:	C:Interface.h.SDHCIDevice
+o.cardreg:	C:Global.h.HALDevice
+o.cardreg:	C:SyncLib.h.mutex
+o.cardreg:	C:SyncLib.h.spin
+o.cardreg:	C:SyncLib.h.spinrw
+o.cardreg:	h.cardreg
+o.cardreg:	h.message
+o.cardreg:	C:h.kernel
+o.command:	c.command
+o.command:	C:h.swis
+o.command:	C:h.kernel
+o.command:	C:Global.h.RISCOS
+o.command:	C:Global.h.Services
+o.command:	C:Interface.h.SDIO
+o.command:	h.command
+o.command:	C:h.kernel
+o.command:	h.globals
+o.command:	C:Global.h.HALDevice
+o.command:	C:Interface.h.SDHCIDevice
+o.command:	C:Global.h.HALDevice
+o.command:	C:SyncLib.h.mutex
+o.command:	C:SyncLib.h.spin
+o.command:	C:SyncLib.h.spinrw
+o.command:	h.cardreg
+o.command:	h.message
+o.command:	C:h.kernel
+o.command:	h.register
+o.command:	h.globals
+o.command:	h.swi
+o.command:	C:h.kernel
+o.command:	h.globals
+o.command:	h.op
+o.command:	h.globals
+o.device:	c.device
+o.device:	C:h.swis
+o.device:	C:h.kernel
+o.device:	C:Global.h.HALEntries
+o.device:	C:Global.h.Services
+o.device:	C:Interface.h.SDIO
+o.device:	h.device
+o.device:	h.globals
+o.device:	C:Global.h.HALDevice
+o.device:	C:Interface.h.SDHCIDevice
+o.device:	C:Global.h.HALDevice
+o.device:	C:SyncLib.h.mutex
+o.device:	C:SyncLib.h.spin
+o.device:	C:SyncLib.h.spinrw
+o.device:	h.cardreg
+o.device:	h.globals
+o.device:	h.register
+o.device:	h.globals
+o.device:	h.swi
+o.device:	C:h.kernel
+o.device:	h.globals
+o.device:	h.op
+o.device:	h.globals
+o.device:	h.SDIOHdr
+o.device:	h.trampoline
+o.device:	h.util
+o.device:	C:h.kernel
+o.device:	h.globals
+o.fgopcb: s.fgopcb
+o.globals:	c.globals
+o.globals:	h.globals
+o.globals:	C:Global.h.HALDevice
+o.globals:	C:Interface.h.SDHCIDevice
+o.globals:	C:Global.h.HALDevice
+o.globals:	C:SyncLib.h.mutex
+o.globals:	C:SyncLib.h.spin
+o.globals:	C:SyncLib.h.spinrw
+o.globals:	h.cardreg
+o.message:	c.message
+o.message:	C:h.kernel
+o.message:	C:h.swis
+o.message:	h.globals
+o.message:	C:Global.h.HALDevice
+o.message:	C:Interface.h.SDHCIDevice
+o.message:	C:Global.h.HALDevice
+o.message:	C:SyncLib.h.mutex
+o.message:	C:SyncLib.h.spin
+o.message:	C:SyncLib.h.spinrw
+o.message:	h.cardreg
+o.message:	h.message
+o.message:	C:h.kernel
+o.module:	c.module
+o.module:	C:h.swis
+o.module:	C:h.kernel
+o.module:	C:Global.h.RISCOS
+o.module:	C:Global.h.NewErrors
+o.module:	C:Global.h.Services
+o.module:	C:Interface.h.SDIO
+o.module:	C:SyncLib.h.synclib
+o.module:	C:SyncLib.h.atomic
+o.module:	C:SyncLib.h.barrier
+o.module:	C:SyncLib.h.cpuevent
+o.module:	C:SyncLib.h.mutex
+o.module:	C:SyncLib.h.spin
+o.module:	C:SyncLib.h.spinrw
+o.module:	h.SDIOHdr
+o.module:	h.command
+o.module:	C:h.kernel
+o.module:	h.device
+o.module:	h.globals
+o.module:	C:Global.h.HALDevice
+o.module:	C:Interface.h.SDHCIDevice
+o.module:	C:Global.h.HALDevice
+o.module:	C:SyncLib.h.mutex
+o.module:	C:SyncLib.h.spin
+o.module:	C:SyncLib.h.spinrw
+o.module:	h.cardreg
+o.module:	h.globals
+o.module:	h.message
+o.module:	C:h.kernel
+o.module:	h.probe
+o.module:	h.globals
+o.module:	h.swi
+o.module:	C:h.kernel
+o.module:	h.globals
+o.module:	h.op
+o.module:	h.globals
+o.module:	h.gpiodebug
+o.op:	c.op
+o.op:	C:h.swis
+o.op:	C:h.kernel
+o.op:	C:h.kernel
+o.op:	C:Global.h.NewErrors
+o.op:	C:Interface.h.SDIO
+o.op:	C:SyncLib.h.atomic
+o.op:	h.globals
+o.op:	C:Global.h.HALDevice
+o.op:	C:Interface.h.SDHCIDevice
+o.op:	C:Global.h.HALDevice
+o.op:	C:SyncLib.h.mutex
+o.op:	C:SyncLib.h.spin
+o.op:	C:SyncLib.h.spinrw
+o.op:	h.cardreg
+o.op:	h.message
+o.op:	C:h.kernel
+o.op:	h.op
+o.op:	h.globals
+o.op:	h.register
+o.op:	h.globals
+o.op:	h.stuff
+o.op:	h.util
+o.op:	C:h.kernel
+o.op:	h.globals
+o.probe:	c.probe
+o.probe:	C:h.kernel
+o.probe:	C:h.swis
+o.probe:	C:Global.h.HALEntries
+o.probe:	C:Global.h.NewErrors
+o.probe:	C:Interface.h.SDIO
+o.probe:	h.globals
+o.probe:	C:Global.h.HALDevice
+o.probe:	C:Interface.h.SDHCIDevice
+o.probe:	C:Global.h.HALDevice
+o.probe:	C:SyncLib.h.mutex
+o.probe:	C:SyncLib.h.spin
+o.probe:	C:SyncLib.h.spinrw
+o.probe:	h.cardreg
+o.probe:	h.message
+o.probe:	C:h.kernel
+o.probe:	h.op
+o.probe:	h.globals
+o.probe:	h.probe
+o.probe:	h.globals
+o.probe:	h.register
+o.probe:	h.globals
+o.probe:	h.swi
+o.probe:	C:h.kernel
+o.probe:	h.globals
+o.probe:	h.op
+o.probe:	h.util
+o.probe:	C:h.kernel
+o.probe:	h.globals
+o.register:	c.register
+o.register:	h.register
+o.register:	h.globals
+o.register:	C:Global.h.HALDevice
+o.register:	C:Interface.h.SDHCIDevice
+o.register:	C:Global.h.HALDevice
+o.register:	C:SyncLib.h.mutex
+o.register:	C:SyncLib.h.spin
+o.register:	C:SyncLib.h.spinrw
+o.register:	h.cardreg
+o.register:	h.gpiodebug
+o.stuff: s.stuff
+o.stuff: <Hdr$Dir>.Global.ListOpts
+o.stuff: <Hdr$Dir>.Global.Macros
+o.stuff: <Hdr$Dir>.Global.APCS.APCS-32
+o.stuff: Hdr:APCS.Common
+o.swi:	c.swi
+o.swi:	C:h.kernel
+o.swi:	C:h.swis
+o.swi:	C:Global.h.HALEntries
+o.swi:	C:Global.h.NewErrors
+o.swi:	C:Global.h.Services
+o.swi:	C:Interface.h.SDIO
+o.swi:	C:SyncLib.h.atomic
+o.swi:	C:SyncLib.h.barrier
+o.swi:	h.SDIOHdr
+o.swi:	h.device
+o.swi:	h.globals
+o.swi:	C:Global.h.HALDevice
+o.swi:	C:Interface.h.SDHCIDevice
+o.swi:	C:Global.h.HALDevice
+o.swi:	C:SyncLib.h.mutex
+o.swi:	C:SyncLib.h.spin
+o.swi:	C:SyncLib.h.spinrw
+o.swi:	h.cardreg
+o.swi:	h.message
+o.swi:	C:h.kernel
+o.swi:	h.op
+o.swi:	h.globals
+o.swi:	h.probe
+o.swi:	h.globals
+o.swi:	h.register
+o.swi:	h.globals
+o.swi:	h.swi
+o.swi:	C:h.kernel
+o.swi:	h.globals
+o.swi:	h.op
+o.swi:	h.util
+o.swi:	C:h.kernel
+o.swi:	h.globals
+h.SDIOHdr:	cmhg.SDIOHdr
+h.SDIOHdr:	C:Global.h.Services
+h.SDIOHdr:	VersionNum
+o.trampoline: s.trampoline
+o.trampoline: <Hdr$Dir>.Global.ListOpts
+o.trampoline: <Hdr$Dir>.Global.Macros
+o.trampoline: <Hdr$Dir>.Interface.HALDevice
+o.util:	c.util
+o.util:	C:h.swis
+o.util:	C:h.kernel
+o.util:	C:Global.h.HALEntries
+o.util:	C:Global.h.NewErrors
+o.util:	C:Interface.h.SDIO
+o.util:	C:SyncLib.h.spinrw
+o.util:	h.message
+o.util:	C:h.kernel
+o.util:	h.util
+o.util:	C:h.kernel
+o.util:	h.globals
+o.util:	C:Global.h.HALDevice
+o.util:	C:Interface.h.SDHCIDevice
+o.util:	C:Global.h.HALDevice
+o.util:	C:SyncLib.h.mutex
+o.util:	C:SyncLib.h.spin
+o.util:	C:SyncLib.h.spinrw
+o.util:	h.cardreg
+o.SDIOHdr:	cmhg.SDIOHdr
+o.SDIOHdr:	C:Global.h.Services
+o.SDIOHdr:	VersionNum

@@ -1,0 +1,46 @@
+
+MMC0_OFFSET  *    &1000
+MMC1_OFFSET  *    &2000
+MMC2_OFFSET  *    &3000
+
+SD_GCTL      *    &000     ;Control
+SD_CKCR      *    &004     ;clock control
+SD_TMOR      *    &008     ;timeout
+SD_BWDR      *    &00C     ;bus width
+SD_BKSR      *    &010     ;block size
+SD_BYCR      *    &014     ;byte count
+SD_CMDR      *    &018     ;command
+SD_CAGR      *    &01C     ;command argument
+SD_RESP0     *    &020     ;response 0
+SD_RESP1     *    &024     ;1
+SD_RESP2     *    &028     ;2
+SD_RESP3     *    &02C     ;3
+SD_IMKR      *    &030     ;interrupt mask
+SD_MISR      *    &034     ;masked interrupt status
+SD_RISR      *    &038     ;raw interrupt status
+SD_STAR      *    &03C     ;status
+SD_FWLR      *    &040     ;FIFO water level
+SD_FUNS      *    &044     ;FIFO function select
+SD_A12A      *    &058     ;autocommand 12 argument
+SD_NTSR      *    &05C     ;SD newTiming set
+SD_SDBG      *    &060     ;SD newTiming set debug
+SD_HWRST     *    &078     ;hardware reset
+SD_DMAC      *    &080     ;BUS mode control
+SD_DBLA      *    &084     ;descriptor list base address
+SD_IDST      *    &088     ;DMAC status
+SD_IDIE      *    &08C     ;DMAC interrupt enable
+SD_THLDC     *    &100     ;card threshold control
+SD_DSBD      *    &10C     ;eMMC4.41 DDR start bit detection control
+SD_RES_CRC   *    &110     ;CRC status from card/eMMC in write operation
+SD_DATA7_CRC *    &114     ;CRC data n from card / eMMC
+SD_DATA6_CRC *    &118     ;CRC data n from card / eMMC
+SD_DATA5_CRC *    &11C     ;CRC data n from card / eMMC
+SD_DATA4_CRC *    &120     ;CRC data n from card / eMMC
+SD_DATA3_CRC *    &124     ;CRC data n from card / eMMC
+SD_DATA2_CRC *    &128     ;CRC data n from card / eMMC
+SD_DATA1_CRC *    &12C     ;CRC data n from card / eMMC
+SD_DATA0_CRC *    &130     ;CRC data n from card / eMMC
+SD_CRC_STA   *    &134     ;Response CRC from card/eMMC
+SD_FIFO      *    &200     ;read/write FIFO
+
+    END

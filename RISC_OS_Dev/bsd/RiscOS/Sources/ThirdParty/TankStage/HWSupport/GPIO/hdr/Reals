@@ -1,0 +1,1151 @@
+;
+; Copyright (c) 2011, Tank Stage Lighting
+; All rights reserved.
+;
+; Redistribution and use in source and binary forms, with or without
+; modification, are permitted provided that the following conditions are met:
+;     * Redistributions of source code must retain the above copyright
+;       notice, this list of conditions and the following disclaimer.
+;     * Redistributions in binary form must reproduce the above copyright
+;       notice, this list of conditions and the following disclaimer in the
+;       documentation and/or other materials provided with the distribution.
+;     * Neither the name of the copyright holder nor the names of their
+;       contributors may be used to endorse or promote products derived from
+;       this software without specific prior written permission.
+;
+; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+; ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+; WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+; DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+; DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+; (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+; ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+
+;hdr.reals
+
+;********************** D A T A  S T R U C T U R E ************************
+		^	0			; beginaddress
+;which machine are we running on
+machine		#	4			;gpio machine number
+halproc		#	4			;processor type
+halboard	#	4			;board Type
+halrevision	#	4			;board revision
+machinename	#	32
+;store for logical addresses
+logicalstore	#	4*8			;only 6 used atm
+logicalstore1	#	4
+logicalsram	#	4
+;pi pull up/down
+pipullen	#	32
+pipullud	#	32
+;i2cprotect flag
+i2cprotect	#	4
+;i2c gpio info store
+i2clowgpio	#	4			;lowest available pin number
+i2chighgpio	#	4			;highest
+;i2c buffers
+i2csend		#	4*8
+i2cdata		#	4*8
+i2creturn	#	4*8
+;flash stuff
+flashcount	*	6			;max GPIOs/32
+flashflags	#	4*flashcount		;are we a flash ?
+flashmark	#	32*flashcount		;on time
+flashspace	#	32*flashcount		;off time
+flashstate	#	32*flashcount		;present count
+
+padding		#	4
+;--- for string displaying ----------Memory cleared upto here
+MainTemp	#	&20
+;copy of GPIO tables
+gpiotablecopy	#	4*((8*8)+(4*8))		;enough for i2c as well
+;cofig data space
+configdata	#	((6*32)+(16*8)+32)	;space for all gpio (and i2c) pins
+
+RMAlimit	*	:INDEX: @
+;*************************** SWI bits **************************************
+
+Error_block	*	&0081DD20
+Error_block_end	*	&0081DD2F
+SWI_base	*	&00058F80
+
+
+;*************************** Constants **************************************
+;physical map locations
+GPIO_1		*	&48310000
+GPIO_2		*	&49050000
+GPIO_3		*	&49052000
+GPIO_4		*	&49054000
+GPIO_5		*	&49056000
+GPIO_6		*	&49058000
+mapsize		*	&200
+
+;physical for control registers for GPIO's
+PADCONF_1	*	&48002000
+padsize		*	&B00
+
+;sram
+sramstart	*	&40200000
+sramsize	*	&00010000
+
+;interupt line mapping
+GPIO_1_int	*	29
+GPIO_2_int	*	30
+GPIO_3_int	*	31
+GPIO_4_int	*	32
+GPIO_5_int	*	33
+GPIO_6_int	*	34
+
+;gpio-controlreg map physical Xm use &0 to protect the register
+C_gpio_0	*	&1E0
+C_gpio_1	*	&A06
+C_gpio_2	*	&A0A
+C_gpio_3	*	&A0C
+C_gpio_4	*	&A0E
+C_gpio_5	*	&A10
+C_gpio_6	*	&A12
+C_gpio_7	*	&A14
+C_gpio_8	*	&A16
+C_gpio_9	*	&A18
+C_gpio_10	*	&A1A
+C_gpio_11	*	&A24
+C_gpio_12	*	&5D8
+C_gpio_13	*	&5DA
+C_gpio_14	*	&5DC
+C_gpio_15	*	&5DE
+C_gpio_16	*	&5E0
+C_gpio_17	*	&5E2
+C_gpio_18	*	&5E4
+C_gpio_19	*	&5E6
+C_gpio_20	*	&5E8
+C_gpio_21	*	&5EA
+C_gpio_22	*	&5EC
+C_gpio_23	*	&5EE
+C_gpio_24	*	&5F0
+C_gpio_25	*	&5F2
+C_gpio_26	*	&5F4
+C_gpio_27	*	&5F6
+C_gpio_28	*	&5F8
+C_gpio_29	*	&5FA
+C_gpio_30	*	&A08
+C_gpio_31	*	&A26
+C_gpio_32	*	&0	;&238	;INPUT ONLY, NOT AVAILABLE?
+C_gpio_33	*	&0	;NOT AVAILABLE ?
+C_gpio_34	*	&07A
+C_gpio_35	*	&07C
+C_gpio_36	*	&07E
+C_gpio_37	*	&080
+C_gpio_38	*	&082
+C_gpio_39	*	&084
+C_gpio_40	*	&086
+C_gpio_41	*	&088
+C_gpio_42	*	&08A
+C_gpio_43	*	&08C
+C_gpio_44	*	&09E
+C_gpio_45	*	&0A0
+C_gpio_46	*	&0A2
+C_gpio_47	*	&0A4
+C_gpio_48	*	&0A6
+C_gpio_49	*	&0A8
+C_gpio_50	*	&0AA
+C_gpio_51	*	&0AC
+C_gpio_52	*	&0B0
+C_gpio_53	*	&0B2
+C_gpio_54	*	&0B4
+C_gpio_55	*	&0B6
+C_gpio_56	*	&0B8
+C_gpio_57	*	&0BA
+C_gpio_58	*	&0BC
+C_gpio_59	*	&0BE
+C_gpio_60	*	&0C6
+C_gpio_61	*	&0C8
+C_gpio_62	*	&0CA
+C_gpio_63	*	&0CE
+C_gpio_64	*	&0D0
+C_gpio_65	*	&0D2
+C_gpio_66	*	&0D4
+C_gpio_67	*	&0D6
+C_gpio_68	*	&0D8
+C_gpio_69	*	&0DA
+C_gpio_70	*	&0DC
+C_gpio_71	*	&0DE
+C_gpio_72	*	&0E0
+C_gpio_73	*	&0E2
+C_gpio_74	*	&0E4
+C_gpio_75	*	&0E6
+C_gpio_76	*	&0E8
+C_gpio_77	*	&0EA
+C_gpio_78	*	&0EC
+C_gpio_79	*	&0EE
+C_gpio_80	*	&0F0
+C_gpio_81	*	&0F2
+C_gpio_82	*	&0F4
+C_gpio_83	*	&0F6
+C_gpio_84	*	&0F8
+C_gpio_85	*	&0FA
+C_gpio_86	*	&0FC
+C_gpio_87	*	&0FE
+C_gpio_88	*	&100
+C_gpio_89	*	&102
+C_gpio_90	*	&104
+C_gpio_91	*	&106
+C_gpio_92	*	&108
+C_gpio_93	*	&10A
+C_gpio_94	*	&10C
+C_gpio_95	*	&10E
+C_gpio_96	*	&110
+C_gpio_97	*	&112
+C_gpio_98	*	&114
+C_gpio_99	*	&116+input_only	;INPUT ONLY
+C_gpio_100	*	&118+input_only	;INPUT ONLY
+C_gpio_101	*	&11A
+C_gpio_102	*	&11C
+C_gpio_103	*	&11E
+C_gpio_104	*	&120
+C_gpio_105	*	&122+input_only	;INPUT ONLY
+C_gpio_106	*	&124+input_only	;INPUT ONLY
+C_gpio_107	*	&126+input_only	;INPUT ONLY
+C_gpio_108	*	&128+input_only	;INPUT ONLY
+C_gpio_109	*	&12A
+C_gpio_110	*	&12C
+C_gpio_111	*	&12E
+C_gpio_112	*	&134+input_only	;INPUT ONLY
+C_gpio_113	*	&136+input_only	;INPUT ONLY
+C_gpio_114	*	&138+input_only	;INPUT ONLY
+C_gpio_115	*	&13A+input_only	;INPUT ONLY
+C_gpio_116	*	&13C
+C_gpio_117	*	&13E
+C_gpio_118	*	&140
+C_gpio_119	*	&142
+C_gpio_120	*	&144
+C_gpio_121	*	&146
+C_gpio_122	*	&148
+C_gpio_123	*	&14A
+C_gpio_124	*	&14C
+C_gpio_125	*	&14E
+C_gpio_126	*	&132
+C_gpio_127	*	&0	;&A54	;different on35xx
+C_gpio_128	*	&0	;&A58	;different on35xx
+C_gpio_129	*	&0	;&A5A	;different on35xx
+C_gpio_130	*	&158
+C_gpio_131	*	&15A
+C_gpio_132	*	&15C
+C_gpio_133	*	&15E
+C_gpio_134	*	&160
+C_gpio_135	*	&162
+C_gpio_136	*	&164
+C_gpio_137	*	&166
+C_gpio_138	*	&168
+C_gpio_139	*	&16A
+C_gpio_140	*	&16C
+C_gpio_141	*	&16E
+C_gpio_142	*	&170
+C_gpio_143	*	&172
+C_gpio_144	*	&174
+C_gpio_145	*	&176
+C_gpio_146	*	&178
+C_gpio_147	*	&17A
+C_gpio_148	*	&17C
+C_gpio_149	*	&17E
+C_gpio_150	*	&180
+C_gpio_151	*	&182
+C_gpio_152	*	&184
+C_gpio_153	*	&186
+C_gpio_154	*	&188
+C_gpio_155	*	&18A
+C_gpio_156	*	&18C
+C_gpio_157	*	&18E
+C_gpio_158	*	&190
+C_gpio_159	*	&192
+C_gpio_160	*	&194
+C_gpio_161	*	&196
+C_gpio_162	*	&198
+C_gpio_163	*	&19A
+C_gpio_164	*	&19C
+C_gpio_165	*	&19E
+C_gpio_166	*	&1A0
+C_gpio_167	*	&130
+C_gpio_168	*	&1BE
+C_gpio_169	*	&1B0
+C_gpio_170	*	&1C6
+C_gpio_171	*	&1C8
+C_gpio_172	*	&1CA
+C_gpio_173	*	&1CC
+C_gpio_174	*	&1CE
+C_gpio_175	*	&1D0
+C_gpio_176	*	&1D2
+C_gpio_177	*	&1D4
+C_gpio_178	*	&1D6
+C_gpio_179	*	&1D8
+C_gpio_180	*	&1DA
+C_gpio_181	*	&1DC
+C_gpio_182	*	&1DE
+C_gpio_183	*	&1C0
+C_gpio_184	*	&1C2
+C_gpio_185	*	&1C4
+C_gpio_186	*	&1E2
+C_gpio_187	*	&0	;&23A	;INPUT ONLY NOT AVAILABLE ?
+C_gpio_188	*	&1B2
+C_gpio_189	*	&1B4
+C_gpio_190	*	&1B6
+C_gpio_191	*	&1B8
+
+top_gpio	*	191
+
+
+;gpio pin numbers we need for connectors
+gpio_0		*	0
+gpio_1		*	1
+gpio_2		*	2
+gpio_3		*	3
+gpio_4		*	4
+gpio_5		*	5
+gpio_6		*	6
+gpio_7		*	7
+gpio_8		*	8
+gpio_9		*	9
+gpio_10		*	10
+gpio_11		*	11
+gpio_12		*	12
+gpio_13		*	13
+gpio_14		*	14
+gpio_15		*	15
+gpio_16		*	16
+gpio_17		*	17
+gpio_18		*	18
+gpio_19		*	19
+gpio_20		*	20
+gpio_21		*	21
+gpio_22		*	22
+gpio_23		*	23
+gpio_24		*	24
+gpio_25		*	25
+gpio_26		*	26
+gpio_27		*	27
+gpio_28		*	28
+gpio_29		*	29
+gpio_30		*	30
+gpio_31		*	31
+gpio_32		*	32
+gpio_33		*	33
+gpio_34		*	34
+gpio_35		*	35
+gpio_36		*	36
+gpio_37		*	37
+gpio_38		*	38
+gpio_39		*	39
+gpio_40		*	40
+gpio_41		*	41
+gpio_42		*	42
+gpio_43		*	43
+gpio_44		*	44
+gpio_45		*	45
+gpio_46		*	46
+gpio_47		*	47
+gpio_48		*	48
+gpio_49		*	49
+gpio_50		*	50
+gpio_51		*	51
+gpio_52		*	52
+gpio_53		*	53
+gpio_54		*	54
+gpio_55		*	55
+gpio_56		*	56
+gpio_57		*	57
+gpio_58		*	58
+gpio_59		*	59
+gpio_61		*	61
+gpio_64		*	64
+gpio_65		*	65
+gpio_66		*	66
+gpio_67		*	67
+gpio_68		*	68
+gpio_69		*	69
+gpio_70		*	70
+gpio_71		*	71
+gpio_72		*	72
+gpio_73		*	73
+gpio_74		*	74
+gpio_75		*	75
+gpio_76		*	76
+gpio_77		*	77
+gpio_78		*	78
+gpio_79		*	79
+gpio_80		*	80
+gpio_81		*	81
+gpio_82		*	82
+gpio_83		*	83
+gpio_84		*	84
+gpio_85		*	85
+gpio_86		*	86
+gpio_87		*	87
+gpio_88		*	88
+gpio_89		*	89
+gpio_90		*	90
+gpio_91		*	91
+gpio_92		*	92
+gpio_93		*	93
+gpio_94		*	94
+gpio_95		*	95
+gpio_96		*	96
+gpio_97		*	97
+gpio_99		*	99		;INPUT ONLY
+gpio_100	*	100		;INPUT ONLY
+gpio_101	*	101
+gpio_102	*	102
+gpio_103	*	103
+gpio_104	*	104
+gpio_105	*	105		;INPUT ONLY
+gpio_106	*	106		;INPUT ONLY
+gpio_107	*	107		;INPUT ONLY
+gpio_108	*	108		;INPUT ONLY
+gpio_109	*	109
+gpio_110	*	110
+gpio_113	*	113
+gpio_121	*	121
+gpio_130	*	130
+gpio_131	*	131
+gpio_132	*	132
+gpio_133	*	133
+gpio_134	*	134
+gpio_135	*	135
+gpio_136	*	136
+gpio_137	*	137
+gpio_138	*	138
+gpio_139	*	139
+gpio_140	*	140
+gpio_141	*	141
+gpio_142	*	142
+gpio_143	*	143
+gpio_144	*	144
+gpio_145	*	145
+gpio_146	*	146
+gpio_147	*	147
+gpio_148	*	148
+gpio_149	*	149
+gpio_150	*	150
+gpio_151	*	151
+gpio_153	*	153
+gpio_155	*	155
+gpio_156	*	156
+gpio_157	*	157
+gpio_158	*	158
+gpio_159	*	159
+gpio_160	*	160
+gpio_161	*	161
+gpio_162	*	162
+gpio_163	*	163
+gpio_164	*	164
+gpio_165	*	165
+gpio_166	*	166
+gpio_167	*	167
+gpio_168	*	168
+gpio_170	*	170
+gpio_171	*	171
+gpio_172	*	172
+gpio_173	*	173
+gpio_174	*	174
+gpio_177	*	177
+gpio_181	*	181
+gpio_183	*	183
+gpio_184	*	184
+gpio_185	*	185
+gpio_186	*	186
+
+;GPIO system registers
+GPIO_SYSCONFIG          *       &010
+GPIO_SYSTATUS           *       &014
+GPIO_IRQSTATUS1		*	&018
+GPIO_IRQENABLE1		*	&01C
+GPIO_WAKEUPENABLE       *       &020
+GPIO_IRQSTATUS2         *       &028
+GPIO_IRQENABLE2         *       &02C
+GPIO_CTRL               *       &030
+GPIO_OE			*	&034
+GPIO_DATAIN             *       &038
+GPIO_DATAOUT            *       &03C
+GPIO_LEVELDETECT0       *       &040
+GPIO_LEVELDETECT1       *       &044
+GPIO_RISINGDETECT       *       &048
+GPIO_FALLINGDETECT      *       &04C
+GPIO_DEBOUNCEENABLE     *       &050
+GPIO_DEBOUNCETIME       *       &054
+GPIO_CLEARIRQENABLE1    *       &060
+GPIO_SETIRQENABLE1      *       &064
+GPIO_CLEARIRQENABLE2    *       &070
+GPIO_SETIRQENABLE2      *       &074
+GPIO_CLEARWKUENA        *       &080
+GPIO_SETWKUENA          *       &084
+GPIO_CLEARDATAOUT	*	&090
+GPIO_SETDATAOUT		*	&094
+
+;Modes for system control
+mode0		*	0		;
+mode1		*	1		;
+mode2		*	2		;
+mode3		*	3		;
+mode4		*	4		;
+mode5		*	5		;
+mode6		*	6		;
+mode7		*	7		;
+
+;bit used in system control
+pullenable	*	1:SHL:3		;
+pulldisable	*	0:SHL:3		;
+pullup		*	1:SHL:4		;
+pulldown	*	0:SHL:4		;
+inputenable	*	1:SHL:8		;
+inputdisable	*	0:SHL:8		;
+
+;GPIO modes
+mygpiomode1	*	mode4+pullenable+pullup+inputenable
+mygpiomode2	*	mode4+pullenable+pulldown+inputenable
+mymode0		*	mode0
+mymode1		*	mode1
+mymode2		*	mode2
+mymode3		*	mode3
+safemode	*	mode7
+
+;*************************** Beagle Xm **************************************
+M_button	*	gpio_4
+M_led0		*	gpio_149
+M_led1		*	gpio_150
+;i2c on exp
+i2c_1		*	gpio_183
+i2c_2		*	gpio_168
+;i2c on cam
+i2c_3		*	gpio_184
+i2c_4		*	gpio_185
+;uart on exp
+uart_rx		*	gpio_143
+uart_tx		*	gpio_146
+uart_cts	*	gpio_144
+uart_rts	*	gpio_145
+uart_rx_mode	*	1<<8
+uart_tx_mode	*	0<<8
+uart_cts_mode	*	0<<8
+uart_rts_mode	*	0<<8
+;usb on aux
+usb1_0		*	gpio_14
+usb1_1		*	gpio_15
+usb1_2		*	gpio_16
+usb1_3		*	gpio_21
+usb1_4		*	gpio_18
+usb1_5		*	gpio_19
+usb1_6		*	gpio_20
+usb1_7		*	gpio_17
+usb1_nxt	*	gpio_23
+usb1_clk	*	gpio_13
+usb1_dit	*	gpio_22
+usb1_stp	*	gpio_12
+usb1_mode	*	3<<8
+;mmc on aux
+mmc3_0		*	gpio_18
+mmc3_1		*	gpio_19
+mmc3_2		*	gpio_20
+mmc3_3		*	gpio_17
+mmc3_4		*	gpio_14
+mmc3_5		*	gpio_23
+mmc3_6		*	gpio_22
+mmc3_7		*	gpio_21
+mmc3_cmd	*	gpio_13
+mmc3_clk	*	gpio_12
+mmc3_mode	*	2<<8
+;mmc on exp
+mmc2_0		*	gpio_132
+mmc2_1		*	gpio_133
+mmc2_2		*	gpio_134
+mmc2_3		*	gpio_135
+mmc2_4		*	gpio_136
+mmc2_5		*	gpio_137
+mmc2_6		*	gpio_138
+mmc2_7		*	gpio_139
+mmc2_cmd	*	gpio_131
+mmc2_clk	*	gpio_130
+mmc2_mode	*	0<<8
+;mm on aux
+mm1_txen	*	gpio_21
+mm1_txdat	*	gpio_16
+mm1_txseo	*	gpio_15
+mm1_rx		*	gpio_23
+mm1_rxrcv	*	gpio_14
+mm1_rxdp	*	gpio_12
+mm1_mode	*	5<<8
+
+;bitmaps for GPIO pins on headers
+expbitmap	*	2_11110000000001111000111111111100
+auxbitmap	*	2_00000000011111111111100000000000
+cambitmap	*	2_00000000000000000101111111111111
+
+;i2c bus for i2c on exp
+i2cbus		*	1
+;************************** Beagle Xm end ************************************
+;***************************** Devkit ****************************************
+dev_button	*	gpio_26
+dev_led1	*	gpio_186
+dev_led2	*	gpio_163
+dev_led3	*	gpio_164
+;i2c on exp
+dev_i2c_1	*	gpio_184
+dev_i2c_2	*	gpio_185
+;uart on exp
+dev_uart_rx	*	gpio_151
+dev_uart_tx	*	gpio_148
+dev_uart_cts	*	gpio_150
+dev_uart_rts	*	gpio_149
+;mmc on exp
+dev_mmc2_0	*	gpio_132
+dev_mmc2_1	*	gpio_133
+dev_mmc2_2	*	gpio_134
+dev_mmc2_3	*	gpio_135
+dev_mmc2_4	*	gpio_136
+dev_mmc2_5	*	gpio_137
+dev_mmc2_6	*	gpio_138
+dev_mmc2_7	*	gpio_139
+dev_mmc2_cmd	*	gpio_131
+dev_mmc2_clk	*	gpio_130
+
+;i2c bus for i2c on exp
+dev_i2cbus	*	1
+;**************************** Devkit end *************************************
+;**************************** Panda ******************************************
+;physical map locations
+PDGPIO_1		*	&4A310000
+PDGPIO_2		*	&48055000
+PDGPIO_3		*	&48057000
+PDGPIO_4		*	&48059000
+PDGPIO_5		*	&4805B000
+PDGPIO_6		*	&4805D000
+
+PDPADCONF_1		*	&4A100000
+
+C_PDgpio_0	*	&184
+C_PDgpio_1	*	&186
+C_PDgpio_2	*	&190
+C_PDgpio_3	*	&192
+C_PDgpio_4	*	&048
+C_PDgpio_5	*	&050+input_only
+C_PDgpio_6	*	&054
+C_PDgpio_7	*	&05A
+C_PDgpio_8	*	&05C
+C_PDgpio_9	*	&068
+C_PDgpio_10	*	&06A
+C_PDgpio_11	*	&1AE
+C_PDgpio_12	*	&1B0
+C_PDgpio_13	*	&1B2
+C_PDgpio_14	*	&1B4
+C_PDgpio_15	*	&1B6
+C_PDgpio_16	*	&1B8
+C_PDgpio_17	*	&1BA
+C_PDgpio_18	*	&1BC
+C_PDgpio_19	*	&1BE
+C_PDgpio_20	*	&1C0
+C_PDgpio_21	*	&1C2
+C_PDgpio_22	*	&1C4
+C_PDgpio_23	*	&1C6
+C_PDgpio_24	*	&1C8
+C_PDgpio_25	*	&1CA
+C_PDgpio_26	*	&1CC
+C_PDgpio_27	*	&1CE
+C_PDgpio_28	*	&1D0
+C_PDgpio_29	*	&066
+C_PDgpio_30	*	&056
+C_PDgpio_31	*	&058
+C_PDgpio_32	*	&050
+C_PDgpio_33	*	&052
+C_PDgpio_34	*	&054
+C_PDgpio_35	*	&056
+C_PDgpio_36	*	&058
+C_PDgpio_37	*	&05A
+C_PDgpio_38	*	&05C
+C_PDgpio_39	*	&05E
+C_PDgpio_40	*	&060
+C_PDgpio_41	*	&062
+C_PDgpio_42	*	&064
+C_PDgpio_43	*	&066
+C_PDgpio_44	*	&068
+C_PDgpio_45	*	&06A
+C_PDgpio_46	*	&06C
+C_PDgpio_47	*	&06E
+C_PDgpio_48	*	&070
+C_PDgpio_49	*	&072
+C_PDgpio_50	*	&074
+C_PDgpio_51	*	&076
+C_PDgpio_52	*	&078
+C_PDgpio_53	*	&07A
+C_PDgpio_54	*	&07C
+C_PDgpio_55	*	&07E
+C_PDgpio_56	*	&080
+C_PDgpio_57	*	&082
+C_PDgpio_58	*	&084
+C_PDgpio_59	*	&086
+C_PDgpio_60	*	&088
+C_PDgpio_61	*	&08A
+C_PDgpio_62	*	&08C
+C_PDgpio_63	*	&098
+C_PDgpio_64	*	&09A
+C_PDgpio_65	*	&09C
+C_PDgpio_66	*	&09E
+C_PDgpio_67	*	&0A0+input_only
+C_PDgpio_68	*	&0A2+input_only
+C_PDgpio_69	*	&0A4+input_only
+C_PDgpio_70	*	&0A6+input_only
+C_PDgpio_71	*	&0A8+input_only
+C_PDgpio_72	*	&0AA+input_only
+C_PDgpio_73	*	&0AC+input_only
+C_PDgpio_74	*	&0AE+input_only
+C_PDgpio_75	*	&0B0+input_only
+C_PDgpio_76	*	&0B2+input_only
+C_PDgpio_77	*	&0B4+input_only
+C_PDgpio_78	*	&0B6+input_only
+C_PDgpio_79	*	&0B8+input_only
+C_PDgpio_80	*	&0BA+input_only
+C_PDgpio_81	*	&0BC
+C_PDgpio_82	*	&0BE
+C_PDgpio_83	*	&0C0
+C_PDgpio_84	*	&0C2
+C_PDgpio_85	*	&0C4
+C_PDgpio_86	*	&0C6
+C_PDgpio_87	*	&0C8
+C_PDgpio_88	*	&0CA
+C_PDgpio_89	*	&0CC
+C_PDgpio_90	*	&0CE
+C_PDgpio_91	*	&0D0
+C_PDgpio_92	*	&0D2
+C_PDgpio_93	*	&0D4
+C_PDgpio_94	*	&0D6
+C_PDgpio_95	*	&0D8
+C_PDgpio_96	*	&0DA
+C_PDgpio_97	*	&0DC
+C_PDgpio_98	*	&0DE
+C_PDgpio_99	*	&0E0
+C_PDgpio_100	*	&0E2
+C_PDgpio_101	*	&0E4
+C_PDgpio_102	*	&0E6
+C_PDgpio_103	*	&0E8
+C_PDgpio_104	*	&0EA
+C_PDgpio_105	*	&0EC
+C_PDgpio_106	*	&0EE
+C_PDgpio_107	*	&0F0
+C_PDgpio_108	*	&0F2
+C_PDgpio_109	*	&0F4
+C_PDgpio_110	*	&0F6
+C_PDgpio_111	*	&0F8
+C_PDgpio_112	*	&0FA
+C_PDgpio_113	*	&0FC
+C_PDgpio_114	*	&0FE
+C_PDgpio_115	*	&100
+C_PDgpio_116	*	&102
+C_PDgpio_117	*	&104
+C_PDgpio_118	*	&10E
+C_PDgpio_119	*	&110
+C_PDgpio_120	*	&112
+C_PDgpio_121	*	&114
+C_PDgpio_122	*	&116
+C_PDgpio_123	*	&118
+C_PDgpio_124	*	&11A
+C_PDgpio_125	*	&11C
+C_PDgpio_126	*	&11E
+C_PDgpio_127	*	&120
+C_PDgpio_128	*	&126
+C_PDgpio_129	*	&128
+C_PDgpio_130	*	&12A
+C_PDgpio_131	*	&12C
+C_PDgpio_132	*	&12E
+C_PDgpio_133	*	&130
+C_PDgpio_134	*	&132
+C_PDgpio_135	*	&134
+C_PDgpio_136	*	&136
+C_PDgpio_137	*	&138
+C_PDgpio_138	*	&13A
+C_PDgpio_139	*	&13C
+C_PDgpio_140	*	&13E
+C_PDgpio_141	*	&140
+C_PDgpio_142	*	&142
+C_PDgpio_143	*	&144
+C_PDgpio_144	*	&146
+C_PDgpio_145	*	&148
+C_PDgpio_146	*	&14A
+C_PDgpio_147	*	&14C
+C_PDgpio_148	*	&14E
+C_PDgpio_149	*	&150
+C_PDgpio_150	*	&152
+C_PDgpio_151	*	&154
+C_PDgpio_152	*	&156
+C_PDgpio_153	*	&158
+C_PDgpio_154	*	&15A
+C_PDgpio_155	*	&15C
+C_PDgpio_156	*	&15E
+C_PDgpio_157	*	&160
+C_PDgpio_158	*	&162
+C_PDgpio_159	*	&164
+C_PDgpio_160	*	&166
+C_PDgpio_161	*	&168
+C_PDgpio_162	*	&16A
+C_PDgpio_163	*	&16C
+C_PDgpio_164	*	&16E
+C_PDgpio_165	*	&170
+C_PDgpio_166	*	&172
+C_PDgpio_167	*	&174
+C_PDgpio_168	*	&176
+C_PDgpio_169	*	&178
+C_PDgpio_170	*	&17A
+C_PDgpio_171	*	&17C
+C_PDgpio_172	*	&17E
+C_PDgpio_173	*	&180
+C_PDgpio_174	*	&182
+C_PDgpio_175	*	&184
+C_PDgpio_176	*	&186
+C_PDgpio_177	*	&188
+C_PDgpio_178	*	&18A
+C_PDgpio_179	*	&0
+C_PDgpio_180	*	&0
+C_PDgpio_181	*	&19A
+C_PDgpio_182	*	&19C
+C_PDgpio_183	*	&1A0
+C_PDgpio_184	*	&1A2
+C_PDgpio_185	*	&1A4
+C_PDgpio_186	*	&1A6
+C_PDgpio_187	*	&1A8
+C_PDgpio_188	*	&1AA
+C_PDgpio_189	*	&1AC
+C_PDgpio_190	*	&1D2
+C_PDgpio_191	*	&1D4
+
+;i2c
+PD_i2c_1	*	gpio_130
+PD_i2c_2	*	gpio_131
+PD_i2c_3	*	gpio_132
+PD_i2c_4	*	gpio_133
+;user
+PDES_button	*	gpio_113
+PDES_ledD1	*	gpio_110
+PDES_ledD2	*	gpio_8
+
+PD_button	*	gpio_121
+PD_ledD1	*	gpio_7
+PD_ledD2	*	gpio_8
+
+;mmc
+PD_mmc1_0	*	gpio_32
+PD_mmc1_1	*	gpio_33
+PD_mmc1_2	*	gpio_34
+PD_mmc1_3	*	gpio_35
+PD_mmc1_4	*	gpio_36
+PD_mmc1_5	*	gpio_37
+PD_mmc1_6	*	gpio_38
+PD_mmc1_7	*	gpio_39
+PD_mmc1_cmd	*	gpio_55
+PD_mmc1_clk	*	gpio_56
+PD_mmc1_mode	*	5<<8
+
+;uart
+PD_uart4_rx	*	gpio_155
+PD_uart4_tx	*	gpio_156
+PD_uart4_mode	*	0
+
+
+omap4_GPIO_SYSCONFIG		*	&010
+omap4_GPIO_SYSSTATUS		*	&114
+omap4_GPIO_IRQSTATUS1		*	&118
+omap4_GPIO_IRQENABLE1		*	&11c
+omap4_GPIO_WAKE_EN		*	&120
+omap4_GPIO_IRQSTATUS2		*	&128
+omap4_GPIO_IRQENABLE2		*	&12c
+omap4_GPIO_CTRL			*	&130
+omap4_GPIO_OE			*	&134
+omap4_GPIO_DATAIN		*	&138
+omap4_GPIO_DATAOUT		*	&13c
+omap4_GPIO_LEVELDETECT0		*	&140
+omap4_GPIO_LEVELDETECT1		*	&144
+omap4_GPIO_RISINGDETECT		*	&148
+omap4_GPIO_FALLINGDETECT	*	&14c
+omap4_GPIO_DEBOUNCE_EN		*	&150
+omap4_GPIO_DEBOUNCE_VAL		*	&154
+omap4_GPIO_CLEARIRQENABLE1	*	&160
+omap4_GPIO_SETIRQENABLE1	*	&164
+omap4_GPIO_CLEARIRQENABLE2	*       &170
+omap4_GPIO_SETIRQENABLE2	*       &174
+omap4_GPIO_CLEARWKUENA		*	&180
+omap4_GPIO_SETWKUENA		*	&184
+omap4_GPIO_CLEARDATAOUT		*	&190
+omap4_GPIO_SETDATAOUT		*	&194
+
+PDexpbitmap	*	2_00000000000000000000000000000000
+PDauxbitmap	*	2_00000000000000000000000000000000
+PDcambitmap	*	2_00000000000000000000000000000000
+
+;***************************** Panda end ****************************************
+;***************************** Raspberry ****************************************
+;pi_GPIO_Base	*	&7E200000
+pi_GPIO_Base	*	&20200000
+piMk2_GPIO_Base	*	&3F200000
+		^	0
+pi_GPSEL0	#	4
+pi_GPSEL1	#	4
+pi_GPSEL2	#	4
+pi_GPSEL3	#	4
+pi_GPSEL4	#	4
+pi_GPSEL5	#	4
+pi_res1		#	4
+pi_GPSET0	#	4
+pi_GPSET1	#	4
+pi_res2		#	4
+pi_GPCLR0	#	4
+pi_GPCLR1	#	4
+pi_res3		#	4
+pi_GPLEV0	#	4
+pi_GPLEV1	#	4
+pi_res4		#	4
+pi_GPEDS0	#	4
+pi_GPEDS1	#	4
+pi_res5		#	4
+pi_GPREN0	#	4
+pi_GPREN1	#	4
+pi_res6		#	4
+pi_GPFEN0	#	4
+pi_GPFEN1	#	4
+pi_res7		#	4
+pi_GPHEN0	#	4
+pi_GPHEN1	#	4
+pi_res8		#	4
+pi_GPLEN0	#	4
+pi_GPLEN1	#	4
+pi_res9		#	4
+pi_GPAREN0	#	4
+pi_GPAREN1	#	4
+pi_res10	#	4
+pi_GPAFEN0	#	4
+pi_GPAFEN1	#	4
+pi_res11	#	4
+pi_GPPUD	#	4
+pi_GPPUDCLK0	#	4
+pi_GPPUDCLK1	#	4
+pi_res12	#	4
+pi_test		#	4
+
+
+pi_FSEL0	*	&000+0
+pi_FSEL1	*	&000+3
+pi_FSEL2	*	&000+6
+pi_FSEL3	*	&000+9
+pi_FSEL4	*	&000+12
+pi_FSEL5	*	&000+15
+pi_FSEL6	*	&000+18
+pi_FSEL7	*	&000+21
+pi_FSEL8	*	&000+24
+pi_FSEL9	*	&000+27
+pi_FSEL10	*	&100+0
+pi_FSEL11	*	&100+3
+pi_FSEL12	*	&100+6
+pi_FSEL13	*	&100+9
+pi_FSEL14	*	&100+12
+pi_FSEL15	*	&100+15
+pi_FSEL16	*	&100+18
+pi_FSEL17	*	&100+21
+pi_FSEL18	*	&100+24
+pi_FSEL19	*	&100+27
+pi_FSEL20	*	&200+0
+pi_FSEL21	*	&200+3
+pi_FSEL22	*	&200+6
+pi_FSEL23	*	&200+9
+pi_FSEL24	*	&200+12
+pi_FSEL25	*	&200+15
+pi_FSEL26	*	&200+18
+pi_FSEL27	*	&200+21
+pi_FSEL28	*	&200+24
+pi_FSEL29	*	&200+27
+pi_FSEL30	*	&300+0
+pi_FSEL31	*	&300+3
+pi_FSEL32	*	&300+6
+pi_FSEL33	*	&300+9
+pi_FSEL34	*	&300+12
+pi_FSEL35	*	&300+15
+pi_FSEL36	*	&300+18
+pi_FSEL37	*	&300+21
+pi_FSEL38	*	&300+24
+pi_FSEL39	*	&300+27
+pi_FSEL40	*	&400+0
+pi_FSEL41	*	&400+3
+pi_FSEL42	*	&400+6
+pi_FSEL43	*	&400+9
+pi_FSEL44	*	&400+12
+pi_FSEL45	*	&400+15
+pi_FSEL46	*	&400+18
+pi_FSEL47	*	&400+21
+pi_FSEL48	*	&400+24
+pi_FSEL49	*	&400+27
+pi_FSEL50	*	&500+0
+pi_FSEL51	*	&500+3
+pi_FSEL52	*	&500+6
+pi_FSEL53	*	&500+9
+
+pi_top_gpio	*	45
+
+;user
+Pi_LED		*	gpio_16
+Com_LED		*	gpio_47
+;i2c on exp
+rpi_i2c0_1	*	gpio_1
+rpi_i2c0_2	*	gpio_0
+rpi_i2c1_1	*	gpio_3
+rpi_i2c1_2	*	gpio_2
+;uart on exp
+rpi_uart0_rx	*	gpio_15
+rpi_uart0_tx	*	gpio_14
+pi_uart0	*	Pi_Alt0<<8
+;spio on exp
+rpi_spio0_ce1	*	gpio_7
+rpi_spio0_ce0	*	gpio_8
+rpi_spio0_miso	*	gpio_9
+rpi_spio0_mosi	*	gpio_10
+rpi_spio0_sclk	*	gpio_11
+pi_spio0	*	Pi_Alt0<<8
+
+Pi_GPIOIn	*	0
+Pi_GPIOOut	*	1
+Pi_Alt0		*	4
+Pi_Alt1		*	5
+Pi_Alt2		*	6
+Pi_Alt3		*	7
+Pi_Alt4		*	2
+Pi_Alt5		*	3
+
+Pi_PUDOff	*	0
+Pi_PUDEnDown	*	1
+Pi_PUDEnUp	*	2
+
+
+;pi_exp_bitmask		*	2_00000011111001101100111110010011
+;pi_com_bitmask1	*	2_11111111111111111111111111111111
+;pi_com_bitmask2	*	2_00000000001111111111111111111111
+
+;i2c bus for i2c on exp
+pi_i2cbusr1	*	0
+pi_i2cbusr2	*	0
+;**************************** Raspberry end *************************************
+;dummy hal
+		^	0
+hal_dummy	#	1
+
+		^	0
+dummy		#	1
+dummynext	#	1
+
+;If new boards are added, change revision (from Hdr.GPIODevice) to the new last one and add a table!!!
+;this gives internal machine type....
+		^	0
+hal_rev_dummy	#	dummynext
+hal_rev_beagle	#	GPIORevision_BeagleBoard_xMC+1
+hal_rev_dev	#	GPIORevision_DevKit8000_Unknown+1
+hal_rev_igep	#	GPIORevision_IGEPv2_C+1
+hal_rev_pandora	#	GPIORevision_Pandora_Unknown+1
+hal_rev_panda	#	GPIORevision_PandaES+1
+	[ {FALSE}
+hal_rev_pi	#	GPIORevision_RaspberryPi_Mk2_B_1+1
+	]
+
+;offsets into table
+			^	0
+control_reg		#	4
+exp_pins		#	4
+aux_pins		#	4
+camera_pins		#	4
+user_pins		#	4
+i2c_pins		#	4
+widebit_pins		#	4
+uart_pins		#	4
+usb_pins		#	4
+mmc_aux_pins		#	4
+mmc_exp_pins		#	4
+mm_pins			#	4
+srambase		#	4
+map			#	4
+physical_table		#	4
+boardnamestring		#	4
+
+maxtable		#	:INDEX: @
+
+tablesize		*	6	;table size of 16 locations
+
+;config bits
+conf_io		*	1<<12
+conf_updown	*	1<<13
+conf_inenable	*	1<<14
+conf_extended	*	1<<15	;if set bits below are used
+conf_lv0	*	1<<16
+conf_lv1	*	1<<17
+conf_rising	*	1<<18
+conf_falling	*	1<<19
+conf_debounce	*	1<<20
+conf_irq1	*	1<<21
+conf_irq2	*	1<<22
+
+input_only	*	1<<15
+;wide offsets
+		^	0
+wide_exp	#	4
+wide_exppin	#	4
+wide_aux	#	4
+wide_auxpin	#	4
+wide_cam	#	4
+wide_campin	#	4
+
+;i2c gpio bits
+i2c_bus1	*	0<<24	;bus 1
+i2c_bus2	*	1<<24	;bus 2
+i2c_bus3	*	1<<25	;bus 3
+i2c_bus4	*	3<<24	;bus 4
+i2c_flag	*	1<<31	;test flag
+i2c_base	*	&40	;base address of device
+i2c_max		*	&4C	;last device addressable
+
+;i2c gpio chip registers
+mcpiodira	*	0
+mcpipola	*	2
+mcpintena	*	4
+mcpdefvala	*	6
+mcpicona	*	8
+mcpiocona	*	&A
+mcpgppua	*	&C
+mcpintfa	*	&E
+mcpintcapa	*	&10
+mcpgpioa	*	&12
+mcpolata	*	&14
+mcpbase		*	&40
+
+;proc reg table offsets
+			^	0
+proc_sysconfig		#	2
+proc_sysstatus		#	2
+proc_irqstatus1		#	2
+proc_irqenable1		#	2
+proc_wakeupenable	#	2
+proc_irqstatus2		#	2
+proc_irqenable2		#	2
+proc_ctrl		#	2
+proc_oe			#	2
+proc_datain		#	2
+proc_dataout		#	2
+proc_leveldetect0	#	2
+proc_leveldetect1	#	2
+proc_risingdetect	#	2
+proc_fallingdetect	#	2
+proc_debounceenable	#	2
+proc_debouncetime	#	2
+proc_clearirqenable1	#	2
+proc_setirqenable1	#	2
+proc_clearirqenable2	#	2
+proc_setirqenable2	#	2
+proc_clearwkuena	#	2
+proc_setwkuena		#	2
+proc_cleardataout	#	2
+proc_setdataout		#	2
+
+proc_tableshift		*	6
+
+	END

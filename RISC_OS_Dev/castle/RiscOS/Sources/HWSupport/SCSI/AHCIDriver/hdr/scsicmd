@@ -1,0 +1,66 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+;
+
+; definition of bits etc in various scsi commands
+
+        [       :LNOT: :DEF: __SCSICMD_HDR__
+        GBLL    __SCSICMD_HDR__
+Service_SCSIAttached  * &20102
+Service_SCSIDetached  * &20103
+Service_SCSIStarting  * &20100
+Service_SCSIDying     * &20101
+
+; r0 flags for forground and background Ops
+WriteBit        *       24
+ReadBit         *       25
+RWMask          *       (3<<WriteBit)
+ScatterListBit  *       26
+BackgroundBit   *       29
+
+
+;SCSI Inquiry comand &12
+                ^       0
+SCInq           #       0
+SCInqType       #       1
+SCInqHDD        *       0
+SCInqCD         *       5
+SCInqRemove     #       1
+SCInqRem        *       (1<<7)
+SCInqVersion    #       1
+SCInqResponse   #       1
+SCInqResptype   *       2
+SCInqCount      #       1       ; total data available less 4
+SCInqP1         #       1
+SCInqP2         #       1
+SCInqP3         #       1
+SCInqP3val      *       2
+SCInqVendor     #       8
+SCInqProduct    #       16
+SCInqRevn       #       4
+SCInqEnd        #       0
+SCInqLen        *       (SCInqEnd - 4)
+        ASSERT  SCInqEnd = 36
+
+; SCSI status byte values
+TARGET_GOOD                     EQU 2_00000000
+TARGET_CHECK_CONDITION          EQU 2_00000010
+TARGET_BUSY                     EQU 2_00001000
+
+        ]
+        END

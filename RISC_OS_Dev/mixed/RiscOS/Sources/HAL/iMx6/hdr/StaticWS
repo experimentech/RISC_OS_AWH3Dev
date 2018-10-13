@@ -1,0 +1,304 @@
+; This source code in this file is licensed to You by Castle Technology
+; Limited ("Castle") and its licensors on contractual terms and conditions
+; ("Licence") which entitle you freely to modify and/or to distribute this
+; source code subject to Your compliance with the terms of the Licence.
+;
+; This source code has been made available to You without any warranties
+; whatsoever. Consequently, Your use, modification and distribution of this
+; source code is entirely at Your own risk and neither Castle, its licensors
+; nor any other person who has contributed to this source code shall be
+; liable to You for any loss or damage which You may suffer as a result of
+; Your use, modification or distribution of this source code.
+;
+; Full details of Your rights and obligations are set out in the Licence.
+; You should have received a copy of the Licence with this source code file.
+; If You have not received a copy, the text of the Licence is available
+; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;
+
+        [       :LNOT: :DEF: __HAL_STATICWS_HDR__
+        GBLL    __HAL_STATICWS_HDR__
+
+        GET     SDMA
+        GET     Video
+        GET     Audio
+        GET     I2C
+        GET     cpmem
+        GET     Hdr:SDHCIDevice
+        GET     Hdr:DMADevice
+        GET     Hdr:EtherDevice
+        GET     Hdr:AHCIDevice
+        GET     Hdr:GPIODevice
+        GET     Hdr:SPIDevice
+        GET     ENET
+        GET     AHCI
+        GET     GPIO
+        GET     SPI
+        GET     CPUSpeed
+        GET     hdr.CPUSpeed
+
+sb              RN      9
+
+; Per-SDHCI workspace
+
+                        ^       0
+SDHCIDevice             #       HALDevice_SDHCISize     ; see Hdr:SDHCIDevice
+SDHCISB                 #       4                       ; pointer to HAL workspace for HAL calls
+SDHCISlotInfo           #       HALDeviceSDHCI_SlotInfo_Size ; each of our controllers has just the 1 slot
+SDHCIBaseClock          #       4                       ; Base clock in kHz
+SDHCISize               *       :INDEX:@
+
+MaxSDControllers        *       3
+
+; Per-DMA channel workspace
+                       ^ 0, a1
+DMACDevice             # HALDevice_DMAL_Size
+DMACWorkspace          # 4 ; HAL workspace ptr
+DMACChanMask           # 4 ; 1<<number
+DMACChanNum            # 1 ; Channel number
+DMACRequestNo          # 1 ; DMA request number this channel is allocated to
+                       # 2 ; Spare
+DMACOptions            # 4 ; Flags from SetOptions
+DMACPeriAddress        # 4 ; Address from SetOptions
+DMACDescriptors        # 4 ; Log addr of buffer descriptors
+DMACLastProgress       # 4 ; Last reported progress value
+DMACLastDescriptor     # 4 ; Last buffer descriptor polled (i.e. first one still in use by SDMA)
+DMACDesc               # 28 ; Buffer for description string
+DMAC_DeviceSize        * :INDEX: @
+
+; NOTE.. all items at start workspace are duplicated in h.ws in the StaticWS structure  .. KEEP THESE IN SYNC!!
+                ^       0,sb
+StaticWS_C_Base #       0
+CPUIOBase       #       4 ; CPUIO space logical base
+PCIeBase        #       4 ; PCIe space logical base
+MainIOBase      #       4 ; Main IO space logical base
+ScrInit         #       4 ; Phys addr of screen start
+CCM_Base        #       4                    ; CCM base address
+IOMUXC_Base     #       4                    ; IOMUXC base address
+HDMI_Log        #       4                    ; HDMI base address
+IRQDi_Log       #       4 ; Interrupt Distributor logical address
+IRQC_Log        #       4 ; Interrupt controller logical address
+Timers_Log      #       4*5 ; Timers logical base addresses (5 off)
+SCU_Log         #       4 ; Snoop Control Unit logical address
+SRC_Log         #       4 ; System Reset unit logical address
+IPU1_Log        #       4 ;
+IPU2_Log        #       4 ;
+CCMAn_Log       #       4 ;
+GPC_Log         #       4 ;
+ENET_Log        #       4 ;
+SATA_Log        #       4 ; sata chip
+USB_Log         #       4 ;
+USBPHY_Log      #       4 ;
+OCOTP_Log       #       4 ;
+GPIO_Log        #       4 ; GPIO (GPIO1)
+WDOG1_Log       #       4 ; WDOG (WDOG1)
+WDOG2_Log       #       4 ; WDOG (WDOG2)
+SDIO_Log        #       4 ; USDHC1
+SPI_Log         #       4 ; BaseSPI address
+AudMux_Log      #       4
+SSI_Log         #       12
+;
+ [ VideoInHAL
+myHDMI_infos    #       0 ; start of hdmi_data_info_s structure
+enc_in_format   #       4
+enc_out_format  #       4
+enc_color_depth #       4
+colorimetry     #       4
+pix_repet_factor #      4
+hdcp_enable     #       4
+video_mode      #       4
+
+myHDMI_vmode_infos    # 0 ; start of hdmi_vmode_s structure
+mCode                 # 4
+mHdmiDviSel           # 4
+mRVBlankInOSC         # 4
+mRefreshRate          # 4
+mHImageSize           # 4
+mVImageSize           # 4
+mHActive              # 4
+mVActive              # 4
+mHBlanking            # 4
+mVBlanking            # 4
+mHSyncOffset          # 4
+mVSyncOffset          # 4
+mHSyncPulseWidth      # 4
+mVSyncPulseWidth      # 4
+mHSyncPolarity        # 4
+mVSyncPolarity        # 4
+mDataEnablePolarity   # 4
+mInterlaced           # 4
+mPixelClock           # 4
+mHBorder              # 4
+mVBorder              # 4
+mPixelRepetitionInput # 4
+ml2bpp                # 4
+
+myHDMI_audioparams  #   0 ; start of hdmi_audioparam_s structure
+IecCgmsA                  # 1
+                          # 3
+IecCopyright              # 4
+IecCategoryCode           # 1
+IecPcmMode                # 1
+IecSourceNumber           # 1
+IecClockAccuracy          # 1
+OriginalSamplingFrequency # 4
+ChannelAllocation         # 1
+                          # 3
+SamplingFrequency         # 4
+SampleSize                # 4
+
+myidmacinfo         #   ipu_idmac_info_size ; used in ipu_idmac
+
+myHDMI_dev_panel        # 0 ; start of ips_dev_panel_t structure
+mpanel_name             # 32;
+mpanel_id               # 4;
+mpanel_type             # 4;
+mcolorimetry            # 4;
+mrefresh_rate           # 4;
+mwidth                  # 4;
+mheight                 # 4;
+mpixel_clock            # 4;
+mhsync_start_width      # 4;
+mhsync_width            # 4;
+mhsync_end_width        # 4;
+mvsync_start_width      # 4;
+mvsync_width            # 4;
+mvsync_end_width        # 4;
+mdelay_h2v              # 4;
+mpinterlaced            # 4;
+mclk_sel                # 4;
+mclk_pol                # 4;
+mhsync_pol              # 4;
+mvsync_pol              # 4;
+mdrdy_pol               # 4;
+mdata_pol               # 4;
+mpanel_init             # 4;
+mpanel_deinit           # 4;
+ ] ; VideoInHAL
+
+; end of StaticWS C header
+
+OSheader        #       4
+OSentries       #       4*(HighestOSEntry+1)
+UART_Base       #       4*(UART_Count)       ; base hardware address of uarts
+UART_IRQ        #       4*(UART_Count)       ; irq numbers for the uarts
+DebugUART       #       4                    ; base hardware address: DebugUart
+UART_TIRQEn     #       1*(UART_Count)       ; recort state of transmit irq enable
+; align on 4 byte boundary
+                #       (((:INDEX:@)+3):AND::NOT:3)-(:INDEX:@)
+
+I2C_Table       #       (I2CBlockSize * I2C_BusCount); I2C space
+
+
+sys_clk         #       4 ; System clock speed in Hz
+Timer_DelayMul  #       4 ; sys_clk/100KHz
+HALInitialised  #       4 ; Flag for whether HAL_Init is done yet
+NVMemoryFound   #       4 ; Size of EEPROM detected (may be 0)
+SDMA_Log        #       4 ; SDMA logical address
+IntSRAM_Log     #       4 ; SRAM logical address
+;
+BoardDetectInfo #       4         ; stores result of board detect
+                                  ; for detecting RevD boards
+                                  ; Bit 0 NZ if it looks like RevD
+                                  ; From EthernetPhy Testing
+;BoardDetectInfo1 #      4
+
+ [ DebugInterrupts
+LastInterrupt_IRQ #     4 ; Last IRQ, -1 if cleared
+LastInterrupt_FIQ #     4 ; Last FIQ, -1 if cleared
+tickertimer       #     4 ; used to do ticker reports
+  [ ExtraDebugInterrupts
+ExtraDebugIRQEnabled #  4 ; Nonzero if extra debugging enabled
+  ]
+ ]
+; some iMx6 board specific stuff- this is copied to allocate HAL memory later
+;
+PeriBase        #       4
+IRQ_Base_Address #      4
+UARTFCRSoftCopy #       4
+MMUOffBaseAddr  #       4         ; original address kernel was loaded from
+MachineID       #       8         ; derived from MAC address if there
+
+ [ VideoInHAL
+VIDCList3       #       VIDCList3_Size    ; space for a V3 mode def
+ ]
+
+NCNBWorkspace   #       4 ; Base of ncnb workspace
+NCNBAllocNext   #       4 ; next free address in ncnb workspace
+;
+
+VideoDevice     #       Video_DeviceSize
+ [ VideoInHAL
+PointerPhys     #       4 ; Phys addr of pointer image
+PointerLog      #       4 ; Log addr of pointer image
+PointerPal      #       16 ; Pointer palette
+PointerX        #       4 ; Pointer delta values - offset of image within buffer
+PointerY        #       4
+PointerPalDirty #       1 ; Nonzero if pointer palette has changed
+PointerDisabled #       1 ; Nonzero if pointer is disabled
+                #       2
+ ]
+
+EPITClk          #       4 ; EPIT clock rate in Hz
+
+EtherTH_Device  #       (ENETDeviceSize)
+
+AHCI_Device     #       (AHCIDeviceSize)
+CPUClk_Device   #       (CPUClkDeviceSize)
+GPIO_Device     #       (GPIODeviceSize)
+SPI_Device      #       (SPIDeviceSize)
+
+SDIOWS          #       SDHCISize * MaxSDControllers
+
+DMA_CH_Count    *       31 ; Channel 0 is reserved for HAL use, remaining 31 are exposed to OS
+DMAFreeChannels #       4 ; Mask of which physical DMA channels are free
+DMANumChannels  #       4 ; Count of how many channel devices exist
+DMACCB          #       4 ; Pointer to base of channel control blocks
+DMABD0          #       4 ; Pointer to channel 0 buffer descriptor
+DMAChannelList  #       DMA_CH_Count*4 ; List of channel devices for Enumerate
+                #       (16-:INDEX:@):AND:15    ; align nicely
+DMAController   #       HALDevice_DMAC_Size_0_1 ; see Hdr:HALDevice
+
+SataWorkLog     #       4       ; Logical address of sata workspace at runtime
+SataRXFISLog    #       4       ; logical FIS address
+SataCMDHDLog    #       4       ; logical cmdtab address
+SataRXFISPhys   #       4       ; Physical FIS address
+SataCMDHDPhys   #       4       ; Physical cmdtab address
+; SATA_CMDHD_BASE MUST be on a 1k boundary.. positioning of this workspace
+; seems less predictable, so allow for it,and compute at run time
+MAX_SATA_PROTOCOL_SIZE * &1000  ; max workspace for the  protocol stuff below
+; SATA workspace for AHCI work files etc
+SATA_WORK_START #       0
+; align at 256 byte base in final position
+SATA_RXFIS_BASE #       0
+                #       SATA_RX_FIS_Size
+; align at 1024 boundary in final position
+SATA_CMDHD_BASE #       0
+                #       32*SATA_CMD_HEADER_SIZE
+SATA_CMDTB_BASE #       0
+                #       MAX_SATA_PROTOCOL_SIZE - SATA_CMDTB_BASE + SATA_RXFIS_BASE
+                #       1024+256                ; add an extra K + 256 to enable
+                                        ; run time align
+SATA_CMDTB_END  #       0
+        ASSERT  (SATA_CMDTB_END-SATA_RXFIS_BASE) = MAX_SATA_PROTOCOL_SIZE +1024+256
+
+; align on 16 byte boundary
+                #       (((:INDEX:@)+15):AND::NOT:15)-(:INDEX:@)
+
+USBAllocAreaSize        *       16*1024
+; With an ordinary setup, about half of this memory gets used.
+; About 3K goes to some big allocs (looks like the bus structs)
+
+USBAllocArea    #       USBAllocAreaSize
+
+DMAChannels     #       DMAC_DeviceSize*32      ; List of channel devices (indexed by physical channel #)
+
+AudioWS         #       Audio_WorkspaceSize
+RTCDeviceStruct #       80
+PL310Device     #       HALDeviceSize
+
+HAL_WsSize      *       :INDEX:@
+
+        ] ; __HAL_STATICWS_HDR__
+
+        END

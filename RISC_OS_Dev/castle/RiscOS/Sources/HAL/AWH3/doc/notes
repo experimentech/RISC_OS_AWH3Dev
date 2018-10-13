@@ -1,0 +1,28 @@
+r9: pointer to U-Boot functions
+
+Something like image type =sec in U boot env may be what's needed to get it to boot.
+
+TODO: EVERYTHING!
+
+*DMA
+*IIC
+*SPI?
+*SD Card
+*CPU speed (and maybe DRAM?)
+*SMP
+*RAM detection
+*Video
+*Audio
+*PIO with GPIO layer inc. RPI compat for OPiPC, board LEDs
+*Finish USB
+*Ethernet
+*PCI??????? OHCI seems to need it.
+
+*Add hdr2h to Makefile
+*File cleanup
+*Add support for other H3 based boards
+*Add support for H3 related SoCs
+*Get VRAM allocated as RAM and not IO?
+*Allocate "Dead RAM" around VRAM
+*Do something with SRAM?
+*Crypto?
