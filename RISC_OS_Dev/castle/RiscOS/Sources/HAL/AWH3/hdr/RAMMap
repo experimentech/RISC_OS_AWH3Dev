@@ -23,7 +23,11 @@ VRAM_FLAGS        *    2_001100000011
 ;an extra mb of wiggle room for stashing stuff.
 ;All hardcoded for now. No detection.
 RO_RAM_START       *    &7F800000
-RO_RAM_END         *    RO_RAM_START + RO_SIZE ;&7FD00000
+;Let's go all the way.
+RO_RAM_END	   *    &80000000
+
+;Below works but causes incomplete RAM usage
+;RO_RAM_END         *    RO_RAM_START + RO_SIZE ;&7FD00000
 RO_SIZE            *    &500000
 PreMMU_Workspace   *    &7FD00000 ; &40000000 ;Maybe I'm treading on something.
 PreMMU_Stack       *    &7FDFFFFC
