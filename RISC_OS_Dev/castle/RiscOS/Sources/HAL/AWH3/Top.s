@@ -92,6 +92,7 @@ HAL_Base
 ;        DCD     0
 ;        B       reset   ;not interested in info for board config yet
 
+;Most of the following isn't really needed anymore.
 simple_handler
 
 reset   B       setup
@@ -369,13 +370,13 @@ setup
 	;Op1{cond} coproc, #op1, Rt, CRn, CRm,  {#op2}
 ;	MRC        p15,    #0,    a2, c1,  c0,   #2  ;CACR
 ;	ORR    a1, a2, (2_11 << 22) ;cp11 access rights
-;    ORR    a1, a2, (2_11 << 20) ;cp10 access rights
-;    MCR        p15,    #0,    a1, c1,  c0,   #2
-;    DSB    SY
-;    ISB    SY
-;     PUSH   {lr} ;probably not needed.
-;     BL     gic_clear
-;     POP    {lr}
+;   ORR    a1, a2, (2_11 << 20) ;cp10 access rights
+;   MCR        p15,    #0,    a1, c1,  c0,   #2
+;   DSB    SY
+;   ISB    SY
+;   PUSH   {lr} ;probably not needed.
+;   BL     gic_clear
+;   POP    {lr}
 
 
 
@@ -695,7 +696,7 @@ bypass_rom_reloc
         B       rom_checkedout_ok
 
 get_end_of_ram
-	;hardcoded cheat for now to the beginning ov VRAM.
+	;hardcoded cheat for now to the beginning of VRAM.
 	LDR    a1, =RO_RAM_END
 	MOV    pc, lr
 
