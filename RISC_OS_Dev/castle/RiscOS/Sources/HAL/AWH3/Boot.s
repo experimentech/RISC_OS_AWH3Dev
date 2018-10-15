@@ -85,7 +85,9 @@
 ;        IMPORT OSentries
          ;from hdmi.s
         IMPORT  my_video_init
-        IMPORT  VideoDevice_Init
+
+;;removed. Opting for GraphicsV module.
+;        IMPORT  VideoDevice_Init
 
  [ Debug
          IMPORT DebugHALPrint
@@ -558,7 +560,8 @@ HAL_InitDevices
     DebugTX "Running PHY Init"
     BL    my_video_init
     DebugTX "Exited PHY Init"
-    BL    VideoDevice_Init
+    ;;Removed. Using GraphicsV
+;;    BL    VideoDevice_Init
     EXIT
 
 
