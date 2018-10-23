@@ -414,7 +414,7 @@ setup
 
     ;physical address of UART for Pre-MMU debugging.
     ;temporary silly code.
-    ;This just allows a single set of UART functions.
+    ;This just allows a single set of UART functions.svn u
     LDR	a1, =UART_0
 	STR	a1, DebugUART
 	STR	a1, HALUART_Log
@@ -754,7 +754,7 @@ Video_Twiddle
     BLE    %BT10
     Pull  "a1-a3, lr"
     MOV    pc, lr
-
+;Compare this with ram_detector.s!
 ;------------------------------------------------------------------------------
 ; RAM Detect (or at least try to)
 ;------------------------------------------------------------------------------
