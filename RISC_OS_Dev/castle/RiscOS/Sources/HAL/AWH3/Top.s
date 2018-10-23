@@ -414,6 +414,7 @@ setup
 
     ;physical address of UART for Pre-MMU debugging.
     ;temporary silly code.
+    ;This just allows a single set of UART functions.
     LDR	a1, =UART_0
 	STR	a1, DebugUART
 	STR	a1, HALUART_Log
@@ -433,7 +434,7 @@ setup
 	DebugTX "PreMMU UART configured"
 	ALIGN
  ;	Pull "lr"
-	;Haven't got the HAL UART FIFO code complete yet.
+
 ;    ADRL sb, workspace
 ;	LDR a1, =UART_0
 ;	STR a1, DebugUART
@@ -449,9 +450,10 @@ setup
     BL  cpu_scry
 ;    Push "lr"
     DebugTX "Returned from cpu_scry"
+    ;---This is the last code known executing from UART readout.---
     ALIGN
 ;    Pull "lr"
-    BL Video_Twiddle
+;    BL Video_Twiddle
  ]
  [ DebugTiming
 
@@ -735,7 +737,7 @@ clearram
 ;------------------------------------------------------------------------------
 ;Otherwise useless function for messing with the video hardware
 ;and framebuffer.
-
+;This is stomping on the ROM. DOn't execute it right now.
 Video_Twiddle
     Push "a1-a3, lr"
     LDR    a1, =&7Fe79000 ;this /should/ be the base of the framebuffer.
