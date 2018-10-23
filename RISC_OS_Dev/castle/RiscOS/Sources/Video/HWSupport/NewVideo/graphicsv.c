@@ -41,6 +41,7 @@
 
 #include "graphicsv.h"
 #include "consts.h"
+#include "misc.h"
 
 static int do_null(_kernel_swi_regs *r)
 {
@@ -131,7 +132,8 @@ static int do_iicop(_kernel_swi_regs *r)
 static int do_pixelformats(_kernel_swi_regs *r)
 {
 	/* TODO (required) */
-	return 1;
+	return (MODE_8BPP | MODE_16BPP | MODE_32BPP);
+	//return 1;
 }
 
 static int do_readinfo(_kernel_swi_regs *r)
