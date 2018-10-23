@@ -21,7 +21,8 @@
 
 ;Do I really have to do this?
      GET    Hdr:VideoDevice
-     GET    hdr.VideoiMx6
+;     GET    hdr.VideoiMx6
+;     GET    Hdr:OSEntries
 
 sb                      RN      9
                         ^       0, sb
@@ -76,7 +77,7 @@ OSheader                #       4
 HDMI_BaseAddr           #       4
 
 ;clipped from iMx6
-VideoDevice     #       Video_DeviceSize
+;VideoDevice     #       Video_DeviceSize
  [ VideoInHAL
 PointerPhys     #       4 ; Phys addr of pointer image
 PointerLog      #       4 ; Log addr of pointer image

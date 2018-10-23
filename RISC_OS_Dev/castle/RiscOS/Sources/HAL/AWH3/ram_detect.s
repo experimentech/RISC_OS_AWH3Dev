@@ -15,9 +15,9 @@
     GET     Hdr:ListOpts
     GET     Hdr:Macros
     GET     Hdr:System
-    GET     Hdr:OSEntries
+;    GET     Hdr:OSEntries
     GET     hdr.AllWinnerH3
-    GET     hdr.StaticWS
+;    GET     hdr.StaticWS
 
     EXPORT  ram_detector
  [ Debug

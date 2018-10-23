@@ -45,7 +45,7 @@
         GET     UART
         GET     Interrupts
         ;UART is just there for testing.
-  	    GET	    hdr.StaticWS
+  	GET     StaticWS
 
  [ Debug
         GET     Debug

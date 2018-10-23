@@ -6,7 +6,7 @@
         GET     Hdr:Machine.<Machine>
         GET     Hdr:ImageSize.<ImageSize>
 
-        GET     Hdr:OSEntries
+;        GET     Hdr:OSEntries
 
     GET hdr.Timers
     IMPORT HAL_CounterDelay
@@ -26,10 +26,10 @@
     IMPORT  DebugMemDump
     IMPORT  DebugHALPrintByte
     IMPORT  DebugCallstack
-    
+
  ]
 
-    
+
     AREA    |Asm$$Code|, CODE, READONLY, PIC
 
 my_video_init
@@ -195,8 +195,8 @@ phy_init
     MOV   pc, lr
 
     END
-    
-    
+
+
 
 
 
