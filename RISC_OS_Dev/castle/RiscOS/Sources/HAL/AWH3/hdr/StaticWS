@@ -26,7 +26,9 @@
 sb                      RN      9
                         ^       0, sb
 ;OSEntries breaks hdr2h.
-OSentries               #       4*(HighestOSEntry+1)
+;OSentries               #       4*(HighestOSEntry+1)
+OSentries               #       32
+  ASSERT ?OSentries = 4*(HighestOSEntry+1)
 
 IO_BaseAddr             #       4
 SRAM_A1_BaseAddr        #       4
