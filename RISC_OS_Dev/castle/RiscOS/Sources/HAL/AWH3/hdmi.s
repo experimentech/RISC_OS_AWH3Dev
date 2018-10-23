@@ -6,7 +6,7 @@
         GET     Hdr:Machine.<Machine>
         GET     Hdr:ImageSize.<ImageSize>
 
-;        GET     Hdr:OSEntries
+        GET     Hdr:OSEntries
 
     GET hdr.Timers
     IMPORT HAL_CounterDelay

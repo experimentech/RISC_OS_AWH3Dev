@@ -223,18 +223,18 @@ HALdescriptor   DATA
         DCD     HAL_Entries
         DCD     HAL_WsSize
 
-        MACRO
-        CallOS  $entry, $tailcall
-        ASSERT  $entry <= HighestOSEntry
- [ "$tailcall"=""
-        MOV     lr, pc
- |
-   [ "$tailcall"<>"tailcall"
-        ! 0, "Unrecognised parameter to CallOS"
-   ]
- ]
-        LDR     pc, OSentries + 4*$entry
-        MEND
+;        MACRO
+;        CallOS  $entry, $tailcall
+;        ASSERT  $entry <= HighestOSEntry
+; [ "$tailcall"=""
+;        MOV     lr, pc
+; |
+;   [ "$tailcall"<>"tailcall"
+;        ! 0, "Unrecognised parameter to CallOS"
+;   ]
+; ]
+;        LDR     pc, OSentries + 4*$entry
+;        MEND
 
 
         MACRO
