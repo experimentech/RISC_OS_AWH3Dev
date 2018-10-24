@@ -2,14 +2,14 @@
 # Limited ("Castle") and its licensors on contractual terms and conditions
 # ("Licence") which entitle you freely to modify and/or to distribute this
 # source code subject to Your compliance with the terms of the Licence.
-# 
+#
 # This source code has been made available to You without any warranties
 # whatsoever. Consequently, Your use, modification and distribution of this
 # source code is entirely at Your own risk and neither Castle, its licensors
 # nor any other person who has contributed to this source code shall be
 # liable to You for any loss or damage which You may suffer as a result of
 # Your use, modification or distribution of this source code.
-# 
+#
 # Full details of Your rights and obligations are set out in the Licence.
 # You should have received a copy of the Licence with this source code file.
 # If You have not received a copy, the text of the Licence is available
@@ -48,12 +48,15 @@ include CModule
 #CFLAGS +=  -ff -APCS 3/32bit/nofp/noswst
 CCFLAGS += -ff -APCS 3/32bit/nofp/noswst
 ASFLAGS += -APCS 3/nofp/noswst --cpu Cortex-A7
-ROM_LIBS = 
+ROM_LIBS =
+HDRS = hdr.StaticWS
+
 
 
 #${USBDIR}.o.MUSBDriver ${USBDIR}.o.EHCIHALLib ${USBDIR}.o.USBDriver
 
 resources:
+        gen_h
         @${ECHO} ${COMPONENT}: no resources
 
 rom: aof.${TARGET}
@@ -78,5 +81,17 @@ ${AIFDBG}: ${ROM_OBJS_} ${ROM_LIBS}
 
 ${GPADBG}: ${AIFDBG}
         ToGPA -s ${AIFDBG} ${GPADBG}
+
+#Custom stuff
+gen_h: ${HDRS}
+       @${ECHO} ${HDRS}: hdr2h complete
+
+h.StaticWS: hdr.StaticWS
+        ${MKDIR} h
+        ${HDR2H} hdr.StaticWS $@
+
+h.AllWinnerH3: hdr.AllWinnerH3
+        ${MKDIR} h
+        ${HDR2H} hdr.AllWinnerH3 $@
 
 # Dynamic dependencies:

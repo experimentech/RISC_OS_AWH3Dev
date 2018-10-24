@@ -20,7 +20,7 @@
         GBLL    __HAL_STATICWS_HDR__
 
 ;Do I really have to do this?
-     GET    Hdr:VideoDevice
+;     GET    Hdr:VideoDevice
 ;     GET    hdr.VideoiMx6
 ;     GET    Hdr:OSEntries
 
