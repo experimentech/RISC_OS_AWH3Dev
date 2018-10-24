@@ -26,3 +26,11 @@ TODO: EVERYTHING!
 *Allocate "Dead RAM" around VRAM
 *Do something with SRAM?
 *Crypto?
+
+C modules build with the -zM flags for some reason. Find why. Possibly CModule
+needs alteration for a HAL version.
+
+cc -zM -zps1 -c -depend !Depend -throwback   -ff -fah -o o.dummy c.dummy
+
+The hdr2h addition to the makefile appears to be working, although it's
+not done too well.

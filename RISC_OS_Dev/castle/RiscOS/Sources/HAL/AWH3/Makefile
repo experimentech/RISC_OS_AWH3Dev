@@ -22,7 +22,7 @@ VideoInHAL ?= FALSE
 
 COMPONENT = AWH3 HAL
 TARGET = AWH3
-OBJS = Top Boot Debug KbdScan UART Interrupts RAM Timers CLib CLibAsm Misc CMOS Watchdog USB hdmi ram_detect #VideoiMx6 #Video #PIO_c
+OBJS = Top Boot Debug KbdScan UART Interrupts RAM Timers CLib CLibAsm Misc CMOS Watchdog USB hdmi ram_detect dummy #VideoiMx6 #Video #PIO_c
 # PRCM Video I2C RTC SDMA TPS Audio GPIO GPMC NIC NVMemory CPUClk SR37x SDIO KbdMatrix PAudio BMU gic-disable
 USBDIR = <Lib$Dir>.USB
 
