@@ -66,7 +66,7 @@ castle/RiscOS/Sources/FileSys/SCSIFS/SCSIFS                 HEAD
 cddl/RiscOS/Sources/FileSys/SDFS/SDFS                       HEAD
 #
 # Sources/HAL
-castle/RiscOS/Sources/HAL/AWH3                             HEAD
+mixed/RiscOS/Sources/HAL/AWH3                             HEAD
 #
 # Sources/HWSupport
 ##bsd/RiscOS/Sources/HWSupport/BatMgrHAL                      HEAD
