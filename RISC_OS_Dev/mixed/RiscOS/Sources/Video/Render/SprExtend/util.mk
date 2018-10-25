@@ -26,8 +26,8 @@ include CApp
 
 # Dynamic dependencies:
 o.genyuvtabs:	c.genyuvtabs
+o.genpalette:	c.genpalette
 o.genjhdr:	c.genjhdr
 o.genjhdr:	h.jpeglib
 o.genjhdr:	h.jconfig
 o.genjhdr:	h.jmorecfg
-o.genpalette:	c.genpalette

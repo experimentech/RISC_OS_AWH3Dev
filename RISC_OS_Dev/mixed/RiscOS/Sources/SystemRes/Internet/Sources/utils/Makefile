@@ -97,16 +97,3 @@ utl.ReadCMOSIP: o.ReadCMOSIP
 
 #---------------------------------------------------------------------------
 # Dynamic dependencies:
-o.CheckMem: s.CheckMem
-o.CheckMem: Hdr:ListOpts
-o.CheckMem: Hdr:Macros
-o.CheckMem: Hdr:System
-o.CheckMem: Hdr:SWIs
-o.CheckMem: Hdr:CPU.Arch
-o.CheckMem: Hdr:Machine.<Machine>
-o.CheckMem: Hdr:Machine.Machine
-o.CheckMem: Hdr:CPU.Generic26
-o.CheckMem: Hdr:CPU.Generic32
-o.CheckMem: Hdr:IO.GenericIO
-o.CheckMem: Hdr:RISCOS
-o.CheckMem: Hdr:Proc

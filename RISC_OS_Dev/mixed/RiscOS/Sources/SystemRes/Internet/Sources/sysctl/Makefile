@@ -46,31 +46,3 @@ PathConf:	PathConf.o
 		Link -o $@ PathConf.o ${LIBS}
 	
 # Dynamic dependencies:
-o.SysCtl:	c.SysCtl
-o.SysCtl:	TCPIPLibs:sys.h.types
-o.SysCtl:	TCPIPLibs:sys.h.cdefs
-o.SysCtl:	TCPIPLibs:machine.h.endian
-o.SysCtl:	TCPIPLibs:machine.h.ansi
-o.SysCtl:	TCPIPLibs:machine.h.types
-o.SysCtl:	TCPIPLibs:sys.h.stat
-o.SysCtl:	TCPIPLibs:sys.h.time
-o.SysCtl:	TCPIPLibs:sys.h.cdefs
-o.SysCtl:	TCPIPLibs:sys.h.cdefs
-o.SysCtl:	TCPIPLibs:sys.h.sysctl
-o.SysCtl:	TCPIPLibs:sys.h._posix
-o.SysCtl:	TCPIPLibs:sys.h.cdefs
-o.SysCtl:	TCPIPLibs:sys.h.resource
-o.SysCtl:	TCPIPLibs:sys.h.types
-o.SysCtl:	TCPIPLibs:sys.h.cdefs
-o.SysCtl:	TCPIPLibs:h.err
-o.SysCtl:	TCPIPLibs:machine.h.ansi
-o.SysCtl:	TCPIPLibs:sys.h.cdefs
-o.SysCtl:	TCPIPLibs:h.unistd
-o.SysCtl:	TCPIPLibs:sys.h.cdefs
-o.SysCtl:	TCPIPLibs:sys.h.types
-o.SysCtl:	TCPIPLibs:sys.h.unistd
-o.SysCtl:	TCPIPLibs:sys.h._posix
-o.SysCtl:	TCPIPLibs:sys.h.errno
-o.SysCtl:	C:h.kernel
-o.SysCtl:	TCPIPLibs:h.unixlib
-o.SysCtl:	TCPIPLibs:h.riscos

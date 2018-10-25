@@ -42,6 +42,3 @@ clean:;		${RM} ${TARGET}
 		IfThere o.* Then ${WIPE} o.* ${WFLAGS}
 	
 # Dynamic dependencies:
-o.NewFiler:	c.NewFiler
-o.NewFiler:	C:h.kernel
-o.NewFiler:	C:h.swis
