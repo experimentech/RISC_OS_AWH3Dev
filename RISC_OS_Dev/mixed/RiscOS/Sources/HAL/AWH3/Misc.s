@@ -1,21 +1,29 @@
-; This source code in this file is licensed to You by Castle Technology
-; Limited ("Castle") and its licensors on contractual terms and conditions
-; ("Licence") which entitle you freely to modify and/or to distribute this
-; source code subject to Your compliance with the terms of the Licence.
+;Copyright (c) 2017, Tristan Mumford
+;All rights reserved.
 ;
-; This source code has been made available to You without any warranties
-; whatsoever. Consequently, Your use, modification and distribution of this
-; source code is entirely at Your own risk and neither Castle, its licensors
-; nor any other person who has contributed to this source code shall be
-; liable to You for any loss or damage which You may suffer as a result of
-; Your use, modification or distribution of this source code.
+;Redistribution and use in source and binary forms, with or without
+;modification, are permitted provided that the following conditions are met:
 ;
-; Full details of Your rights and obligations are set out in the Licence.
-; You should have received a copy of the Licence with this source code file.
-; If You have not received a copy, the text of the Licence is available
-; online at www.castle-technology.co.uk/riscosbaselicence.htm
+;1. Redistributions of source code must retain the above copyright notice, this
+;   list of conditions and the following disclaimer.
+;2. Redistributions in binary form must reproduce the above copyright notice,
+;   this list of conditions and the following disclaimer in the documentation
+;   and/or other materials provided with the distribution.
 ;
-
+;THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+;ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+;DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+;ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+;(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+;ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+;(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+;SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;The views and conclusions contained in the software and documentation are those
+;of the authors and should not be interpreted as representing official policies,
+;either expressed or implied, of the RISC OS project.
 
         GET     Hdr:ListOpts
         GET     Hdr:Macros
@@ -100,32 +108,5 @@ HAL_Reset
     ;B   .
 
 ;----------------------------------------------------------------------
-;Changes DWC reg offsets to mangled SunXi reg offsets.
-
-DWCToSunXi
-    Push  "a2"
-    RBIT   a2, a1
-    ORR    a2, a2, a1
-    LDR    a1, =&55555555
-    AND    a2, a2, a1
-
-    ORR    a2, a2, LSR#1
-    LDR    a1, =&33333333
-    AND    a2, a2, a1
-
-    ORR    a2, a2, LSR#2
-    LDR    a1, =&0f0f0f0f
-    AND    a2, a2, a1
-
-    ORR    a2, a2, LSR#4
-    LDR    a1, =&00FF00FF
-    AND    a2, a2, a1
-
-    ORR    a2, a2, LSR#8
-    LDR    a1, =&0000FFFF
-    AND    a2, a2, a1
-    MOV    a1, a2
-    Pull  "a2"
-    MOV    pc, lr
 
 	END
